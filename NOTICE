@@ -1,0 +1,9 @@
+Hungry Ghost Audio suite
+Copyright (C) 2026 Hungry Ghost Studios
+
+Hungry Ghost source code, original rendered interface assets and storefront: AGPL-3.0-or-later.
+JUCE framework 9.0.2: AGPLv3 option; copyright Raw Material Software Limited.
+Dependency sources and their original notices are retained by the pinned JUCE checkout.
+VST is a trademark of Steinberg Media Technologies GmbH.
+
+This program is distributed without any warranty; see LICENSE.

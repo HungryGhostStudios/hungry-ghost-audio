@@ -1,0 +1,31 @@
+const $ = s => document.querySelector(s);
+let products=[], family='All', config={ready:false,products:{}};
+const money = value => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(value);
+const safe = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const notice = message => {$('#notice').textContent=message;$('#notice').hidden=false;setTimeout(()=>$('#notice').hidden=true,9000);};
+function render(){
+ const term=$('#search').value.toLowerCase().trim();
+ const shown=products.filter(p=>(family==='All'||p.family===family)&&`${p.name} ${p.family} ${p.description}`.toLowerCase().includes(term));
+ $('#result-count').textContent=`${shown.length} ${shown.length===1?'tool':'tools'}${family==='All'?'':` in ${family.toLowerCase()}`}`;
+ $('#empty').hidden=shown.length!==0;
+ $('#product-grid').innerHTML=shown.map(p=>`<article class="product-card"><div class="card-top"><span>${String(products.indexOf(p)+1).padStart(2,'0')} / ${safe(p.family.toUpperCase())}</span><span>VST3</span></div><h3>${safe(p.name)}</h3><p>${safe(p.description)}</p><div class="card-bottom"><span>${money(p.price)}</span><span class="build-state">${config.products[p.id]?.ready?'EXPLORE ↗':p.status==='validated'?'VALIDATED BUILD ↗':'IN DEVELOPMENT ↗'}</span></div><button aria-label="Explore ${safe(p.name)}" data-product="${safe(p.id)}">Explore ${safe(p.name)}</button></article>`).join('');
+}
+async function checkout(id, button){
+ const old=button.textContent;button.disabled=true;button.textContent='Opening secure checkout…';
+ try{const response=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product:id})});const result=await response.json();if(!response.ok)throw Error(result.error||'Checkout is temporarily unavailable.');if(new URL(result.url).hostname!=='polar.sh')throw Error('Invalid checkout destination.');window.location.assign(result.url);}catch(error){notice(error.message);button.disabled=false;button.textContent=old;}
+}
+function openProduct(id){
+ const p=products.find(p=>p.id===id);if(!p)return;const release=config.products[p.id];
+ const controls=p.controls.length?p.controls.map(c=>c.name):p.id==='feral'?['Eight EQ bands','Per-band dynamics','Mid / side','External key','Bus compressor','A / B']:['Room / Chamber / Hall / Plate / Cloud','Decay','Damping','Motion','Duck','Freeze'];
+ $('#dialog-content').innerHTML=`<p class="eyebrow">${safe(p.family.toUpperCase())} / HUNGRY GHOST AUDIO</p><h2 class="dialog-title" id="dialog-title">${safe(p.name)}</h2><p class="dialog-description">${safe(p.description)}</p>${p.image?`<img class="dialog-image" src="${safe(p.image)}" alt="Actual ${safe(p.name)} plugin interface">`:''}<div class="control-list">${controls.map(c=>`<span>${safe(c)}</span>`).join('')}</div><p class="small-note">Windows x64 · VST3 · Version ${safe(p.version)} · AGPLv3 source</p><div class="dialog-bottom"><div><strong>${money(p.price)}</strong><p>Perpetual purchase · Two devices<br>Taxes calculated at checkout.</p></div><button class="button solid" id="dialog-buy" ${release?.ready?'':'disabled'}>${release?.ready?'Buy '+safe(p.name)+' ↗':'Release being prepared'}</button></div>${release?.download?`<p class="small-note"><a class="text-link" href="${safe(release.download)}">Download ${safe(p.name)} ↗</a></p>`:`<p class="small-note">${p.status==='validated'?'The native build has passed our current test suite. Store licensing and delivery are being prepared.':'This processor is in development. Purchasing will open after its build and release are validated.'}</p>`}`;
+ if(release?.ready)$('#dialog-buy').addEventListener('click',e=>checkout(p.id,e.currentTarget));
+ $('#product-dialog').showModal();
+}
+document.querySelectorAll('[data-family]').forEach(b=>b.addEventListener('click',()=>{family=b.dataset.family;document.querySelectorAll('[data-family]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));render();}));
+$('#search').addEventListener('input',render);
+$('#product-grid').addEventListener('click',e=>{const b=e.target.closest('[data-product]');if(b)openProduct(b.dataset.product);});
+document.querySelectorAll('[data-open]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openProduct(a.dataset.open);}));
+$('.dialog-close').addEventListener('click',()=>$('#product-dialog').close());
+$('#product-dialog').addEventListener('click',e=>{if(e.target===$('#product-dialog')){const b=e.target.getBoundingClientRect();if(e.clientX<b.left||e.clientX>b.right||e.clientY<b.top||e.clientY>b.bottom)e.target.close();}});
+$('#buy-suite').addEventListener('click',e=>checkout('suite',e.currentTarget));
+try{const responses=await Promise.all([fetch('/catalogue.json'),fetch('/api/config')]);if(!responses[0].ok)throw Error('The collection could not be loaded.');products=await responses[0].json();if(responses[1].ok)config=await responses[1].json();render();if(config.ready){$('#buy-suite').disabled=false;$('#buy-suite').textContent='Get the complete suite ↗';$('#suite-status').textContent='Secure checkout by Polar. Licence key delivered with your purchase.';}if(config.source)$('#source-link').href=config.source;if(config.support){$('#support-copy').textContent=`Contact ${config.support} for support. Download releases from our GitHub repository; purchase receipts and licence keys are in Polar’s customer portal.`;}}catch(error){$('#result-count').textContent='Unable to load the collection.';notice(error.message);}

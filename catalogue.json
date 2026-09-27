@@ -1,0 +1,2026 @@
+[
+  {
+    "id": "reverb",
+    "name": "REVERB",
+    "family": "Space",
+    "engine": "OriginalReverb",
+    "description": "Sixteen delay lines. One enormous sense of space.",
+    "price": 25,
+    "controls": [],
+    "status": "validated",
+    "version": "0.2.0",
+    "image": "/assets/reverb.png"
+  },
+  {
+    "id": "feral",
+    "name": "FERAL",
+    "family": "Dynamics",
+    "engine": "OriginalFeral",
+    "description": "Eight bands of dynamic EQ with a stereo bus compressor.",
+    "price": 99,
+    "controls": [],
+    "status": "validated",
+    "version": "0.1.1",
+    "image": "/assets/feral.png"
+  },
+  {
+    "id": "rift",
+    "name": "RIFT",
+    "family": "Dynamics",
+    "engine": "Compressor",
+    "description": "A clean feed-forward compressor for precise level control.",
+    "price": 39,
+    "controls": [
+      {
+        "name": "Threshold",
+        "minimum": -60,
+        "maximum": 0,
+        "default": -18,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Ratio",
+        "minimum": 1,
+        "maximum": 20,
+        "default": 4,
+        "unit": ":1",
+        "skew": 1
+      },
+      {
+        "name": "Attack",
+        "minimum": 0.1,
+        "maximum": 100,
+        "default": 10,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Release",
+        "minimum": 10,
+        "maximum": 1000,
+        "default": 120,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Knee",
+        "minimum": 0,
+        "maximum": 24,
+        "default": 6,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Makeup",
+        "minimum": -12,
+        "maximum": 24,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "claw",
+    "name": "CLAW",
+    "family": "Dynamics",
+    "engine": "FastCompressor",
+    "description": "Fast peak compression for drums and sharp attacks.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Threshold",
+        "minimum": -60,
+        "maximum": 0,
+        "default": -12,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Ratio",
+        "minimum": 1,
+        "maximum": 20,
+        "default": 4,
+        "unit": ":1",
+        "skew": 1
+      },
+      {
+        "name": "Attack",
+        "minimum": 0.1,
+        "maximum": 20,
+        "default": 0.5,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Release",
+        "minimum": 10,
+        "maximum": 1000,
+        "default": 120,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Knee",
+        "minimum": 0,
+        "maximum": 24,
+        "default": 6,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Makeup",
+        "minimum": -12,
+        "maximum": 24,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "velvet",
+    "name": "VELVET",
+    "family": "Dynamics",
+    "engine": "RmsCompressor",
+    "description": "Slower RMS detection for smooth vocal and instrument levelling.",
+    "price": 39,
+    "controls": [
+      {
+        "name": "Threshold",
+        "minimum": -60,
+        "maximum": 0,
+        "default": -18,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Ratio",
+        "minimum": 1,
+        "maximum": 20,
+        "default": 4,
+        "unit": ":1",
+        "skew": 1
+      },
+      {
+        "name": "Attack",
+        "minimum": 0.1,
+        "maximum": 100,
+        "default": 10,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Release",
+        "minimum": 10,
+        "maximum": 1000,
+        "default": 120,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Knee",
+        "minimum": 0,
+        "maximum": 24,
+        "default": 6,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Makeup",
+        "minimum": -12,
+        "maximum": 24,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "bond",
+    "name": "BOND",
+    "family": "Dynamics",
+    "engine": "BusCompressor",
+    "description": "A stereo-linked compressor with a filtered detector.",
+    "price": 39,
+    "controls": [
+      {
+        "name": "Threshold",
+        "minimum": -60,
+        "maximum": 0,
+        "default": -18,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Ratio",
+        "minimum": 1,
+        "maximum": 10,
+        "default": 2,
+        "unit": ":1",
+        "skew": 1
+      },
+      {
+        "name": "Attack",
+        "minimum": 0.1,
+        "maximum": 100,
+        "default": 10,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Release",
+        "minimum": 10,
+        "maximum": 1000,
+        "default": 120,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Key high-pass",
+        "minimum": 20,
+        "maximum": 500,
+        "default": 100,
+        "unit": "Hz",
+        "skew": 0.4
+      },
+      {
+        "name": "Makeup",
+        "minimum": -12,
+        "maximum": 24,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "crush",
+    "name": "CRUSH",
+    "family": "Dynamics",
+    "engine": "ParallelCompressor",
+    "description": "Blend intense compression with the original signal.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Threshold",
+        "minimum": -60,
+        "maximum": 0,
+        "default": -30,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Ratio",
+        "minimum": 1,
+        "maximum": 20,
+        "default": 12,
+        "unit": ":1",
+        "skew": 1
+      },
+      {
+        "name": "Attack",
+        "minimum": 0.1,
+        "maximum": 100,
+        "default": 10,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Release",
+        "minimum": 10,
+        "maximum": 1000,
+        "default": 120,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Knee",
+        "minimum": 0,
+        "maximum": 24,
+        "default": 6,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Makeup",
+        "minimum": -12,
+        "maximum": 24,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "hush",
+    "name": "HUSH",
+    "family": "Dynamics",
+    "engine": "DeEsser",
+    "description": "Band-sensitive gain reduction for sibilance.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Threshold",
+        "minimum": -60,
+        "maximum": 0,
+        "default": -18,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Frequency",
+        "minimum": 20,
+        "maximum": 20000,
+        "default": 6500,
+        "unit": "Hz",
+        "skew": 0.23
+      },
+      {
+        "name": "Bandwidth",
+        "minimum": 0.3,
+        "maximum": 5,
+        "default": 1.5,
+        "unit": "Q",
+        "skew": 1
+      },
+      {
+        "name": "Release",
+        "minimum": 10,
+        "maximum": 1000,
+        "default": 120,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Range",
+        "minimum": 0,
+        "maximum": 24,
+        "default": 6,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Attack",
+        "minimum": 0.1,
+        "maximum": 100,
+        "default": 10,
+        "unit": "ms",
+        "skew": 0.4
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "gate",
+    "name": "GATE",
+    "family": "Dynamics",
+    "engine": "Gate",
+    "description": "A downward gate with hysteresis and a controllable floor.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Threshold",
+        "minimum": -80,
+        "maximum": 0,
+        "default": -40,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Floor",
+        "minimum": -90,
+        "maximum": 0,
+        "default": -70,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Attack",
+        "minimum": 0.1,
+        "maximum": 100,
+        "default": 10,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Release",
+        "minimum": 10,
+        "maximum": 1000,
+        "default": 120,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Hysteresis",
+        "minimum": 0,
+        "maximum": 12,
+        "default": 3,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Hold",
+        "minimum": 0,
+        "maximum": 500,
+        "default": 40,
+        "unit": "ms",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "bloom",
+    "name": "BLOOM",
+    "family": "Dynamics",
+    "engine": "Expander",
+    "description": "Restore separation with gentle downward expansion.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Threshold",
+        "minimum": -80,
+        "maximum": 0,
+        "default": -35,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Ratio",
+        "minimum": 1,
+        "maximum": 8,
+        "default": 2,
+        "unit": ":1",
+        "skew": 1
+      },
+      {
+        "name": "Attack",
+        "minimum": 0.1,
+        "maximum": 100,
+        "default": 10,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Release",
+        "minimum": 10,
+        "maximum": 1000,
+        "default": 120,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Range",
+        "minimum": 0,
+        "maximum": 60,
+        "default": 30,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Makeup",
+        "minimum": -12,
+        "maximum": 24,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "punch",
+    "name": "PUNCH",
+    "family": "Dynamics",
+    "engine": "Transient",
+    "description": "Shape the attack and body of drums without a threshold.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Attack",
+        "minimum": -100,
+        "maximum": 100,
+        "default": 30,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Sustain",
+        "minimum": -100,
+        "maximum": 100,
+        "default": -10,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Speed",
+        "minimum": 1,
+        "maximum": 30,
+        "default": 8,
+        "unit": "ms",
+        "skew": 1
+      },
+      {
+        "name": "Body",
+        "minimum": 30,
+        "maximum": 500,
+        "default": 150,
+        "unit": "ms",
+        "skew": 1
+      },
+      {
+        "name": "Sensitivity",
+        "minimum": 0.2,
+        "maximum": 5,
+        "default": 1,
+        "unit": "",
+        "skew": 1
+      },
+      {
+        "name": "Makeup",
+        "minimum": -12,
+        "maximum": 24,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "tail",
+    "name": "TAIL",
+    "family": "Dynamics",
+    "engine": "Sustain",
+    "description": "Extend or tighten note sustain with a slow envelope.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Sustain",
+        "minimum": -100,
+        "maximum": 100,
+        "default": 30,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Attack protect",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 70,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Speed",
+        "minimum": 1,
+        "maximum": 30,
+        "default": 8,
+        "unit": "ms",
+        "skew": 1
+      },
+      {
+        "name": "Body",
+        "minimum": 30,
+        "maximum": 1000,
+        "default": 300,
+        "unit": "ms",
+        "skew": 1
+      },
+      {
+        "name": "Sensitivity",
+        "minimum": 0.2,
+        "maximum": 5,
+        "default": 1,
+        "unit": "",
+        "skew": 1
+      },
+      {
+        "name": "Makeup",
+        "minimum": -12,
+        "maximum": 24,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "guard",
+    "name": "GUARD",
+    "family": "Dynamics",
+    "engine": "Limiter",
+    "description": "A linked sample-peak limiter with a hard safety ceiling.",
+    "price": 39,
+    "controls": [
+      {
+        "name": "Ceiling",
+        "minimum": -12,
+        "maximum": 0,
+        "default": -1,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Input",
+        "minimum": 0,
+        "maximum": 24,
+        "default": 3,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Release",
+        "minimum": 10,
+        "maximum": 1000,
+        "default": 120,
+        "unit": "ms",
+        "skew": 0.4
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "edge",
+    "name": "EDGE",
+    "family": "Dynamics",
+    "engine": "Clipper",
+    "description": "Set a peak ceiling with adjustable soft clipping.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Ceiling",
+        "minimum": -18,
+        "maximum": 0,
+        "default": -1,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Input",
+        "minimum": 0,
+        "maximum": 24,
+        "default": 3,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Softness",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 25,
+        "unit": "%",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "ride",
+    "name": "RIDE",
+    "family": "Dynamics",
+    "engine": "Leveller",
+    "description": "A slow automatic level rider with bounded gain.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Target",
+        "minimum": -36,
+        "maximum": -6,
+        "default": -18,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Range",
+        "minimum": 0,
+        "maximum": 24,
+        "default": 6,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Attack",
+        "minimum": 50,
+        "maximum": 2000,
+        "default": 300,
+        "unit": "ms",
+        "skew": 1
+      },
+      {
+        "name": "Release",
+        "minimum": 100,
+        "maximum": 5000,
+        "default": 1000,
+        "unit": "ms",
+        "skew": 1
+      },
+      {
+        "name": "Noise floor",
+        "minimum": -80,
+        "maximum": -20,
+        "default": -50,
+        "unit": "dB",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "duck",
+    "name": "DUCK",
+    "family": "Dynamics",
+    "engine": "Ducker",
+    "description": "Use an external key to make room for another track.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Threshold",
+        "minimum": -60,
+        "maximum": 0,
+        "default": -18,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Ratio",
+        "minimum": 1,
+        "maximum": 20,
+        "default": 4,
+        "unit": ":1",
+        "skew": 1
+      },
+      {
+        "name": "Attack",
+        "minimum": 0.1,
+        "maximum": 100,
+        "default": 10,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Release",
+        "minimum": 10,
+        "maximum": 1000,
+        "default": 120,
+        "unit": "ms",
+        "skew": 0.4
+      },
+      {
+        "name": "Range",
+        "minimum": 0,
+        "maximum": 36,
+        "default": 12,
+        "unit": "dB",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "shade",
+    "name": "SHADE",
+    "family": "Tone",
+    "engine": "ParametricEQ",
+    "description": "Three fixed-width bell bands for broad tonal shaping.",
+    "price": 39,
+    "controls": [
+      {
+        "name": "Frequency",
+        "minimum": 20,
+        "maximum": 20000,
+        "default": 120,
+        "unit": "Hz",
+        "skew": 0.23
+      },
+      {
+        "name": "Low gain",
+        "minimum": -18,
+        "maximum": 18,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Frequency",
+        "minimum": 20,
+        "maximum": 20000,
+        "default": 1200,
+        "unit": "Hz",
+        "skew": 0.23
+      },
+      {
+        "name": "Mid gain",
+        "minimum": -18,
+        "maximum": 18,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Frequency",
+        "minimum": 20,
+        "maximum": 20000,
+        "default": 8000,
+        "unit": "Hz",
+        "skew": 0.23
+      },
+      {
+        "name": "High gain",
+        "minimum": -18,
+        "maximum": 18,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "tilt",
+    "name": "TILT",
+    "family": "Tone",
+    "engine": "TiltEQ",
+    "description": "Move warmth and brightness around a single pivot.",
+    "price": 15,
+    "controls": [
+      {
+        "name": "Frequency",
+        "minimum": 20,
+        "maximum": 20000,
+        "default": 1000,
+        "unit": "Hz",
+        "skew": 0.23
+      },
+      {
+        "name": "Tilt",
+        "minimum": -18,
+        "maximum": 18,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "weight",
+    "name": "WEIGHT",
+    "family": "Tone",
+    "engine": "LowShelf",
+    "description": "A low shelf with an adjustable corner and resonance.",
+    "price": 15,
+    "controls": [
+      {
+        "name": "Frequency",
+        "minimum": 20,
+        "maximum": 20000,
+        "default": 100,
+        "unit": "Hz",
+        "skew": 0.23
+      },
+      {
+        "name": "Weight",
+        "minimum": -18,
+        "maximum": 18,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Resonance",
+        "minimum": 0.1,
+        "maximum": 12,
+        "default": 0.707,
+        "unit": "Q",
+        "skew": 0.4
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "air",
+    "name": "AIR",
+    "family": "Tone",
+    "engine": "HighShelf",
+    "description": "A high shelf for presence, sparkle and darker tops.",
+    "price": 15,
+    "controls": [
+      {
+        "name": "Frequency",
+        "minimum": 20,
+        "maximum": 20000,
+        "default": 8000,
+        "unit": "Hz",
+        "skew": 0.23
+      },
+      {
+        "name": "Air",
+        "minimum": -18,
+        "maximum": 18,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Resonance",
+        "minimum": 0.1,
+        "maximum": 12,
+        "default": 0.707,
+        "unit": "Q",
+        "skew": 0.4
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "void",
+    "name": "VOID",
+    "family": "Tone",
+    "engine": "Notch",
+    "description": "A focused rejection filter for problem frequencies.",
+    "price": 15,
+    "controls": [
+      {
+        "name": "Frequency",
+        "minimum": 20,
+        "maximum": 20000,
+        "default": 1000,
+        "unit": "Hz",
+        "skew": 0.23
+      },
+      {
+        "name": "Resonance",
+        "minimum": 0.1,
+        "maximum": 12,
+        "default": 0.707,
+        "unit": "Q",
+        "skew": 0.4
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "cross",
+    "name": "CROSS",
+    "family": "Tone",
+    "engine": "BandPass",
+    "description": "Band-pass filtering with controllable width.",
+    "price": 15,
+    "controls": [
+      {
+        "name": "Frequency",
+        "minimum": 20,
+        "maximum": 20000,
+        "default": 1000,
+        "unit": "Hz",
+        "skew": 0.23
+      },
+      {
+        "name": "Resonance",
+        "minimum": 0.1,
+        "maximum": 12,
+        "default": 0.707,
+        "unit": "Q",
+        "skew": 0.4
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "contour",
+    "name": "CONTOUR",
+    "family": "Tone",
+    "engine": "Cuts",
+    "description": "High-pass and low-pass filtering for focused bandwidth.",
+    "price": 15,
+    "controls": [
+      {
+        "name": "Low cut",
+        "minimum": 20,
+        "maximum": 2000,
+        "default": 80,
+        "unit": "Hz",
+        "skew": 0.3
+      },
+      {
+        "name": "High cut",
+        "minimum": 500,
+        "maximum": 20000,
+        "default": 16000,
+        "unit": "Hz",
+        "skew": 0.4
+      },
+      {
+        "name": "Resonance",
+        "minimum": 0.1,
+        "maximum": 12,
+        "default": 0.707,
+        "unit": "Q",
+        "skew": 0.4
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "focus",
+    "name": "FOCUS",
+    "family": "Tone",
+    "engine": "MidSideEQ",
+    "description": "A bell EQ that independently shapes mid and side channels.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Frequency",
+        "minimum": 20,
+        "maximum": 20000,
+        "default": 1000,
+        "unit": "Hz",
+        "skew": 0.23
+      },
+      {
+        "name": "Mid gain",
+        "minimum": -18,
+        "maximum": 18,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Side gain",
+        "minimum": -18,
+        "maximum": 18,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Resonance",
+        "minimum": 0.1,
+        "maximum": 12,
+        "default": 0.707,
+        "unit": "Q",
+        "skew": 0.4
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "ember",
+    "name": "EMBER",
+    "family": "Colour",
+    "engine": "SoftSaturation",
+    "description": "Smooth symmetric saturation with tone filtering.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Drive",
+        "minimum": 0,
+        "maximum": 36,
+        "default": 9,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Tone",
+        "minimum": 200,
+        "maximum": 20000,
+        "default": 12000,
+        "unit": "Hz",
+        "skew": 0.3
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "iron",
+    "name": "IRON",
+    "family": "Colour",
+    "engine": "AsymmetricSaturation",
+    "description": "Biased saturation with controllable even harmonics.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Drive",
+        "minimum": 0,
+        "maximum": 36,
+        "default": 9,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Bias",
+        "minimum": -0.5,
+        "maximum": 0.5,
+        "default": 0.12,
+        "unit": "",
+        "skew": 1
+      },
+      {
+        "name": "Tone",
+        "minimum": 200,
+        "maximum": 20000,
+        "default": 12000,
+        "unit": "Hz",
+        "skew": 0.3
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "furnace",
+    "name": "FURNACE",
+    "family": "Colour",
+    "engine": "TubeSaturation",
+    "description": "Two soft nonlinear stages for dense harmonic colour.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Drive",
+        "minimum": 0,
+        "maximum": 36,
+        "default": 9,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Character",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 35,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Tone",
+        "minimum": 200,
+        "maximum": 20000,
+        "default": 12000,
+        "unit": "Hz",
+        "skew": 0.3
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "fold",
+    "name": "FOLD",
+    "family": "Colour",
+    "engine": "Wavefolder",
+    "description": "Fold peaks back into the waveform for complex harmonics.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Drive",
+        "minimum": 0,
+        "maximum": 36,
+        "default": 9,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Symmetry",
+        "minimum": -0.5,
+        "maximum": 0.5,
+        "default": 0,
+        "unit": "",
+        "skew": 1
+      },
+      {
+        "name": "Tone",
+        "minimum": 200,
+        "maximum": 20000,
+        "default": 12000,
+        "unit": "Hz",
+        "skew": 0.3
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "rect",
+    "name": "RECT",
+    "family": "Colour",
+    "engine": "Rectifier",
+    "description": "Blend full-wave rectification into the original waveform.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Amount",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 50,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Bias",
+        "minimum": 0,
+        "maximum": 0.5,
+        "default": 0.05,
+        "unit": "",
+        "skew": 1
+      },
+      {
+        "name": "Tone",
+        "minimum": 200,
+        "maximum": 20000,
+        "default": 12000,
+        "unit": "Hz",
+        "skew": 0.3
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "shards",
+    "name": "SHARDS",
+    "family": "Colour",
+    "engine": "BitCrusher",
+    "description": "Reduce amplitude resolution with optional dither.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Bits",
+        "minimum": 2,
+        "maximum": 24,
+        "default": 8,
+        "unit": "bit",
+        "skew": 1
+      },
+      {
+        "name": "Dither",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Tone",
+        "minimum": 200,
+        "maximum": 20000,
+        "default": 12000,
+        "unit": "Hz",
+        "skew": 0.3
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "static",
+    "name": "STATIC",
+    "family": "Colour",
+    "engine": "RateReducer",
+    "description": "Sample-and-hold reduction with a smoothing filter.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Rate",
+        "minimum": 500,
+        "maximum": 48000,
+        "default": 8000,
+        "unit": "Hz",
+        "skew": 0.4
+      },
+      {
+        "name": "Smooth",
+        "minimum": 200,
+        "maximum": 20000,
+        "default": 12000,
+        "unit": "Hz",
+        "skew": 0.3
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "echo",
+    "name": "ECHO",
+    "family": "Space",
+    "engine": "Delay",
+    "description": "A clean stereo delay with filtered feedback.",
+    "price": 35,
+    "controls": [
+      {
+        "name": "Time",
+        "minimum": 1,
+        "maximum": 2000,
+        "default": 375,
+        "unit": "ms",
+        "skew": 0.35
+      },
+      {
+        "name": "Feedback",
+        "minimum": -95,
+        "maximum": 95,
+        "default": 30,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Tone",
+        "minimum": 200,
+        "maximum": 20000,
+        "default": 6000,
+        "unit": "Hz",
+        "skew": 0.3
+      },
+      {
+        "name": "Motion",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0,
+        "unit": "%",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "reel",
+    "name": "REEL",
+    "family": "Space",
+    "engine": "TapeDelay",
+    "description": "A darkened delay with drifting tape-style repeats.",
+    "price": 35,
+    "controls": [
+      {
+        "name": "Time",
+        "minimum": 1,
+        "maximum": 2000,
+        "default": 400,
+        "unit": "ms",
+        "skew": 0.35
+      },
+      {
+        "name": "Feedback",
+        "minimum": -95,
+        "maximum": 95,
+        "default": 40,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Tone",
+        "minimum": 200,
+        "maximum": 20000,
+        "default": 6000,
+        "unit": "Hz",
+        "skew": 0.3
+      },
+      {
+        "name": "Motion",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 20,
+        "unit": "%",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "ping",
+    "name": "PING",
+    "family": "Space",
+    "engine": "PingPong",
+    "description": "Repeats that cross from one channel to the other.",
+    "price": 35,
+    "controls": [
+      {
+        "name": "Time",
+        "minimum": 1,
+        "maximum": 2000,
+        "default": 300,
+        "unit": "ms",
+        "skew": 0.35
+      },
+      {
+        "name": "Feedback",
+        "minimum": -95,
+        "maximum": 95,
+        "default": 40,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Tone",
+        "minimum": 200,
+        "maximum": 20000,
+        "default": 6000,
+        "unit": "Hz",
+        "skew": 0.3
+      },
+      {
+        "name": "Motion",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0,
+        "unit": "%",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "slap",
+    "name": "SLAP",
+    "family": "Space",
+    "engine": "SlapDelay",
+    "description": "Short doubled reflections for vocals and instruments.",
+    "price": 35,
+    "controls": [
+      {
+        "name": "Time",
+        "minimum": 1,
+        "maximum": 2000,
+        "default": 100,
+        "unit": "ms",
+        "skew": 0.35
+      },
+      {
+        "name": "Feedback",
+        "minimum": -95,
+        "maximum": 95,
+        "default": 10,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Tone",
+        "minimum": 200,
+        "maximum": 20000,
+        "default": 6000,
+        "unit": "Hz",
+        "skew": 0.3
+      },
+      {
+        "name": "Motion",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0,
+        "unit": "%",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "dub",
+    "name": "DUB",
+    "family": "Space",
+    "engine": "DubDelay",
+    "description": "Saturated feedback with a darkened low-pass tone.",
+    "price": 35,
+    "controls": [
+      {
+        "name": "Time",
+        "minimum": 1,
+        "maximum": 2000,
+        "default": 500,
+        "unit": "ms",
+        "skew": 0.35
+      },
+      {
+        "name": "Feedback",
+        "minimum": -95,
+        "maximum": 95,
+        "default": 55,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Tone",
+        "minimum": 200,
+        "maximum": 20000,
+        "default": 6000,
+        "unit": "Hz",
+        "skew": 0.3
+      },
+      {
+        "name": "Motion",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0,
+        "unit": "%",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "teeth",
+    "name": "TEETH",
+    "family": "Space",
+    "engine": "Comb",
+    "description": "A short feedback delay for pitched comb textures.",
+    "price": 35,
+    "controls": [
+      {
+        "name": "Time",
+        "minimum": 0.2,
+        "maximum": 50,
+        "default": 8,
+        "unit": "ms",
+        "skew": 0.35
+      },
+      {
+        "name": "Feedback",
+        "minimum": -95,
+        "maximum": 95,
+        "default": 60,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Tone",
+        "minimum": 200,
+        "maximum": 20000,
+        "default": 6000,
+        "unit": "Hz",
+        "skew": 0.3
+      },
+      {
+        "name": "Motion",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0,
+        "unit": "%",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "choir",
+    "name": "CHOIR",
+    "family": "Motion",
+    "engine": "Chorus",
+    "description": "Two modulated delay voices with stereo phase offset.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Rate",
+        "minimum": 0.05,
+        "maximum": 10,
+        "default": 0.7,
+        "unit": "Hz",
+        "skew": 0.4
+      },
+      {
+        "name": "Depth",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 40,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Delay",
+        "minimum": 5,
+        "maximum": 40,
+        "default": 18,
+        "unit": "ms",
+        "skew": 1
+      },
+      {
+        "name": "Feedback",
+        "minimum": -80,
+        "maximum": 80,
+        "default": 10,
+        "unit": "%",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "flux",
+    "name": "FLUX",
+    "family": "Motion",
+    "engine": "Flanger",
+    "description": "A short modulated feedback delay with moving notches.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Rate",
+        "minimum": 0.02,
+        "maximum": 10,
+        "default": 0.2,
+        "unit": "Hz",
+        "skew": 0.4
+      },
+      {
+        "name": "Depth",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 60,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Delay",
+        "minimum": 0.2,
+        "maximum": 10,
+        "default": 2,
+        "unit": "ms",
+        "skew": 1
+      },
+      {
+        "name": "Feedback",
+        "minimum": -90,
+        "maximum": 90,
+        "default": 40,
+        "unit": "%",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "phase",
+    "name": "PHASE",
+    "family": "Motion",
+    "engine": "Phaser",
+    "description": "Six moving all-pass stages with feedback.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Rate",
+        "minimum": 0.02,
+        "maximum": 10,
+        "default": 0.3,
+        "unit": "Hz",
+        "skew": 0.4
+      },
+      {
+        "name": "Depth",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 60,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Frequency",
+        "minimum": 20,
+        "maximum": 20000,
+        "default": 800,
+        "unit": "Hz",
+        "skew": 0.23
+      },
+      {
+        "name": "Feedback",
+        "minimum": -80,
+        "maximum": 80,
+        "default": 20,
+        "unit": "%",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "pulse",
+    "name": "PULSE",
+    "family": "Motion",
+    "engine": "Tremolo",
+    "description": "Amplitude modulation from gentle motion to hard pulses.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Rate",
+        "minimum": 0.05,
+        "maximum": 30,
+        "default": 4,
+        "unit": "Hz",
+        "skew": 0.4
+      },
+      {
+        "name": "Depth",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 60,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Shape",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0,
+        "unit": "%",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "orbit",
+    "name": "ORBIT",
+    "family": "Motion",
+    "engine": "AutoPan",
+    "description": "A moving stereo balance with adjustable motion shape.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Rate",
+        "minimum": 0.05,
+        "maximum": 20,
+        "default": 0.5,
+        "unit": "Hz",
+        "skew": 0.4
+      },
+      {
+        "name": "Depth",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 80,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Shape",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 0,
+        "unit": "%",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "ring",
+    "name": "RING",
+    "family": "Motion",
+    "engine": "RingMod",
+    "description": "Multiply the signal by an oscillator for metallic sidebands.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Frequency",
+        "minimum": 0.1,
+        "maximum": 4000,
+        "default": 100,
+        "unit": "Hz",
+        "skew": 0.3
+      },
+      {
+        "name": "Depth",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 100,
+        "unit": "%",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "drift",
+    "name": "DRIFT",
+    "family": "Motion",
+    "engine": "Vibrato",
+    "description": "Modulated fractional delay for pitch movement.",
+    "price": 25,
+    "controls": [
+      {
+        "name": "Rate",
+        "minimum": 0.05,
+        "maximum": 20,
+        "default": 5,
+        "unit": "Hz",
+        "skew": 0.4
+      },
+      {
+        "name": "Depth",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 30,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Delay",
+        "minimum": 2,
+        "maximum": 30,
+        "default": 10,
+        "unit": "ms",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "wide",
+    "name": "WIDE",
+    "family": "Stereo",
+    "engine": "Width",
+    "description": "Control side energy while keeping the mid signal intact.",
+    "price": 15,
+    "controls": [
+      {
+        "name": "Width",
+        "minimum": 0,
+        "maximum": 200,
+        "default": 125,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Bass mono",
+        "minimum": 20,
+        "maximum": 1000,
+        "default": 120,
+        "unit": "Hz",
+        "skew": 0.4
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "center",
+    "name": "CENTER",
+    "family": "Stereo",
+    "engine": "MonoBass",
+    "description": "Collapse only the low-frequency side information.",
+    "price": 15,
+    "controls": [
+      {
+        "name": "Crossover",
+        "minimum": 20,
+        "maximum": 1000,
+        "default": 120,
+        "unit": "Hz",
+        "skew": 0.4
+      },
+      {
+        "name": "Amount",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 100,
+        "unit": "%",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "shadow",
+    "name": "SHADOW",
+    "family": "Stereo",
+    "engine": "Haas",
+    "description": "A small channel delay for the Haas widening effect.",
+    "price": 15,
+    "controls": [
+      {
+        "name": "Delay",
+        "minimum": 0,
+        "maximum": 40,
+        "default": 12,
+        "unit": "ms",
+        "skew": 1
+      },
+      {
+        "name": "Side",
+        "minimum": -100,
+        "maximum": 100,
+        "default": 100,
+        "unit": "%",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "trim",
+    "name": "TRIM",
+    "family": "Utility",
+    "engine": "Gain",
+    "description": "Precise gain, stereo balance and channel metering.",
+    "price": 15,
+    "controls": [
+      {
+        "name": "Gain",
+        "minimum": -60,
+        "maximum": 24,
+        "default": 0,
+        "unit": "dB",
+        "skew": 1
+      },
+      {
+        "name": "Balance",
+        "minimum": -100,
+        "maximum": 100,
+        "default": 0,
+        "unit": "%",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "reverse",
+    "name": "REVERSE",
+    "family": "Utility",
+    "engine": "Polarity",
+    "description": "Independent left and right polarity inversion.",
+    "price": 15,
+    "controls": [
+      {
+        "name": "Left invert",
+        "minimum": 0,
+        "maximum": 1,
+        "default": 1,
+        "unit": "",
+        "skew": 1
+      },
+      {
+        "name": "Right invert",
+        "minimum": 0,
+        "maximum": 1,
+        "default": 0,
+        "unit": "",
+        "skew": 1
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  },
+  {
+    "id": "clean",
+    "name": "CLEAN",
+    "family": "Utility",
+    "engine": "DCBlock",
+    "description": "Remove DC offset and subsonic energy.",
+    "price": 15,
+    "controls": [
+      {
+        "name": "Cutoff",
+        "minimum": 1,
+        "maximum": 40,
+        "default": 10,
+        "unit": "Hz",
+        "skew": 0.5
+      }
+    ],
+    "status": "development",
+    "version": "0.1.0"
+  }
+]

@@ -1,0 +1,10 @@
+build/
+node_modules/
+.wrangler/
+.dev.vars
+*.pem
+*.key
+*.pfx
+*.user
+.DS_Store
+releases/
