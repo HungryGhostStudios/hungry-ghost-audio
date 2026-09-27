@@ -9,7 +9,7 @@ Initial Windows x64 VST3 release with 50 effects. REVERB updates to 0.3.0 and FE
 - Windows installer verifies every embedded and installed plugin file, supports individual selection and backs up replacements.
 - Complete AGPLv3 corresponding source includes JUCE 9.0.2, editable Blender scenes, interface assets, installer, tests and storefront.
 
-All 50 exact release binaries passed pluginval 1.0.4 at strictness 5, seed 2130, with GUI tests disabled. Native checks separately render each editor at three sizes. Four native check targets and twelve store API tests passed. Processor checks cover six sample rates, mono/stereo, large and empty blocks, non-finite input recovery, bypass latency, external sidechain behaviour and a coherent high-frequency alias measurement.
+All 50 exact release binaries passed pluginval 1.0.4 at strictness 5, seed 2130, with GUI tests disabled. Native checks separately render each editor at three sizes. Four native check targets and thirteen store API tests passed. Processor checks cover six sample rates, mono/stereo, large and empty blocks, non-finite input recovery, bypass latency, external sidechain behaviour and a coherent high-frequency alias measurement.
 
 The installer passed payload verification, individual extraction, replacement and restoration after a blocked copy. Windows plugins include the C++ runtime statically. Published binary hashes appear in `manifest.json`; package hashes appear in `SHA256SUMS.txt`.
 
