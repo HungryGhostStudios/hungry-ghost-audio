@@ -38,4 +38,4 @@ export async function api(request,env){
  }
  return json({error:'Not found'},404);
 }
-export default {async fetch(request,env){const url=new URL(request.url);let response;if(url.pathname.startsWith('/api/')){try{response=await api(request,env);}catch{return json({error:'Service temporarily unavailable'},503);}}else response=await env.ASSETS.fetch(request);const headers=new Headers(response.headers);for(const [key,value] of Object.entries(security))headers.set(key,value);return new Response(response.body,{status:response.status,headers});}};
+export default {async fetch(request,env){const url=new URL(request.url);if(url.hostname==='www.hungryghostaudio.com')return Response.redirect('https://hungryghostaudio.com'+url.pathname+url.search,308);let response;if(url.pathname.startsWith('/api/')){try{response=await api(request,env);}catch{return json({error:'Service temporarily unavailable'},503);}}else response=await env.ASSETS.fetch(request);const headers=new Headers(response.headers);for(const [key,value] of Object.entries(security))headers.set(key,value);return new Response(response.body,{status:response.status,headers});}};
