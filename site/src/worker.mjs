@@ -1,5 +1,6 @@
 export const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
-export function configuration(env){try{return JSON.parse(env.STORE_CONFIG||'{"ready":false,"products":{}}');}catch{return {ready:false,products:{}};}}
+import releaseConfiguration from './release-config.mjs';
+export function configuration(env){try{return env.STORE_CONFIG?JSON.parse(env.STORE_CONFIG):releaseConfiguration;}catch{return {ready:false,products:{}};}}
 export function checkoutDestination(value){const url=new URL(value);if(url.protocol!=='https:'||url.username||url.password||!((url.hostname==='polar.sh'&&url.pathname.startsWith('/checkout/'))||(url.hostname==='buy.polar.sh'&&/^\/polar_cl_[A-Za-z0-9]+$/.test(url.pathname))))throw Error('Invalid checkout destination');return url.href;}
 export function b64url(bytes){let value='';for(const b of new Uint8Array(bytes))value+=String.fromCharCode(b);return btoa(value).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
 function fromPem(pem){return Uint8Array.from(atob(pem.replace(/-----[^-]+-----/g,'').replace(/\s/g,'')),c=>c.charCodeAt(0));}
