@@ -2,7 +2,7 @@
 #include "SuiteProcessor.h"
 #include <iostream>
 using namespace hungryghost;
-int main() {
+int main(int argc, char** argv) {
   juce::ScopedJuceInitialiser_GUI init;
   for (int index = 2; index < 50; ++index) {
     SuiteProcessor p(index);
@@ -32,6 +32,13 @@ int main() {
       auto image = editor->createComponentSnapshot(editor->getLocalBounds());
       if (!image.isValid())
         return 3;
+      if (argc > 1 && size.x == 940) {
+        juce::File directory = juce::File::getCurrentWorkingDirectory().getChildFile(argv[1]);
+        directory.createDirectory();
+        auto stream = directory.getChildFile(juce::String(p.product.id) + ".png").createOutputStream();
+        if (!stream || !juce::PNGImageFormat().writeImageToStream(image, *stream))
+          return 4;
+      }
     }
     std::cout << p.product.name
               << " state/A-B, large block and native editor passed\n";
