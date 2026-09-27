@@ -242,8 +242,15 @@ void SuiteEngine::process(float *left, float *right, const float *keyLeft,
         kr = filters[1][0].tick(kr);
       }
       float level = std::max(std::abs(kl), std::abs(kr));
-      if (kind == Kind::RmsCompressor) {
-        const float a = 1 - std::exp(-1.f / (.025f * srF));
+      if (kind == Kind::FastCompressor) {
+        fastEnvelope =
+            std::max(level, fastEnvelope * std::exp(-1.f / (.0005f * srF)));
+        level = fastEnvelope;
+      }
+      if (kind == Kind::RmsCompressor || kind == Kind::ParallelCompressor) {
+        const float a =
+            1 - std::exp(-1.f /
+                         ((kind == Kind::RmsCompressor ? .025f : .003f) * srF));
         envelope += a * (level * level - envelope);
         level = std::sqrt(std::max(0.f, envelope));
       }
@@ -266,7 +273,10 @@ void SuiteEngine::process(float *left, float *right, const float *keyLeft,
       if (kind == Kind::DeEsser)
         gr = std::min(gr, smooth[4]);
       const float aMs = kind == Kind::DeEsser ? smooth[5] : smooth[2],
-                  rMs = smooth[3];
+                  rMs =
+                      smooth[3] * (kind == Kind::FastCompressor
+                                       ? (.25f + .75f * clamp(gr / 18.f, 0, 1))
+                                       : 1.f);
       const float desired = db(-gr),
                   coefficient = std::exp(
                       -1.f / (std::max(.1f, desired < gainState ? aMs : rMs) *
@@ -484,8 +494,9 @@ void SuiteEngine::process(float *left, float *right, const float *keyLeft,
           kind == Kind::TapeDelay ? smooth[3] * .02f : smooth[3] * .005f;
       float dl = readDelay(0, smooth[0] +
                                   move * static_cast<float>(std::sin(phase))),
-            dr = readDelay(1, smooth[0] + move * static_cast<float>(
-                                                     std::sin(phase + 1.3)));
+            dr = readDelay(
+                1, smooth[0] * (kind == Kind::SlapDelay ? 1.12f : 1.f) +
+                       move * static_cast<float>(std::sin(phase + 1.3)));
       float a = 1 - std::exp(-2.f * static_cast<float>(pi) *
                              clamp(smooth[2], 20, srF * .45f) / srF);
       toneL += a * (dl - toneL);
@@ -494,13 +505,14 @@ void SuiteEngine::process(float *left, float *right, const float *keyLeft,
       float nextL = l + fb * (kind == Kind::PingPong ? toneR : toneL),
             nextR = r + fb * (kind == Kind::PingPong ? toneL : toneR);
       if (kind == Kind::TapeDelay || kind == Kind::DubDelay) {
-        nextL = std::tanh(nextL);
-        nextR = std::tanh(nextR);
+        const float drive = kind == Kind::DubDelay ? 1.8f : 1.f;
+        nextL = std::tanh(nextL * drive) / drive;
+        nextR = std::tanh(nextR * drive) / drive;
       }
       delay[0][writeIndex] = clamp(nextL, -8, 8);
       delay[1][writeIndex] = clamp(nextR, -8, 8);
-      l = dl;
-      r = dr;
+      l = toneL;
+      r = toneR;
       break;
     }
     case Kind::Chorus:
@@ -578,8 +590,10 @@ void SuiteEngine::process(float *left, float *right, const float *keyLeft,
       break;
     }
     case Kind::Haas: {
-      float dl = readDelay(0, std::max(.02f, smooth[0])),
-            dr = readDelay(1, std::max(.02f, smooth[0]));
+      float dl =
+                smooth[0] < .001f ? l : readDelay(0, std::max(.02f, smooth[0])),
+            dr =
+                smooth[0] < .001f ? r : readDelay(1, std::max(.02f, smooth[0]));
       delay[0][writeIndex] = l;
       delay[1][writeIndex] = r;
       if (smooth[1] < 0)

@@ -1,0 +1,21 @@
+name: Windows native checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Configure JUCE and suite
+        run: cmake -S . -B build
+      - name: Build all 50 VST3 plugins and native checks
+        run: cmake --build build --config Release --target hg_suite hg_dsp_tests hg_plugin_tests hg_processor_tests hg_license_tests --parallel 4
+      - name: Native checks
+        run: ctest --test-dir build -C Release --output-on-failure
+      - name: Store activation and checkout checks
+        run: node --test site/tests/worker.test.mjs

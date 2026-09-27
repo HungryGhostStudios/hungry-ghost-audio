@@ -16,7 +16,8 @@ SuiteProcessor::layout(const Product &p) {
   juce::AudioProcessorValueTreeState::ParameterLayout result;
   for (int i = 0; i < p.controlCount; ++i) {
     const auto &c = p.controls[i];
-    juce::NormalisableRange<float> range(c.min, c.max, 0, c.skew);
+    juce::NormalisableRange<float> range(
+        c.min, c.max, p.kind == Kind::Polarity ? 1.f : 0.f, c.skew);
     result.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("control" + juce::String(i), 1), c.name, range,
         c.initial, juce::AudioParameterFloatAttributes().withLabel(c.unit)));
@@ -40,6 +41,7 @@ SuiteProcessor::SuiteProcessor(int index)
               .withInput("External key", juce::AudioChannelSet::stereo(),
                          false)),
       product(products.at(static_cast<std::size_t>(index))),
+      licence(product.id),
       state(*this, &undo, juce::Identifier("HG_" + juce::String(product.id)),
             layout(product)),
       engine(product.kind) {
@@ -61,13 +63,56 @@ bool SuiteProcessor::isBusesLayoutSupported(const BusesLayout &b) const {
   return key.isDisabled() || key == juce::AudioChannelSet::mono() ||
          key == juce::AudioChannelSet::stereo();
 }
+bool SuiteProcessor::isNonlinear() const {
+  return product.kind == Kind::Clipper ||
+         product.kind == Kind::SoftSaturation ||
+         product.kind == Kind::AsymmetricSaturation ||
+         product.kind == Kind::TubeSaturation ||
+         product.kind == Kind::Wavefolder || product.kind == Kind::Rectifier;
+}
 void SuiteProcessor::prepareToPlay(double sr, int) {
-  engine.prepare(sr);
+  oversampling.reset();
+  latency = 0;
+  if (isNonlinear()) {
+    const std::size_t power = sr <= 96000 ? 2 : sr <= 192000 ? 1 : 0;
+    if (power > 0) {
+      oversampling = std::make_unique<juce::dsp::Oversampling<float>>(
+          static_cast<std::size_t>(getMainBusNumOutputChannels()), power,
+          juce::dsp::Oversampling<float>::filterHalfBandPolyphaseIIR, true,
+          true);
+      oversampling->initProcessing(analysisSize);
+      latency = juce::roundToInt(oversampling->getLatencyInSamples());
+    }
+  }
+  setLatencySamples(latency);
+  engine.prepare(sr * (oversampling ? static_cast<double>(
+                                          oversampling->getOversamplingFactor())
+                                    : 1.));
+  blendStep = static_cast<float>(1. - std::exp(-1. / (.003 * sr)));
+  reset();
   fifoIndex = 0;
 }
+void SuiteProcessor::reset() {
+  engine.reset();
+  if (oversampling)
+    oversampling->reset();
+  for (auto &channel : bypassDelay)
+    channel.fill(0);
+  bypassWrite = 0;
+  processingBlend = bypass && bypass->load() > .5f ? 0.f
+                    : licence.canProcess()         ? 1.f
+                                                   : 0.f;
+}
 double SuiteProcessor::getTailLengthSeconds() const {
-  if (product.kind >= Kind::Delay && product.kind <= Kind::Comb)
-    return 60.;
+  if (product.kind >= Kind::Delay && product.kind <= Kind::Comb) {
+    const double time = static_cast<double>(controls[0]->load()) * .001;
+    const double feedback =
+        std::min(.95, std::abs(static_cast<double>(controls[1]->load()) * .01));
+    return time *
+           (feedback > 0 ? std::max(1., std::log(.001) / std::log(feedback))
+                         : 1.) *
+           (product.kind == Kind::SlapDelay ? 1.12 : 1.);
+  }
   if (product.kind == Kind::Chorus || product.kind == Kind::Flanger ||
       product.kind == Kind::Vibrato || product.kind == Kind::Haas)
     return .1;
@@ -78,10 +123,13 @@ juce::AudioProcessorParameter *SuiteProcessor::getBypassParameter() const {
 }
 void SuiteProcessor::processBlock(juce::AudioBuffer<float> &buffer,
                                   juce::MidiBuffer &) {
+  run(buffer, false);
+}
+void SuiteProcessor::run(juce::AudioBuffer<float> &buffer, bool hostBypass) {
   juce::ScopedNoDenormals noDenormals;
   auto audio = getBusBuffer(buffer, false, 0);
   const int n = audio.getNumSamples();
-  if (n == 0)
+  if (n == 0 || audio.getNumChannels() == 0)
     return;
   float peakIn = 0;
   for (int i = 0; i < n; ++i) {
@@ -93,6 +141,7 @@ void SuiteProcessor::processBlock(juce::AudioBuffer<float> &buffer,
   // Capture input in a fixed stack buffer, in bounded chunks, before in-place
   // processing.
   std::array<float, analysisSize> input{};
+  std::array<std::array<float, analysisSize>, 2> delayedDry{};
   std::array<float, 6> values{};
   for (int j = 0; j < product.controlCount; ++j)
     values[j] = controls[j]->load();
@@ -102,17 +151,39 @@ void SuiteProcessor::processBlock(juce::AudioBuffer<float> &buffer,
       key.getNumChannels() > 0 ? key.getReadPointer(0) : nullptr;
   const float *keyR = key.getNumChannels() > 1 ? key.getReadPointer(1) : keyL;
   float peakOut = 0;
+  const bool processing =
+      !hostBypass && bypass->load() < .5f && licence.canProcess();
   for (int offset = 0; offset < n; offset += analysisSize) {
     const int count = std::min(analysisSize, n - offset);
     for (int i = 0; i < count; ++i) {
       float sum = 0;
       for (int ch = 0; ch < audio.getNumChannels(); ++ch) {
         float x = audio.getSample(ch, offset + i);
+        if (!std::isfinite(x)) {
+          x = 0.f;
+          audio.setSample(ch, offset + i, x);
+        }
         sum += std::isfinite(x) ? x : 0.f;
       }
       input[i] = sum / static_cast<float>(audio.getNumChannels());
+      for (int ch = 0; ch < audio.getNumChannels(); ++ch) {
+        const float x = audio.getSample(ch, offset + i);
+        bypassDelay[ch][bypassWrite] = std::isfinite(x) ? x : 0.f;
+        delayedDry[ch][i] =
+            bypassDelay[ch][(bypassWrite + 256 - latency) % 256];
+      }
+      bypassWrite = (bypassWrite + 1) % 256;
     }
-    if (bypass->load() < .5f)
+    if (oversampling) {
+      auto block = juce::dsp::AudioBlock<float>(audio).getSubBlock(
+          static_cast<std::size_t>(offset), static_cast<std::size_t>(count));
+      auto up = oversampling->processSamplesUp(block);
+      engine.process(up.getChannelPointer(0),
+                     up.getNumChannels() > 1 ? up.getChannelPointer(1)
+                                             : nullptr,
+                     nullptr, nullptr, static_cast<int>(up.getNumSamples()));
+      oversampling->processSamplesDown(block);
+    } else
       engine.process(audio.getWritePointer(0) + offset,
                      audio.getNumChannels() > 1
                          ? audio.getWritePointer(1) + offset
@@ -120,9 +191,13 @@ void SuiteProcessor::processBlock(juce::AudioBuffer<float> &buffer,
                      keyL ? keyL + offset : nullptr,
                      keyR ? keyR + offset : nullptr, count);
     for (int i = 0; i < count; ++i) {
+      processingBlend +=
+          blendStep * ((processing ? 1.f : 0.f) - processingBlend);
       float sum = 0;
       for (int ch = 0; ch < audio.getNumChannels(); ++ch) {
         float x = audio.getSample(ch, offset + i);
+        x = delayedDry[ch][i] + processingBlend * (x - delayedDry[ch][i]);
+        audio.setSample(ch, offset + i, x);
         sum += x;
         peakOut = std::max(peakOut, std::abs(x));
       }
@@ -140,11 +215,11 @@ void SuiteProcessor::processBlock(juce::AudioBuffer<float> &buffer,
   }
   inputPeak.store(peakIn);
   outputPeak.store(peakOut);
-  reduction.store(bypass->load() < .5f ? engine.gainReduction() : 0);
+  reduction.store(processing ? engine.gainReduction() : 0);
 }
-void SuiteProcessor::processBlockBypassed(juce::AudioBuffer<float> &,
+void SuiteProcessor::processBlockBypassed(juce::AudioBuffer<float> &buffer,
                                           juce::MidiBuffer &) {
-  reduction.store(0);
+  run(buffer, true);
 }
 bool SuiteProcessor::popAnalysis(std::array<float, analysisSize> &pre,
                                  std::array<float, analysisSize> &post) {

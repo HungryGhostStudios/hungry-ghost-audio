@@ -1,13 +1,15 @@
 #pragma once
 #include "DSP/SuiteEngine.h"
+#include "Licensing/LicenseManager.h"
 #include <juce_audio_utils/juce_audio_utils.h>
+#include <juce_dsp/juce_dsp.h>
 namespace hungryghost {
 class SuiteProcessor final : public juce::AudioProcessor {
 public:
   explicit SuiteProcessor(int productIndex);
   void prepareToPlay(double, int) override;
   void releaseResources() override {}
-  void reset() override { engine.reset(); }
+  void reset() override;
   bool isBusesLayoutSupported(const BusesLayout &) const override;
   void processBlock(juce::AudioBuffer<float> &, juce::MidiBuffer &) override;
   void processBlockBypassed(juce::AudioBuffer<float> &,
@@ -37,6 +39,7 @@ public:
   bool popAnalysis(std::array<float, analysisSize> &,
                    std::array<float, analysisSize> &);
   const Product &product;
+  LicenseManager licence;
   juce::UndoManager undo;
   juce::AudioProcessorValueTreeState state;
   std::atomic<float> inputPeak{0}, outputPeak{0}, reduction{0};
@@ -45,6 +48,12 @@ private:
   static juce::AudioProcessorValueTreeState::ParameterLayout
   layout(const Product &);
   SuiteEngine engine;
+  std::unique_ptr<juce::dsp::Oversampling<float>> oversampling;
+  std::array<std::array<float, 256>, 2> bypassDelay{};
+  int bypassWrite = 0, latency = 0;
+  float processingBlend = 1, blendStep = .005f;
+  bool isNonlinear() const;
+  void run(juce::AudioBuffer<float> &, bool hostBypass);
   std::array<std::atomic<float> *, 6> controls{};
   std::atomic<float> *wet = nullptr, *out = nullptr, *bypass = nullptr;
   std::array<juce::ValueTree, 2> banks;

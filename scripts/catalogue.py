@@ -1,6 +1,6 @@
 """One reviewed catalogue drives the native products and storefront."""
 from pathlib import Path
-import json
+import json, argparse
 
 ROOT = Path(__file__).resolve().parents[1]
 def p(name, lo, hi, default, unit='', skew=1):
@@ -27,8 +27,8 @@ def add(name, family, kind, description, controls, price=25):
 
 add('REVERB','Space','OriginalReverb','Sixteen delay lines. One enormous sense of space.', [],25)
 add('FERAL','Dynamics','OriginalFeral','Eight bands of dynamic EQ with a stereo bus compressor.', [],99)
-rows[0].update(version='0.2.0',status='validated',image='/assets/reverb.png')
-rows[1].update(version='0.1.1',status='validated',image='/assets/feral.png')
+rows[0].update(version='0.3.0',status='development',image='/assets/reverb.png')
+rows[1].update(version='0.2.0',status='development',image='/assets/feral.png')
 for name, kind, text, defaults in [
  ('RIFT','Compressor','A clean feed-forward compressor for precise level control.',[threshold,ratio,attack,release,knee,makeup]),
  ('CLAW','FastCompressor','Fast peak compression for drums and sharp attacks.',[p('Threshold',-60,0,-12,'dB'),ratio,p('Attack',.1,20,.5,'ms',.4),release,knee,makeup]),
@@ -89,6 +89,18 @@ add('CLEAN','Utility','DCBlock','Remove DC offset and subsonic energy.',[p('Cuto
 
 assert len(rows)==50, len(rows)
 assert len({r['id'] for r in rows})==50
+parser=argparse.ArgumentParser()
+parser.add_argument('--validated',type=Path,help='Record of all 50 exact pluginval-tested binaries')
+args=parser.parse_args()
+if args.validated:
+ import hashlib
+ checks=json.loads(args.validated.read_text())
+ valid={r['id']:r for r in checks if r.get('passed') and r.get('strictness',0)>=5}
+ assert set(valid)==set(r['id'] for r in rows), 'All 50 products must pass'
+ for row in rows:
+  check=valid[row['id']]
+  assert hashlib.sha256(Path(check['binary']).read_bytes()).hexdigest()==check['sha256'], 'Binary changed after validation'
+  row.update(status='validated',image='/assets/plugins/'+row['id']+'.png')
 (ROOT/'site/public/catalogue.json').write_text(json.dumps(rows,indent=2)+'\n')
 (ROOT/'catalogue.json').write_text(json.dumps(rows,indent=2)+'\n')
 lines=['#pragma once','#include <array>','#include <string_view>','namespace hungryghost {',

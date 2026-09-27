@@ -411,6 +411,7 @@ void FrequencyGraph::mouseWheelMove(const juce::MouseEvent &e,
 FeralEditor::FeralEditor(FeralProcessor &p)
     : AudioProcessorEditor(p), graph(p), processor(p) {
   setLookAndFeel(&theme);
+  addAndMakeVisible(licenceButton);
   addAndMakeVisible(graph);
   graph.onSelection = [this] { bindSelection(); };
   for (int i = 0; i < 8; ++i) {
@@ -670,8 +671,6 @@ void FeralEditor::paint(juce::Graphics &original) {
   g.drawLine(31, 730, 1088, 730);
   g.setFont(font(10));
   g.setColour(Theme::muted().withAlpha(.7f));
-  g.drawText("HUNGRY GHOST AUDIO / FERAL 0.1.1", 563, 748, 270, 20,
-             juce::Justification::centred);
   g.drawText("ZERO LATENCY", 941, 749, 142, 17, juce::Justification::right);
 }
 void FeralEditor::resized() {
@@ -688,6 +687,7 @@ void FeralEditor::resized() {
   bounds(bankB, 820, 32, 36, 34);
   bounds(copy, 862, 32, 71, 34);
   bounds(power, 959, 32, 129, 34);
+  bounds(licenceButton, 568, 742, 285, 28);
   for (int i = 0; i < 8; ++i)
     bounds(bands[i], 31 + i * 49, 91, 43, 28);
   bounds(bus, 439, 91, 74, 28);

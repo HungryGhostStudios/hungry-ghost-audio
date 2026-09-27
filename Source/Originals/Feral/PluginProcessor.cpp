@@ -151,7 +151,7 @@ void FeralProcessor::run(juce::AudioBuffer<float> &buffer, bool bypassed) {
   if (channels == 0)
     return;
   auto p = readParameters();
-  if (bypassed)
+  if (bypassed || !licence.canProcess())
     p.bypass = 1;
   const float *scL = nullptr;
   const float *scR = nullptr;

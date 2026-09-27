@@ -11,6 +11,7 @@ float decibel(float x) { return juce::Decibels::gainToDecibels(x, -90.f); }
 SuiteEditor::SuiteEditor(SuiteProcessor &p)
     : AudioProcessorEditor(p), processor(p) {
   setLookAndFeel(&theme);
+  addAndMakeVisible(licenceButton);
   setSize(940, 660);
   setResizable(true, true);
   setResizeLimits(760, 534, 1410, 990);
@@ -24,7 +25,10 @@ SuiteEditor::SuiteEditor(SuiteProcessor &p)
                                      : "output";
     const auto *control = i < 6 ? &processor.product.controls[i] : nullptr;
     knobs[i].setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    knobs[i].getProperties().set("suite", true);
     knobs[i].setTextBoxStyle(juce::Slider::TextBoxBelow, false, 100, 28);
+    knobs[i].setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+    knobs[i].setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::transparentBlack);
     knobs[i].setRotaryParameters(juce::MathConstants<float>::pi * 1.2f,
                                  juce::MathConstants<float>::pi * 2.8f, true);
     knobs[i].setDoubleClickReturnValue(
@@ -40,7 +44,10 @@ SuiteEditor::SuiteEditor(SuiteProcessor &p)
     attachments[i] =
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             processor.state, id, knobs[i]);
-    knobs[i].textFromValueFunction = [control, i](double v) {
+    const bool polarity = processor.product.kind == Kind::Polarity && i < 2;
+    knobs[i].textFromValueFunction = [control, i, polarity](double v) {
+      if (polarity)
+        return juce::String(v >= .5 ? "Inverted" : "Normal");
       if (i == 6)
         return juce::String(v * 100, 0) + " %";
       if (i == 7)
@@ -55,6 +62,24 @@ SuiteEditor::SuiteEditor(SuiteProcessor &p)
                   ? ""
                   : " " + juce::String(control->unit));
     };
+    knobs[i].valueFromTextFunction = [control, i,
+                                      polarity](const juce::String &text) {
+      auto value = text.trim().toLowerCase();
+      if (polarity) {
+        if (value == "inverted" || value == "on")
+          return 1.;
+        if (value == "normal" || value == "off")
+          return 0.;
+      }
+      auto result = value.getDoubleValue();
+      if (i == 6)
+        return result * .01;
+      if (control && juce::String(control->unit) == "Hz" &&
+          value.containsChar('k'))
+        result *= 1000.;
+      return result;
+    };
+    knobs[i].updateText();
     labels[i].setText(control  ? control->name
                       : i == 6 ? "Dry / wet"
                                : "Output",
@@ -95,6 +120,8 @@ void SuiteEditor::resized() {
   copy.setBounds(742 * s, 39 * s, 65 * s, 30 * s);
   bypassButton.setBounds(815 * s, 39 * s, 88 * s, 30 * s);
   resetButton.setBounds(785 * s, 567 * s, 110 * s, 31 * s);
+  licenceButton.setBounds(juce::roundToInt(663 * s), juce::roundToInt(616 * s),
+                          juce::roundToInt(230 * s), juce::roundToInt(26 * s));
   int count = processor.product.controlCount + 2;
   float gap = 830.f / static_cast<float>(count);
   int n = 0;
@@ -166,7 +193,8 @@ void SuiteEditor::paint(juce::Graphics &g) {
   g.drawText("INPUT / OUTPUT SPECTRUM", plot.getCentreX() - 120 * s,
              display.getY() + 8 * s, 240 * s, 15 * s,
              juce::Justification::centred);
-  g.drawText("20 kHz", plot.getRight() - 80 * s, display.getBottom() - 21 * s,
+  const auto upperFrequency = std::min(20000., (processor.getSampleRate() > 0 ? processor.getSampleRate() : 48000.) * .45);
+  g.drawText(juce::String(upperFrequency / 1000., upperFrequency == 20000. ? 0 : 1) + " kHz", plot.getRight() - 80 * s, display.getBottom() - 21 * s,
              80 * s, 15 * s, juce::Justification::right);
   g.setFont(font(12 * s));
   g.drawText("IN  " + juce::String(decibel(peakIn), 1) + " dBFS", 47 * s,
@@ -180,8 +208,8 @@ void SuiteEditor::paint(juce::Graphics &g) {
   g.drawText(processor.product.description, 45 * s, 572 * s, 715 * s, 26 * s,
              juce::Justification::left);
   g.setFont(font(10 * s));
-  g.drawText("HUNGRY GHOST AUDIO / 0.1.0", 42 * s, 620 * s, 845 * s, 18 * s,
-             juce::Justification::centred);
+  g.drawText("HUNGRY GHOST AUDIO / 0.1.0", 42 * s, 620 * s, 560 * s, 18 * s,
+             juce::Justification::left);
 }
 void SuiteEditor::timerCallback() {
   peakIn = std::max(processor.inputPeak.load(), peakIn * .87f);

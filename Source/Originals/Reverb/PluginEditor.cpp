@@ -175,6 +175,7 @@ void TailView::paint(juce::Graphics &g) {
 AfterEditor::AfterEditor(AfterProcessor &p)
     : AudioProcessorEditor(p), processor(p), tail(p) {
   setLookAndFeel(&look);
+  addAndMakeVisible(licenceButton);
   setOpaque(true);
   const char *ids[] = {"decay", "size", "tone", "motion", "predelay", "mix"};
   const char *titles[] = {"Decay",  "Size",      "Tone",
@@ -378,8 +379,6 @@ void AfterEditor::paint(juce::Graphics &g) {
              static_cast<int>(40 * s), juce::Justification::left);
   g.drawText("OUT", getWidth() - static_cast<int>(179 * s), footer, 35,
              static_cast<int>(40 * s), juce::Justification::left);
-  g.drawText("HUNGRY GHOST  /  REVERB 0.2", getWidth() / 2 - 160, footer, 320,
-             static_cast<int>(40 * s), juce::Justification::centred);
   const int actionY = shape.getY() - static_cast<int>(12 * s);
   seam((float)actionY);
   if (shapeOpen)
@@ -441,6 +440,9 @@ void AfterEditor::resized() {
     trim.setTextBoxStyle(juce::Slider::TextBoxLeft, false,
                          juce::roundToInt(74 * s), juce::roundToInt(24 * s));
   const int footer = getHeight() - static_cast<int>(52 * s);
+  licenceButton.setBounds(getWidth() / 2 - juce::roundToInt(125 * s),
+                          footer + juce::roundToInt(8 * s),
+                          juce::roundToInt(250 * s), juce::roundToInt(25 * s));
   trims[0].setBounds(static_cast<int>(59 * s), footer + static_cast<int>(8 * s),
                      static_cast<int>(116 * s), static_cast<int>(25 * s));
   trims[1].setBounds(getWidth() - static_cast<int>(140 * s),

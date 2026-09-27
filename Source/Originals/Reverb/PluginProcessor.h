@@ -1,4 +1,5 @@
 #pragma once
+#include "../../Licensing/LicenseManager.h"
 #include "ReverbEngine.h"
 #include <juce_audio_utils/juce_audio_utils.h>
 
@@ -35,6 +36,7 @@ public:
   bool isMixLocked() const noexcept { return mixLocked.load(); }
   void setMixLocked(bool value) noexcept { mixLocked.store(value); }
   void setValue(const juce::String &id, float value);
+  hungryghost::LicenseManager licence{"reverb"};
   juce::AudioProcessorValueTreeState state;
 
 private:

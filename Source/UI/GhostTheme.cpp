@@ -201,6 +201,8 @@ juce::Font GhostTheme::getComboBoxFont(juce::ComboBox &) {
 }
 juce::Font GhostTheme::getLabelFont(juce::Label &label) {
   if (auto *slider = dynamic_cast<juce::Slider *>(label.getParentComponent())) {
+    if (static_cast<bool>(slider->getProperties()["suite"]))
+      return type(20 * scale, true);
     const bool detail = static_cast<bool>(slider->getProperties()["detail"]);
     return type(static_cast<bool>(slider->getProperties()["large"])
                     ? 42 * scale

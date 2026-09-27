@@ -1,12 +1,12 @@
 # Hungry Ghost Audio
 
-A developing collection of 50 Windows x64 VST3 effects with shared metalwork and individual processing controls. The complete source, original interface assets and storefront are released under **AGPL-3.0-or-later**. JUCE 9.0.2 is the pinned framework dependency.
+A collection of 50 Windows x64 VST3 effects with shared metalwork and individual processing controls. The complete source, original interface assets, editable Blender scenes, installer and storefront are released under **AGPL-3.0-or-later**. JUCE 9.0.2 is the pinned framework dependency.
 
 ## Current state
 
-Reverb 0.2.0 and FERAL 0.1.1 have existing validated releases. The additional 48 processors have passed the initial DSP suite; native integration, host validation, licensing and storefront release work are in progress. Do not describe this development branch as a complete production release.
+Suite 0.1.0 includes REVERB 0.3.0, FERAL 0.2.0 and 48 additional effects. All 50 passed pluginval strictness level 5 (seed 2130, GUI tests disabled). Separate native integration checks render all 50 editors at three sizes. Processor checks cover six sample rates, mono/stereo, oversized buffers, non-finite input recovery, exact bypass latency, external-key ducking and measured oversampling alias suppression. These checks establish the tested behaviours; they do not establish compatibility with every host or a subjective sound-quality ranking.
 
-The catalogue lists the actual controls and processing family of every product. The first storefront is in `site/`; checkout remains closed until a validated release and Polar delivery are configured.
+The catalogue lists the actual controls and processing family of every product. The Cloudflare storefront is in `site/`; individual purchase gates remain closed until their Polar entitlement and checkout are configured. Read the [user guide](Docs/UserGuide.md) for installation, the 30-day trial, activation and each processing family.
 
 ## Build
 
@@ -15,13 +15,19 @@ Install Visual Studio 2022 with Desktop C++ and CMake 3.22 or newer.
 ```powershell
 cmake -S . -B build
 cmake --build build --config Release --target hg_suite --parallel 8
-cmake --build build --config Release --target hg_dsp_tests hg_plugin_tests
+cmake --build build --config Release --target hg_dsp_tests hg_plugin_tests hg_processor_tests hg_license_tests
 ctest --test-dir build -C Release --output-on-failure
 ```
 
-CMake fetches official JUCE tag 9.0.2. An existing checkout can be supplied using `-DJUCE_SOURCE_DIR=/absolute/path/to/JUCE`. The JUCE modules compile once for the shared runtime, while each plugin retains its own VST3 identity. The original Reverb and FERAL state layouts and plugin IDs remain intact.
+CMake fetches official JUCE tag 9.0.2. The corresponding-source release includes it in `vendor/JUCE`, which CMake uses automatically without fetching. An existing checkout can be supplied using `-DJUCE_SOURCE_DIR=/absolute/path/to/JUCE`. JUCE modules compile once for the shared runtime, while each plugin retains its own VST3 identity. Windows builds include the C++ runtime statically. Original Reverb and FERAL state layouts and plugin IDs remain intact.
 
-The catalogue is generated from `scripts/catalogue.py`. Existing Reverb and FERAL sources are included in `Source/Originals`, so building a release does not require the previous repositories.
+The catalogue is generated from `scripts/catalogue.py`; its optional `--validated` argument marks the exact hash-verified release. Existing Reverb and FERAL sources are included in `Source/Originals`, so building does not require the previous repositories. `Design/Blender` contains the original editable metalwork scenes and rendering scripts.
+
+## Release checks and packaging
+
+`scripts/validate_release.py` runs pluginval on every catalogue VST3 and records exact binary hashes. `scripts/package_release.py` refuses to package missing, failing or modified binaries. It creates the complete suite, 50 individual ZIPs, a manifest and the installer's file-hash list. `scripts/build_installer.ps1` compiles the Windows installer using the system .NET Framework compiler. `scripts/source_release.py` packages the complete corresponding source with pinned JUCE. Published downloads include SHA-256 checksums.
+
+Native licence interoperability checks use the published signed fixtures in `Tests/Fixtures/entitlements.json`. They contain artificial device and activation IDs, and the verifier uses their fixed reference clock. No real customer key or production private key is distributed. Trial-policy checks create an isolated temporary cache on each run. For custom fixtures, `scripts/license_fixtures.mjs` needs a private key matching the verification public key; use an isolated development checkout for a different key. Do not substitute a new production key during an ordinary build. Processor integration checks require an active local trial or licence; the independent DSP tests do not.
 
 ## Storefront
 

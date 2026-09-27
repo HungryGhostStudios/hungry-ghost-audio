@@ -1,4 +1,5 @@
 #pragma once
+#include "../../Licensing/LicenseManager.h"
 #include "DynamicsEngine.h"
 #include <juce_audio_utils/juce_audio_utils.h>
 
@@ -43,6 +44,7 @@ public:
   bool popAnalysis(std::array<float, analysisSize> &pre,
                    std::array<float, analysisSize> &post);
   juce::UndoManager undo;
+  hungryghost::LicenseManager licence{"feral"};
   juce::AudioProcessorValueTreeState state;
   std::atomic<int> selected{1};
   std::array<std::atomic<float>, feral::maxBands> reductions{};

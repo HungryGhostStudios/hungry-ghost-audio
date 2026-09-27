@@ -40,6 +40,7 @@ public:
 private:
   AfterProcessor &processor;
   AfterLook look;
+  hungryghost::LicenseButton licenceButton{processor.licence};
   juce::TooltipWindow tooltips{this, 500};
   TailView tail;
   std::array<std::unique_ptr<AfterKnob>, 6> knobs;

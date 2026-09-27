@@ -14,6 +14,7 @@ public:
 private:
   SuiteProcessor &processor;
   GhostTheme theme;
+  LicenseButton licenceButton{processor.licence};
   std::array<juce::Slider, 8> knobs;
   std::array<juce::Label, 8> labels;
   std::array<

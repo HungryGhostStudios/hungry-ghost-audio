@@ -102,7 +102,7 @@ void AfterProcessor::run(juce::AudioBuffer<float> &buffer, bool forceBypass) {
   if (buffer.getNumChannels() == 0)
     return;
   auto p = readParameters();
-  p.bypass = p.bypass || forceBypass;
+  p.bypass = p.bypass || forceBypass || !licence.canProcess();
   engine.setParameters(p);
   engine.process(buffer.getWritePointer(0),
                  buffer.getNumChannels() > 1 ? buffer.getWritePointer(1)

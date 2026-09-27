@@ -62,6 +62,7 @@ public:
 private:
   FeralProcessor &processor;
   hungryghost::GhostTheme theme;
+  hungryghost::LicenseButton licenceButton{processor.licence};
   juce::TooltipWindow tooltips{this, 600};
   std::array<juce::TextButton, 8> bands;
   juce::TextButton bus{"Bus"}, add{"+ Band"}, remove{"Remove"}, bankA{"A"},
