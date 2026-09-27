@@ -13,7 +13,9 @@ Updated 28 September 2026. This file records verified release evidence and remai
 - Thirteen storefront/API tests passed, including checkout destination checks, purchase gating, standard RSA SHA-256 interoperability, device binding, entitlement expiry and provider failure handling.
 - Polar has 50 individual products and a complete-suite product, with 51 checkout links and separate perpetual licence benefits. Each benefit allows two activations and customer-controlled device deactivation. The production signing service rejects invalid keys through Polar.
 
-The [full CI run for the release integration](https://github.com/HungryGhostStudios/hungry-ghost-audio/actions/runs/36357462119) passed. The two subsequent runs covering the www redirect and its routing configuration were still building at the time of this update: [redirect](https://github.com/HungryGhostStudios/hungry-ghost-audio/actions/runs/36358395433), [routing](https://github.com/HungryGhostStudios/hungry-ghost-audio/actions/runs/36358593840). Local storefront checks and deployed redirect checks passed after those changes.
+The [full CI run for the release integration](https://github.com/HungryGhostStudios/hungry-ghost-audio/actions/runs/36357462119) passed. Both subsequent full builds covering the www [redirect](https://github.com/HungryGhostStudios/hungry-ghost-audio/actions/runs/36358395433) and [routing](https://github.com/HungryGhostStudios/hungry-ghost-audio/actions/runs/36358593840) also passed. Local storefront checks and deployed redirect checks passed after those changes.
+
+The storefront includes six dry/processed audio previews rendered through the exact released VST3 binaries. Their original synth/drum sources and settings are reproducible with `scripts/render_audio_demos.py`. Active-region RMS matching keeps the comparison from favouring the louder version. The renderer checks for finite output, real processing differences, matching durations and no clipping after MP3 decoding. These previews are examples, not a comprehensive sonic evaluation.
 
 ## Pricing
 
