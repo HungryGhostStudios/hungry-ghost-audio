@@ -511,7 +511,16 @@ export default {
   "downloads": {
     "installer": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhostSuite-0.2.0-Setup.exe",
     "suite": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhostSuite-0.2.0-Windows-VST3.zip",
-    "source": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhostSuite-0.2.0-Complete-Source.zip"
+    "source": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhostSuite-0.2.0-Complete-Source.zip",
+    "macInstaller": "https://hungryghostaudio.com/downloads/macos/0.2.0/e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e/HungryGhostSuite-0.2.0-macOS-Universal.pkg",
+    "macArtifact": {
+      "path": "/downloads/macos/0.2.0/e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e/HungryGhostSuite-0.2.0-macOS-Universal.pkg",
+      "key": "macos/0.2.0/e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e/HungryGhostSuite-0.2.0-macOS-Universal.pkg",
+      "bytes": 2604372347,
+      "sha256": "e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e",
+      "signed": true,
+      "notarized": true
+    }
   },
   "suite": {
     "ready": true,

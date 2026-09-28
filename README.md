@@ -1,12 +1,14 @@
 # Hungry Ghost Audio
 
-A collection of 50 Windows x64 VST3 effects with shared metalwork and individual processing controls. The complete source, original interface assets, editable Blender scenes, installer and storefront are released under **AGPL-3.0-or-later**. JUCE 9.0.2 is the pinned framework dependency.
+A collection of 50 effects with shared metalwork and individual processing controls: Windows x64 VST3, and universal macOS VST3 / Audio Units for Intel and Apple Silicon. The complete source, original interface assets, editable Blender scenes, installers and storefront are released under **AGPL-3.0-or-later**. JUCE 9.0.2 is the pinned framework dependency.
 
 ## Current state
 
 Suite 0.2.0 includes REVERB 0.3.0, FERAL 0.2.0 and 48 additional effects. All 50 passed pluginval strictness level 5 (seed 2130, GUI tests disabled). Separate native integration checks render all 50 editors at three sizes. Processor checks cover six sample rates, mono/stereo, oversized buffers, non-finite input recovery, exact bypass latency, external-key ducking and measured oversampling alias suppression. These checks establish the tested behaviours; they do not establish compatibility with every host or a subjective sound-quality ranking.
 
 The catalogue lists the actual controls and processing family of every product. The Cloudflare storefront is in `site/`; all 50 individual products and the complete suite are connected to live Polar checkout. See [launch status](Docs/LAUNCH-STATUS.md) for verification evidence and the remaining end-to-end order check. Read the [user guide](Docs/UserGuide.md) for installation, the 30-day trial, activation and each processing family.
+
+The [signed Mac release](https://github.com/HungryGhostStudios/hungry-ghost-audio/actions/runs/36408294229) passed validation of all 100 universal VST3 / AU bundles on Intel and Apple Silicon. Apple accepted the signed installer for notarization; its ticket is stapled. Installer checks exposed all 100 choices and verified installation of only the selected bundles. The public Mac download is enabled only after the exact installer is transferred and its complete checksum verified. See [the Mac release pipeline](Docs/macOS.md).
 
 ## Build
 
@@ -20,6 +22,8 @@ ctest --test-dir build -C Release --output-on-failure
 ```
 
 CMake fetches official JUCE tag 9.0.2. The corresponding-source release includes it in `vendor/JUCE`, which CMake uses automatically without fetching. An existing checkout can be supplied using `-DJUCE_SOURCE_DIR=/absolute/path/to/JUCE`. JUCE modules compile once for the shared runtime, while each plugin retains its own VST3 identity. Windows builds include the C++ runtime statically. Original Reverb and FERAL state layouts and plugin IDs remain intact.
+
+On Mac, install Xcode command-line tools and CMake, then configure with `-DCMAKE_BUILD_TYPE=Release '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DHG_BUILD_STANDALONE=OFF`. The shared suite target builds both VST3 and Audio Units. Public packages require Developer ID signatures and Apple notarization; the workflows in `.github/workflows` perform those checks before packaging.
 
 The catalogue is generated from `scripts/catalogue.py`; its optional `--validated` argument marks the exact hash-verified release. Existing Reverb and FERAL sources are included in `Source/Originals`, so building does not require the previous repositories. `Design/Blender` contains the original editable metalwork scenes and rendering scripts.
 

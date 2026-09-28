@@ -1,8 +1,8 @@
-# Hungry Ghost Audio · Windows VST3
+# Hungry Ghost Audio · Windows and macOS
 
-Suite release 0.2.0. Windows 10 or 11, x64 audio host with VST3 support. REVERB is version 0.3.0; FERAL is 0.2.0; the remaining effects are 0.2.0. Other operating systems and plugin formats are not included in this release.
+Suite release 0.2.0. Windows 10 or 11 uses x64 VST3. macOS 11 and later uses universal VST3 and Audio Units on Intel and Apple Silicon. Choose Audio Units for Logic Pro and VST3 for REAPER or other compatible hosts. REVERB is version 0.3.0; FERAL is 0.2.0; the remaining effects are 0.2.0. The same purchase covers both platforms.
 
-## Install
+## Install on Windows
 
 1. Close your audio host. The installer never closes it for you.
 2. Run `HungryGhostSuite-0.2.0-Setup.exe`, select your effects and choose Install. The default is your standard user VST3 folder: `%LOCALAPPDATA%\Programs\Common\VST3`. Installing there does not require administrator access.
@@ -14,11 +14,21 @@ The installer verifies its embedded payload and installed files. If replacing fi
 
 These initial releases are not signed with a Windows code-signing certificate. Release SHA-256 checksums identify the published packages; licence signatures verify purchase entitlements inside the plugin. They serve different purposes.
 
+## Install on Mac
+
+1. Close your audio hosts and download `HungryGhostSuite-0.2.0-macOS-Universal.pkg` from the website's Mac download.
+2. Open the package in Apple's Installer. Use Customize to select the effects and VST3 / Audio Unit formats you want. Administrator approval is required for the shared plugin folders.
+3. Complete installation, reopen your audio host and rescan plugins if needed.
+
+VST3 bundles install to `/Library/Audio/Plug-Ins/VST3`; Audio Units install to `/Library/Audio/Plug-Ins/Components`. Keep the whole `.vst3` or `.component` bundle intact. To uninstall an effect, close your hosts and remove only its Hungry Ghost bundles from those locations. Existing projects, presets and licence caches are outside the installer payload.
+
+The public Mac installer is Developer ID signed, notarized by Apple and stapled. No security-bypass commands are needed. Its published SHA-256 identifies the exact installer. Every bundle contains native Intel and Apple Silicon code; the release validators checked both architectures. See [Mac release evidence](macOS.md) for the tested scope.
+
 ## Trial and activation
 
 The suite starts a shared 30-day trial on its first launch. No account or audio upload is needed for the trial. When it ends, unlicensed effects pass audio through; they do not insert noise or mute your project. Trial status is assessed when you open a plugin instance, so a running session is not interrupted midway through a take.
 
-After purchasing, sign in to [Polar's customer portal](https://polar.sh/hungry-ghost-audio/portal) using your checkout email. Download the Windows installer from the File Downloads benefit, then copy the `HG_` licence key. The website also offers the installer and ZIP at [Downloads](https://hungryghostaudio.com/#downloads). Click the activation button at the bottom of a plugin, paste the key and activate. A suite key covers all 50 tools. An individual key covers that tool. Activating on a device stores a shared signed record, so you can open your other purchased plugins on that device.
+After purchasing, sign in to [Polar's customer portal](https://polar.sh/hungry-ghost-audio/portal) using your checkout email and copy the `HG_` licence key. The Windows installer is in the File Downloads benefit; platform downloads are also offered at [Downloads](https://hungryghostaudio.com/#downloads). Click the activation button at the bottom of a plugin, paste the key and activate. A suite key covers all 50 tools. An individual key covers that tool. Activating on a device stores a shared signed record, so you can open your other purchased plugins on that device. A Windows computer and a Mac count as separate devices toward the two-device allowance.
 
 Each purchase permits two device activations. Use Manage devices to deactivate an old computer before moving to another. Paid activations work offline for up to 90 days. The plugin refreshes an older cache in the background when the service is available; an offline session retains a still-valid cache. After its expiry, reconnect and use Activate / refresh.
 

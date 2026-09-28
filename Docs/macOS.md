@@ -1,8 +1,14 @@
-# macOS release preparation
+# macOS release
 
-The public 0.2.0 downloads currently contain Windows x64 VST3 builds. A Mac
-release must pass the workflows below before its download is added to the site
-or Polar. Do not label an unsigned preview as a signed public release.
+The [signed 0.2.0 Mac release](https://github.com/HungryGhostStudios/hungry-ghost-audio/actions/runs/36408294229)
+passed the checks below, including all 100 universal VST3 / AU bundles on Intel
+and Apple Silicon, Apple notarization, stapling and selected-installation checks.
+The exact 2,604,372,347-byte installer was transferred to private R2 storage and
+read back in full; its SHA-256 is
+`e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e`.
+The trusted storefront configuration enables this verified artifact only.
+
+[Download the signed Mac installer](https://hungryghostaudio.com/downloads/macos/0.2.0/e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e/HungryGhostSuite-0.2.0-macOS-Universal.pkg).
 
 ## Formats and architectures
 
@@ -75,7 +81,7 @@ offer explicitly labelled Windows and macOS downloads.
 
 ## Large installer downloads
 
-The tested universal installer preview is 2,603,406,456 bytes. GitHub release
+The final universal installer is 2,604,372,347 bytes. GitHub release
 assets must each be smaller than 2 GiB, so the final `.pkg` is hosted in the
 private Cloudflare R2 bucket `hungry-ghost-audio-releases`, bound to the storefront
 as `RELEASES`. Keep the source archive and small validation reports on GitHub.
@@ -89,7 +95,10 @@ checksum, and only then add these fields to the trusted release configuration:
 `node scripts/macos/upload_release.mjs /path/to/the/final.pkg` performs this
 transfer using a temporary, isolated Worker and the existing Wrangler login.
 Its bearer credential expires after two hours, each 32 MiB part is checksummed,
-and the full remote file is read back to verify SHA-256. The helper Worker and
+and the full remote file is read back to verify SHA-256. The client waits for
+secret deployment to reach the edge and allows a long verification download.
+An existing object at the exact checksum key must pass the same complete
+verification before it can be configured publicly. The helper Worker and
 its credential are removed afterward; the object stays private until configured
 for the storefront. The helper writes `macOS-download.json` next to the release
 only after full verification. It rejects preview manifests and missing Accepted

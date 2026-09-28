@@ -41,10 +41,24 @@ try {
  base=output.match(/https:\/\/[a-z0-9.-]+\.workers\.dev/)?.[0];if(!base)throw Error('Upload service URL was not returned');
  await cli(['secret','put','UPLOAD_TOKEN'],token);
  const request=async(path,options={})=>{
-  const response=await fetch(base+path,{...options,headers:{Authorization:'Bearer '+token,...options.headers},signal:AbortSignal.timeout(300000)});
-  if(!response.ok)throw Error('Release transfer failed with HTTP '+response.status);return response;
+  const {timeoutMs=300000,acceptStatuses=[],...fetchOptions}=options;
+  const response=await fetch(base+path,{...fetchOptions,headers:{Authorization:'Bearer '+token,...fetchOptions.headers},signal:AbortSignal.timeout(timeoutMs)});
+  if(!response.ok&&!acceptStatuses.includes(response.status))throw Error('Release transfer failed with HTTP '+response.status);return response;
  };
- const start=await (await request('/start',{method:'POST'})).json();uploadId=start.uploadId;
+ // Secret deployment may reach the edge shortly after Wrangler acknowledges it.
+ let startResponse;
+ for(let attempt=0;attempt<12;attempt++){
+  startResponse=await request('/start',{method:'POST',acceptStatuses:[404,409]});
+  if(startResponse.status!==404)break;
+  await new Promise(done=>setTimeout(done,5000));
+ }
+ if(startResponse.status===404)throw Error('Upload service credential did not become available');
+ const start=await startResponse.json();
+ if(startResponse.status===409){
+  if(start.error!=='Object already exists')throw Error('Unexpected existing-object response');
+  complete=true;console.log('Existing exact-key object found; verifying its complete content before public configuration.');
+ }else{
+ uploadId=start.uploadId;
  if(typeof uploadId!=='string'||start.partBytes!==32*1024*1024)throw Error('Unexpected upload session');
  const file=await open(packagePath,'r'),parts=[];
  try {
@@ -58,7 +72,8 @@ try {
   }
  }finally{await file.close();}
  await request('/finish?uploadId='+encodeURIComponent(uploadId),{method:'POST',body:JSON.stringify(parts)});complete=true;
- const response=await request('/artifact'),remoteHash=createHash('sha256');let received=0;
+ }
+ const response=await request('/artifact',{timeoutMs:90*60*1000}),remoteHash=createHash('sha256');let received=0;
  for await(const chunk of response.body){remoteHash.update(chunk);received+=chunk.length;}
  if(received!==bytes||remoteHash.digest('hex')!==sha256)throw Error('Remote installer verification failed; keep public download disabled');
  const path='/downloads/'+key;
