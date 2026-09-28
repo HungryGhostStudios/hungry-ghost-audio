@@ -71,6 +71,10 @@ with tempfile.TemporaryDirectory(prefix='hungryghost-mac-') as scratch:
             subprocess.run(['pkgbuild', '--root', str(payload), '--component-plist', str(components),
                             '--identifier', package_id, '--version', record['version'],
                             '--install-location', '/Library/Audio/Plug-Ins/' + folder, str(packages / package_name)], check=True)
+            # The component package now owns the payload. Do not retain 100
+            # duplicate staging trees alongside the original universal bundles.
+            assert payload.parent.resolve().parent == scratch.resolve()
+            shutil.rmtree(payload.parent)
             ET.SubElement(branch, 'line', {'choice': choice_id})
             choice = ET.SubElement(dist, 'choice', {'id': choice_id, 'title': record['name'], 'start_selected': 'true'})
             ET.SubElement(choice, 'pkg-ref', {'id': package_id})
