@@ -1,0 +1,89 @@
+name: macOS universal plugins
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'CMakeLists.txt'
+      - 'Products.cmake'
+      - 'Source/**'
+      - 'Tests/**'
+      - 'Assets/**'
+      - 'catalogue.json'
+      - 'scripts/macos/**'
+      - '.github/workflows/macos.yml'
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: macos-15-intel
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Intel and Apple Silicon
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DHG_BUILD_STANDALONE=OFF
+      - name: Build VST3, Audio Units and native checks
+        run: cmake --build build --target hg_suite hg_dsp_tests hg_plugin_tests hg_processor_tests hg_license_tests --parallel 4
+      - name: Native Intel checks
+        run: ctest --test-dir build --output-on-failure
+      - name: Install pinned validator
+        run: |
+          curl --fail --location https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_macOS.zip --output pluginval.zip
+          ditto -x -k pluginval.zip validator
+      - name: Validate all universal bundles on Intel
+        run: python3 scripts/macos/validate.py --build build --validator validator/pluginval.app/Contents/MacOS/pluginval --output mac-validation --workers 2
+      - name: Stage exact validated plugins
+        run: python3 scripts/macos/stage.py --validation mac-validation/results.json --output mac-stage
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mac-intel-validation
+          path: mac-validation
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-universal-stage
+          path: mac-stage
+          compression-level: 6
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-native-checks
+          path: |
+            build/hg_dsp_tests
+            build/hg_plugin_tests_artefacts/Release/hg_plugin_tests
+            build/hg_processor_tests_artefacts/Release/hg_processor_tests
+            build/hg_license_tests_artefacts/Release/hg_license_tests
+  silicon:
+    needs: build
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: mac-universal-stage
+          path: mac-stage
+      - uses: actions/download-artifact@v4
+        with:
+          name: mac-native-checks
+          path: mac-checks
+      - name: Restore executable permissions and native signatures
+        run: |
+          find mac-stage -type f -path '*/Contents/MacOS/*' -exec chmod +x '{}' +
+          find mac-checks -type f -exec chmod +x '{}' +
+          find mac-stage -name '*.vst3' -o -name '*.component' | while IFS= read -r bundle; do codesign --verify --strict "$bundle"; done
+      - name: Native Apple Silicon checks
+        run: |
+          ./mac-checks/hg_dsp_tests
+          ./mac-checks/hg_plugin_tests_artefacts/Release/hg_plugin_tests
+          ./mac-checks/hg_processor_tests_artefacts/Release/hg_processor_tests
+          ./mac-checks/hg_license_tests_artefacts/Release/hg_license_tests Tests/Fixtures/entitlements.json licence-test-cache
+      - name: Install pinned validator
+        run: |
+          curl --fail --location https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_macOS.zip --output pluginval.zip
+          ditto -x -k pluginval.zip validator
+      - name: Validate exact universal bundles on Apple Silicon
+        run: python3 scripts/macos/validate.py --stage mac-stage --validator validator/pluginval.app/Contents/MacOS/pluginval --output mac-validation --workers 2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mac-silicon-validation
+          path: mac-validation

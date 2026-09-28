@@ -5,6 +5,9 @@ node_modules/
 *.pem
 *.key
 *.pfx
+*.p12
+*.p8
+*.certSigningRequest
 *.user
 .DS_Store
 releases/
