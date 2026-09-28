@@ -22,6 +22,7 @@ jobs:
       - name: Configure Intel and Apple Silicon
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DHG_BUILD_STANDALONE=OFF
       - name: Build VST3, Audio Units and native checks
+        id: compile
         run: cmake --build build --target hg_suite hg_dsp_tests hg_plugin_tests hg_processor_tests hg_license_tests --parallel 4
       - name: Native Intel checks
         run: ctest --test-dir build --output-on-failure
@@ -51,6 +52,19 @@ jobs:
             build/hg_plugin_tests_artefacts/Release/hg_plugin_tests
             build/hg_processor_tests_artefacts/Release/hg_processor_tests
             build/hg_license_tests_artefacts/Release/hg_license_tests
+      - name: Preserve compiled bundles for validation recovery
+        uses: actions/upload-artifact@v4
+        if: failure() && steps.compile.outcome == 'success'
+        with:
+          name: mac-unvalidated-build
+          path: |
+            build/*_artefacts/Release/VST3
+            build/*_artefacts/Release/AU
+            build/hg_dsp_tests
+            build/hg_plugin_tests_artefacts/Release/hg_plugin_tests
+            build/hg_processor_tests_artefacts/Release/hg_processor_tests
+            build/hg_license_tests_artefacts/Release/hg_license_tests
+          compression-level: 0
   silicon:
     needs: build
     runs-on: macos-15

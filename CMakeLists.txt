@@ -79,6 +79,15 @@ function(hg_add_product name index code category)
  target_compile_definitions(${name} PUBLIC $<TARGET_PROPERTY:hg_runtime,COMPILE_DEFINITIONS>)
  target_include_directories(${name} PUBLIC $<TARGET_PROPERTY:hg_runtime,INCLUDE_DIRECTORIES>)
  target_link_libraries(${name} PRIVATE hg_runtime)
+ # JUCE generates the VST3 manifest after its initial ad-hoc signing step.
+ # Seal the finished bundle, including that resource, before native validation.
+ if(APPLE)
+  foreach(format VST3 AU)
+   add_custom_command(TARGET ${name}_${format} POST_BUILD
+    COMMAND /usr/bin/codesign --force --sign - "$<TARGET_BUNDLE_DIR:${name}_${format}>"
+    VERBATIM)
+  endforeach()
+ endif()
  list(APPEND HG_PRODUCT_TARGETS ${name}_VST3)
  if(APPLE)
   list(APPEND HG_PRODUCT_TARGETS ${name}_AU)
