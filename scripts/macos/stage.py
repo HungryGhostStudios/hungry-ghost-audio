@@ -15,7 +15,7 @@ for record in records:
     destination = a.output / 'Library/Audio/Plug-Ins' / folder / source.name
     shutil.copytree(source, destination, dirs_exist_ok=True, symlinks=True)
 manifest = dict(suiteVersion='0.2.0', platform='macOS 11+, Apple Silicon and Intel',
-                formats=['VST3', 'AU'], signing='ad-hoc build; not a public installer', products=records)
+                formats=['VST3', 'AU'], signing='validated build; distribution signing checked during packaging', products=records)
 a.output.mkdir(parents=True, exist_ok=True)
 (a.output / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
 print('Staged all 100 validated universal bundles.', flush=True)

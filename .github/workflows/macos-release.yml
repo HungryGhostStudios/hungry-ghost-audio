@@ -1,0 +1,160 @@
+name: Signed macOS release
+on:
+  workflow_dispatch:
+    inputs:
+      build_run:
+        description: Successful macOS universal plugins run ID
+        required: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  sign:
+    if: github.ref == 'refs/heads/main'
+    runs-on: macos-15-intel
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check credentials and validated source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILD_RUN: ${{ inputs.build_run }}
+          MACOS_APPLICATION_P12: ${{ secrets.MACOS_APPLICATION_P12 }}
+          MACOS_INSTALLER_P12: ${{ secrets.MACOS_INSTALLER_P12 }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          MACOS_APPLICATION_IDENTITY: ${{ secrets.MACOS_APPLICATION_IDENTITY }}
+          MACOS_INSTALLER_IDENTITY: ${{ secrets.MACOS_INSTALLER_IDENTITY }}
+          MACOS_APPLE_ID: ${{ secrets.MACOS_APPLE_ID }}
+          MACOS_TEAM_ID: ${{ secrets.MACOS_TEAM_ID }}
+          MACOS_NOTARY_PASSWORD: ${{ secrets.MACOS_NOTARY_PASSWORD }}
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess
+          keys=['MACOS_APPLICATION_P12','MACOS_INSTALLER_P12','MACOS_CERTIFICATE_PASSWORD','MACOS_APPLICATION_IDENTITY','MACOS_INSTALLER_IDENTITY','MACOS_APPLE_ID','MACOS_TEAM_ID','MACOS_NOTARY_PASSWORD']
+          missing=[k for k in keys if not os.environ.get(k)]
+          assert not missing, 'Missing repository secrets: '+', '.join(missing)
+          assert os.environ['BUILD_RUN'].isdigit()
+          r=json.loads(subprocess.check_output(['gh','api','repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['BUILD_RUN']]))
+          assert r['path']=='.github/workflows/macos.yml' and r['conclusion']=='success'
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: mac-universal-stage
+          path: mac-stage
+          run-id: ${{ inputs.build_run }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: mac-intel-validation
+          path: intel-validation
+          run-id: ${{ inputs.build_run }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: mac-silicon-validation
+          path: silicon-validation
+          run-id: ${{ inputs.build_run }}
+          github-token: ${{ github.token }}
+      - name: Verify both native architectures before signing
+        run: |
+          find mac-stage -type f -path '*/Contents/MacOS/*' -exec chmod +x '{}' +
+          python3 scripts/macos/verify_archives.py --stage mac-stage --intel intel-validation/results.json --silicon silicon-validation/results.json
+      - name: Sign universal plugin bundles
+        env:
+          MACOS_APPLICATION_P12: ${{ secrets.MACOS_APPLICATION_P12 }}
+          MACOS_INSTALLER_P12: ${{ secrets.MACOS_INSTALLER_P12 }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          MACOS_APPLICATION_IDENTITY: ${{ secrets.MACOS_APPLICATION_IDENTITY }}
+          MACOS_INSTALLER_IDENTITY: ${{ secrets.MACOS_INSTALLER_IDENTITY }}
+        run: python3 scripts/macos/sign.py --stage mac-stage --keychain "$RUNNER_TEMP/hungryghost.keychain-db" --scratch "$RUNNER_TEMP/certificates"
+      - name: Validate the exact signed binaries on Intel
+        run: |
+          curl --fail --location https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_macOS.zip --output pluginval.zip
+          ditto -x -k pluginval.zip validator
+          python3 scripts/macos/validate.py --stage mac-stage --validator validator/pluginval.app/Contents/MacOS/pluginval --output signed-intel-validation --workers 2
+          python3 scripts/macos/stage.py --validation signed-intel-validation/results.json --output signed-stage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-signed-stage
+          path: signed-stage
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mac-signed-intel-validation
+          path: signed-intel-validation
+      - name: Remove temporary keychain
+        if: always()
+        run: security delete-keychain "$RUNNER_TEMP/hungryghost.keychain-db" || true
+  silicon:
+    needs: sign
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: mac-signed-stage
+          path: mac-stage
+      - name: Verify and validate exact signed binaries on Apple Silicon
+        run: |
+          find mac-stage -type f -path '*/Contents/MacOS/*' -exec chmod +x '{}' +
+          curl --fail --location https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_macOS.zip --output pluginval.zip
+          ditto -x -k pluginval.zip validator
+          python3 scripts/macos/validate.py --stage mac-stage --validator validator/pluginval.app/Contents/MacOS/pluginval --output signed-silicon-validation --workers 2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mac-signed-silicon-validation
+          path: signed-silicon-validation
+  package:
+    needs: [sign, silicon]
+    runs-on: macos-15-intel
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: mac-signed-stage
+          path: mac-stage
+      - uses: actions/download-artifact@v4
+        with:
+          name: mac-signed-intel-validation
+          path: intel-validation
+      - uses: actions/download-artifact@v4
+        with:
+          name: mac-signed-silicon-validation
+          path: silicon-validation
+      - name: Verify both architectures
+        run: |
+          find mac-stage -type f -path '*/Contents/MacOS/*' -exec chmod +x '{}' +
+          python3 scripts/macos/verify_archives.py --stage mac-stage --intel intel-validation/results.json --silicon silicon-validation/results.json
+      - name: Import signing credentials
+        env:
+          MACOS_APPLICATION_P12: ${{ secrets.MACOS_APPLICATION_P12 }}
+          MACOS_INSTALLER_P12: ${{ secrets.MACOS_INSTALLER_P12 }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          MACOS_APPLICATION_IDENTITY: ${{ secrets.MACOS_APPLICATION_IDENTITY }}
+          MACOS_INSTALLER_IDENTITY: ${{ secrets.MACOS_INSTALLER_IDENTITY }}
+        run: python3 scripts/macos/sign.py --import-only --stage empty-stage --keychain "$RUNNER_TEMP/hungryghost.keychain-db" --scratch "$RUNNER_TEMP/certificates"
+      - name: Sign, notarize and staple the Mac installer
+        env:
+          MACOS_APPLICATION_IDENTITY: ${{ secrets.MACOS_APPLICATION_IDENTITY }}
+          MACOS_INSTALLER_IDENTITY: ${{ secrets.MACOS_INSTALLER_IDENTITY }}
+          MACOS_APPLE_ID: ${{ secrets.MACOS_APPLE_ID }}
+          MACOS_TEAM_ID: ${{ secrets.MACOS_TEAM_ID }}
+          MACOS_NOTARY_PASSWORD: ${{ secrets.MACOS_NOTARY_PASSWORD }}
+        run: |
+          xcrun notarytool store-credentials hungryghost-notary --apple-id "$MACOS_APPLE_ID" --team-id "$MACOS_TEAM_ID" --password "$MACOS_NOTARY_PASSWORD" --keychain "$RUNNER_TEMP/hungryghost.keychain-db"
+          python3 scripts/macos/package.py --stage mac-stage --output mac-release --application-identity "$MACOS_APPLICATION_IDENTITY" --installer-identity "$MACOS_INSTALLER_IDENTITY" --notary-profile hungryghost-notary --notary-keychain "$RUNNER_TEMP/hungryghost.keychain-db"
+      - name: Verify selectable installation
+        run: python3 scripts/macos/check_installer.py --package mac-release/HungryGhostSuite-0.2.0-macOS-Universal.pkg --manifest mac-stage/manifest.json --output installer-checks
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-signed-release
+          path: |
+            mac-release
+            installer-checks
+          compression-level: 0
+      - name: Remove temporary keychain
+        if: always()
+        run: security delete-keychain "$RUNNER_TEMP/hungryghost.keychain-db" || true

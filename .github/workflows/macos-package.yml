@@ -1,0 +1,59 @@
+name: macOS installer preparation
+on:
+  workflow_dispatch:
+    inputs:
+      build_run:
+        description: Successful macOS universal plugins run ID
+        required: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  package:
+    runs-on: macos-15-intel
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require successful native build and both architectures
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILD_RUN: ${{ inputs.build_run }}
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess
+          run=json.loads(subprocess.check_output(['gh','api','repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['BUILD_RUN']]))
+          assert run['path']=='.github/workflows/macos.yml' and run['conclusion']=='success'
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: mac-universal-stage
+          path: mac-stage
+          run-id: ${{ inputs.build_run }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: mac-intel-validation
+          path: intel-validation
+          run-id: ${{ inputs.build_run }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: mac-silicon-validation
+          path: silicon-validation
+          run-id: ${{ inputs.build_run }}
+          github-token: ${{ github.token }}
+      - name: Verify exact binaries on both architectures
+        run: |
+          find mac-stage -type f -path '*/Contents/MacOS/*' -exec chmod +x '{}' +
+          python3 scripts/macos/verify_archives.py --stage mac-stage --intel intel-validation/results.json --silicon silicon-validation/results.json
+      - name: Build installer preview
+        run: python3 scripts/macos/package.py --stage mac-stage --output mac-release --preview
+      - name: Verify selectable installation on disposable CI Mac
+        run: python3 scripts/macos/check_installer.py --package mac-release/HungryGhostSuite-0.2.0-macOS-Universal-Preview.pkg --manifest mac-stage/manifest.json --output installer-checks
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-installer-preview
+          path: |
+            mac-release
+            installer-checks
+          compression-level: 0
