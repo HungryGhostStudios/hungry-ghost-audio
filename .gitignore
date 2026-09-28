@@ -8,6 +8,7 @@ node_modules/
 *.p12
 *.p8
 *.certSigningRequest
+__pycache__/
 *.user
 .DS_Store
 releases/
