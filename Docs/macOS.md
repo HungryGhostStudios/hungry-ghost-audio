@@ -18,6 +18,13 @@ universal files on an Apple Silicon runner. The architecture, actual executable
 hashes and validator results are saved in the build artifacts. A successful
 compile alone is not enough to ship.
 
+On disposable CI Macs, validation installs exact AU copies into the system
+Components folder, refreshes AudioComponentRegistrar and verifies that all 50
+identifiers appear in `auval -a` before DSP validation. Registry logs are retained.
+`macos-validate-built.yml` can recover bundles from a completed `macos.yml` run
+whose compile step succeeded. It requires unchanged native sources and repeats
+all native and plugin checks on Intel and Apple Silicon before packaging.
+
 ## Installer
 
 `macos-package.yml` accepts a successful universal build run ID and makes a

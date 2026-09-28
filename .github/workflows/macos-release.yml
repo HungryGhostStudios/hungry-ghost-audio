@@ -36,7 +36,7 @@ jobs:
           assert not missing, 'Missing repository secrets: '+', '.join(missing)
           assert os.environ['BUILD_RUN'].isdigit()
           r=json.loads(subprocess.check_output(['gh','api','repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['BUILD_RUN']]))
-          assert r['path']=='.github/workflows/macos.yml' and r['conclusion']=='success'
+          assert r['path'] in {'.github/workflows/macos.yml', '.github/workflows/macos-validate-built.yml'} and r['head_branch']=='main' and r['conclusion']=='success'
           PY
       - uses: actions/download-artifact@v4
         with:
@@ -73,7 +73,7 @@ jobs:
         run: |
           curl --fail --location https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_macOS.zip --output pluginval.zip
           ditto -x -k pluginval.zip validator
-          python3 scripts/macos/validate.py --stage mac-stage --validator validator/pluginval.app/Contents/MacOS/pluginval --output signed-intel-validation --workers 2
+          python3 scripts/macos/validate.py --stage mac-stage --validator validator/pluginval.app/Contents/MacOS/pluginval --output signed-intel-validation --workers 2 --system-au-install
           python3 scripts/macos/stage.py --validation signed-intel-validation/results.json --output signed-stage
       - uses: actions/upload-artifact@v4
         with:
@@ -102,7 +102,7 @@ jobs:
           find mac-stage -type f -path '*/Contents/MacOS/*' -exec chmod +x '{}' +
           curl --fail --location https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_macOS.zip --output pluginval.zip
           ditto -x -k pluginval.zip validator
-          python3 scripts/macos/validate.py --stage mac-stage --validator validator/pluginval.app/Contents/MacOS/pluginval --output signed-silicon-validation --workers 2
+          python3 scripts/macos/validate.py --stage mac-stage --validator validator/pluginval.app/Contents/MacOS/pluginval --output signed-silicon-validation --workers 2 --system-au-install
       - uses: actions/upload-artifact@v4
         if: always()
         with:

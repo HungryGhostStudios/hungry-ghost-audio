@@ -1,5 +1,5 @@
 """Check both slices and validate all VST3/Audio Unit bundles on the running Mac."""
-import argparse, concurrent.futures, hashlib, json, platform, plistlib, shutil, subprocess
+import argparse, concurrent.futures, hashlib, json, os, platform, plistlib, shutil, subprocess, threading, time
 from pathlib import Path
 
 p = argparse.ArgumentParser()
@@ -8,8 +8,11 @@ p.add_argument('--stage', type=Path)
 p.add_argument('--validator', type=Path, required=True)
 p.add_argument('--output', type=Path, required=True)
 p.add_argument('--workers', type=int, default=2)
+p.add_argument('--system-au-install', action='store_true', help='Use the system Components folder on disposable GitHub CI Macs only')
 a = p.parse_args()
 if bool(a.build) == bool(a.stage): p.error('Supply either --build or --stage')
+if a.system_au_install and os.environ.get('GITHUB_ACTIONS') != 'true':
+    p.error('--system-au-install is restricted to disposable GitHub Actions runners')
 root = Path(__file__).resolve().parents[2]
 products = json.loads((root / 'catalogue.json').read_text(encoding='utf-8'))
 a.output.mkdir(parents=True, exist_ok=True)
@@ -32,10 +35,35 @@ for product in products:
             component = info['AudioComponents'][0]
             assert component['manufacturer'] == 'Aftr'
             record['audioComponent'] = {k: component[k] for k in ('type', 'subtype', 'manufacturer')}
-            destination = Path.home() / 'Library/Audio/Plug-Ins/Components' / bundle.name
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copytree(bundle, destination, dirs_exist_ok=True, symlinks=True)
+            destination = (Path('/Library/Audio/Plug-Ins/Components') if a.system_au_install
+                           else Path.home() / 'Library/Audio/Plug-Ins/Components') / bundle.name
+            if a.system_au_install:
+                subprocess.run(['sudo', 'ditto', str(bundle), str(destination)], check=True)
+            else:
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copytree(bundle, destination, dirs_exist_ok=True, symlinks=True)
+            installed = destination / 'Contents/MacOS' / info['CFBundleExecutable']
+            assert hashlib.sha256(installed.read_bytes()).hexdigest() == record['sha256']
+            subprocess.run(['codesign', '--verify', '--strict', str(destination)], check=True)
         inventory.append(record)
+
+# auval resolves component identifiers through Apple's registrar, rather than a
+# bundle path. Wait for all installed components to appear before testing DSP.
+if os.environ.get('GITHUB_ACTIONS') == 'true':
+    subprocess.run(['sudo', 'killall', '-9', 'AudioComponentRegistrar'], capture_output=True)
+expected = {tuple(r['audioComponent'][k] for k in ('type', 'subtype', 'manufacturer'))
+            for r in inventory if r['format'] == 'AU'}
+assert len(expected) == 50, 'Audio Unit identifiers must be unique'
+for attempt in range(6):
+    scan = subprocess.run(['auval', '-a'], capture_output=True, text=True, timeout=120)
+    (a.output / f'au-registry-{attempt}.log').write_text(scan.stdout + scan.stderr, encoding='utf-8')
+    discovered = {tuple(line.split()[:3]) for line in scan.stdout.splitlines() if len(line.split()) >= 3}
+    missing = expected - discovered
+    if not missing:
+        break
+    time.sleep(2)
+assert not missing, 'Audio Units missing from Apple registrar: ' + repr(sorted(missing))
+au_lock = threading.Lock()
 
 def validate(record):
     record = dict(record)
@@ -50,10 +78,14 @@ def validate(record):
         record.update(validator='Apple auval')
     try:
         with log.open('w', encoding='utf-8') as f:
-            run = subprocess.run(command, stdout=f, stderr=subprocess.STDOUT, timeout=600)
+            if record['format'] == 'AU':
+                with au_lock:
+                    run = subprocess.run(command, stdout=f, stderr=subprocess.STDOUT, timeout=600)
+            else:
+                run = subprocess.run(command, stdout=f, stderr=subprocess.STDOUT, timeout=600)
         record['exitCode'] = run.returncode
         record['passed'] = run.returncode == 0 and hashlib.sha256(Path(record['binary']).read_bytes()).hexdigest() == record['sha256']
-        if record['format'] == 'AU': record['passed'] &= 'AU VALIDATION SUCCEEDED' in log.read_text(errors='replace')
+        if record['format'] == 'AU': record['passed'] &= 'AU VALIDATION SUCCEEDED' in log.read_text(encoding='utf-8', errors='replace')
     except subprocess.TimeoutExpired:
         record.update(passed=False, error='Validation timed out')
     return record
