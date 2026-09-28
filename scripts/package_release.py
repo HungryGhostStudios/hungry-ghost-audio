@@ -26,11 +26,11 @@ docs=[(root/'LICENSE','LICENSE.txt'),(root/'NOTICE','NOTICE.txt'),(root/'Docs'/'
 def package(path,entries):
     with zipfile.ZipFile(path,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as archive:
         for file,name in entries+docs:archive.write(file,name)
-        archive.writestr('SOURCE.txt','Complete corresponding source: https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/tag/v0.1.0\nThe source archive includes the pinned JUCE framework and editable interface assets. AGPL-3.0-or-later.\n')
-package(args.output/'HungryGhostSuite-0.1.0-Windows-VST3.zip',bundle_entries)
+        archive.writestr('SOURCE.txt','Complete corresponding source: https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/tag/v0.2.0\nThe source archive includes the pinned JUCE framework and editable interface assets. AGPL-3.0-or-later.\n')
+package(args.output/'HungryGhostSuite-0.2.0-Windows-VST3.zip',bundle_entries)
 for product in products:
     name=verified[product['id']]['name']+'.vst3'
     package(args.output/('HungryGhost-'+product['name']+'-'+product['version']+'-Windows-VST3.zip'),[(file,path) for file,path in bundle_entries if path.startswith('VST3/'+name+'/')])
 (args.work/'installer-hashes.tsv').write_text(''.join(path+'\t'+hashlib.sha256(file.read_bytes()).hexdigest()+'\n' for file,path in bundle_entries),encoding='utf-8')
-(args.output/'manifest.json').write_text(json.dumps(dict(suiteVersion='0.1.0',platform='Windows x64',format='VST3',products=manifest),indent=2)+'\n')
+(args.output/'manifest.json').write_text(json.dumps(dict(suiteVersion='0.2.0',platform='Windows x64',format='VST3',products=manifest),indent=2)+'\n')
 print('Packaged 50 individual downloads and complete suite; every binary matches its validation hash.',flush=True)

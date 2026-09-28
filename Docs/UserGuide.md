@@ -1,12 +1,12 @@
-# Hungry Ghost Audio · Windows VST3
+# Hungry Ghost Audio Â· Windows VST3
 
-Suite release 0.1.0. Windows 10 or 11, x64 audio host with VST3 support. REVERB is version 0.3.0; FERAL is 0.2.0; the remaining effects are 0.1.0. Other operating systems and plugin formats are not included in this release.
+Suite release 0.2.0. Windows 10 or 11, x64 audio host with VST3 support. REVERB is version 0.3.0; FERAL is 0.2.0; the remaining effects are 0.2.0. Other operating systems and plugin formats are not included in this release.
 
 ## Install
 
 1. Close your audio host. The installer never closes it for you.
-2. Run `HungryGhostSuite-0.1.0-Setup.exe`, select your effects and choose Install. The default is your standard user VST3 folder: `%LOCALAPPDATA%\Programs\Common\VST3`. Installing there does not require administrator access.
-3. Open your host and rescan that folder. In REAPER, open Preferences → Plug-ins → VST, add the folder to the scan paths if needed, and use Re-scan.
+2. Run `HungryGhostSuite-0.2.0-Setup.exe`, select your effects and choose Install. The default is your standard user VST3 folder: `%LOCALAPPDATA%\Programs\Common\VST3`. Installing there does not require administrator access.
+3. Open your host and rescan that folder. In REAPER, open Preferences â†’ Plug-ins â†’ VST, add the folder to the scan paths if needed, and use Re-scan.
 
 The ZIP downloads provide the same tested binaries for manual installation. Copy the folders **inside** `VST3` to your user VST3 folder, or to `C:\Program Files\Common Files\VST3` with administrator access. Copy each whole `.vst3` folder, including Contents; do not extract just the inner binary. Choose either the user location or shared location for an installation to avoid duplicate versions.
 
@@ -18,7 +18,7 @@ These initial releases are not signed with a Windows code-signing certificate. R
 
 The suite starts a shared 30-day trial on its first launch. No account or audio upload is needed for the trial. When it ends, unlicensed effects pass audio through; they do not insert noise or mute your project. Trial status is assessed when you open a plugin instance, so a running session is not interrupted midway through a take.
 
-After purchasing, sign in to [Polar's customer portal](https://polar.sh/hungry-ghost-audio/portal) using your checkout email. Copy the `HG_` licence key. Click the activation button at the bottom of a plugin, paste the key and activate. A suite key covers all 50 tools. An individual key covers that tool. Activating on a device stores a shared signed record, so you can open your other purchased plugins on that device.
+After purchasing, sign in to [Polar's customer portal](https://polar.sh/hungry-ghost-audio/portal) using your checkout email. Download the Windows installer from the File Downloads benefit, then copy the `HG_` licence key. The website also offers the installer and ZIP at [Downloads](https://hungryghostaudio.com/#downloads). Click the activation button at the bottom of a plugin, paste the key and activate. A suite key covers all 50 tools. An individual key covers that tool. Activating on a device stores a shared signed record, so you can open your other purchased plugins on that device.
 
 Each purchase permits two device activations. Use Manage devices to deactivate an old computer before moving to another. Paid activations work offline for up to 90 days. The plugin refreshes an older cache in the background when the service is available; an offline session retains a still-valid cache. After its expiry, reconnect and use Activate / refresh.
 
@@ -30,8 +30,9 @@ The source is available under AGPLv3. You may inspect, modify, build and redistr
 
 - **Dry / wet** blends the effect with the input. Output adjusts final level. Compare at similar loudness before deciding an effect sounds better.
 - **A / B** stores two independent settings for comparison. Copy transfers the current settings to the other bank. Factory returns controls to their defaults.
-- **Bypass** preserves the reported plugin latency. Saturation tools and EDGE use 4× oversampling up to 96 kHz, 2× at 192 kHz, and no additional oversampling above that. Hosts compensate the reported delay.
-- **Input / output spectrum** displays measured audio. It stays flat when no audio arrives. It is not an EQ-response curve. GR reports gain reduction for processors that reduce gain.
+- **Bypass** preserves the reported plugin latency. Saturation tools and EDGE use 4Ã— oversampling up to 96 kHz, 2Ã— at 192 kHz, and no additional oversampling above that. Hosts compensate the reported delay.
+- **Displays** fit each processor: waveforms, spectra, peak and reduction meters, and stereo scopes show measured audio. Response, transfer, LFO shape and repeat timing show settings. See [the interface and control guide](InterfaceUpdate.md).
+- **Shape +** opens deeper settings where relevant. Sync follows host tempo, with a fallback if unavailable; free time/rate is retained when sync is disabled. Key audition plays the detector signal. Mono audition plays the stereo sum.
 - Drag knobs, use the mouse wheel or enter values in their readouts. Double-click a knob to restore its default. Frequency entry accepts Hz or kHz; dry/wet entry uses percent.
 
 ## REVERB
@@ -70,6 +71,6 @@ WIDE adjusts side energy with bass mono filtering. CENTER collapses low-frequenc
 
 ## Source, downloads and help
 
-[Releases and checksums](https://github.com/HungryGhostStudios/hungry-ghost-audio/releases) · [Full source](https://github.com/HungryGhostStudios/hungry-ghost-audio) · [Bug reports](https://github.com/HungryGhostStudios/hungry-ghost-audio/issues)
+[Releases and checksums](https://github.com/HungryGhostStudios/hungry-ghost-audio/releases) Â· [Full source](https://github.com/HungryGhostStudios/hungry-ghost-audio) Â· [Bug reports](https://github.com/HungryGhostStudios/hungry-ghost-audio/issues)
 
 Include your plugin version, host version, sample rate and steps to reproduce a bug. For purchase or activation questions, use the contact details in your Polar receipt. Do not publish a licence key, purchase email or private project.

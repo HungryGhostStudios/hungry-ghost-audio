@@ -11,6 +11,7 @@ public:
   static juce::Colour background(), panel(), ink(), muted(), accent(), line();
   void paintChassis(juce::Graphics &, juce::Rectangle<float>) const;
   void paintDisplay(juce::Graphics &, juce::Rectangle<float>) const;
+  void paintReel(juce::Graphics &, juce::Rectangle<float>, int frame) const;
   bool hasAssets() const;
   void drawRotarySlider(juce::Graphics &, int, int, int, int, float, float,
                         float, juce::Slider &) override;
@@ -29,6 +30,6 @@ public:
   void drawLabel(juce::Graphics &, juce::Label &) override;
 
 private:
-  juce::Image dialAtlas, faceplate, display, keycap, selectedKeycap;
+  juce::Image dialAtlas, faceplate, display, keycap, selectedKeycap, reelAtlas;
 };
 } // namespace hungryghost

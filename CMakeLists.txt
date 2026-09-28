@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(HungryGhostSuite VERSION 0.1.0 LANGUAGES C CXX)
+project(HungryGhostSuite VERSION 0.2.0 LANGUAGES C CXX)
 # Ship self-contained Windows plugins; do not require a separate VC runtime
 # installer on a customer's audio workstation.
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -25,8 +25,8 @@ else()
  FetchContent_Declare(JUCE GIT_REPOSITORY https://github.com/juce-framework/JUCE.git GIT_TAG 9.0.2 GIT_SHALLOW TRUE)
  FetchContent_MakeAvailable(JUCE)
 endif()
-juce_add_binary_data(hg_assets SOURCES Assets/monolith-dial.png Assets/monolith-faceplate.png Assets/monolith-display.png Assets/monolith-button.png Assets/monolith-button-active.png)
-add_library(hg_runtime STATIC Source/SuiteProcessor.cpp Source/SuiteEditor.cpp Source/UI/GhostTheme.cpp Source/Licensing/Entitlement.cpp Source/Licensing/LicenseManager.cpp
+juce_add_binary_data(hg_assets SOURCES Assets/monolith-dial.png Assets/monolith-faceplate.png Assets/monolith-display.png Assets/monolith-button.png Assets/monolith-button-active.png Assets/reel-spool.png)
+add_library(hg_runtime STATIC Source/SuiteProcessor.cpp Source/SuiteEditor.cpp Source/SuiteEditorVisuals.cpp Source/UI/GhostTheme.cpp Source/Licensing/Entitlement.cpp Source/Licensing/LicenseManager.cpp
  Source/Originals/Reverb/PluginProcessor.cpp Source/Originals/Reverb/PluginEditor.cpp Source/Originals/Reverb/ReverbEngine.cpp
  Source/Originals/Feral/PluginProcessor.cpp Source/Originals/Feral/PluginEditor.cpp Source/Originals/Feral/DynamicsEngine.cpp)
 target_include_directories(hg_runtime PUBLIC Source)
@@ -55,7 +55,7 @@ function(hg_add_product name index code category)
   list(APPEND formats Standalone)
  endif()
  set(product "Hungry Ghost ${name}")
- set(version "0.1.0")
+ set(version "${PROJECT_VERSION}")
  string(TOLOWER "${name}" slug)
  if(name STREQUAL "REVERB")
   set(product "Hungry Ghost")

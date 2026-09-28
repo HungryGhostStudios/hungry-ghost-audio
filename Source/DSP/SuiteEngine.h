@@ -1,5 +1,6 @@
 #pragma once
 #include "../Catalogue.h"
+#include "../AdvancedControls.h"
 #include <array>
 #include <cstdint>
 #include <vector>
@@ -11,6 +12,7 @@ public:
   void prepare(double sampleRate);
   void reset();
   void setControls(const std::array<float, 6> &, float mix, float outputDb);
+  void setAdvanced(const AdvancedSettings&);
   void process(float *left, float *right, const float *keyLeft,
                const float *keyRight, int samples) noexcept;
   float gainReduction() const noexcept { return reduction; }
@@ -24,6 +26,9 @@ private:
   Kind kind;
   double sr = 48000, phase = 0;
   std::array<float, 6> target{}, smooth{};
+  AdvancedSettings advanced,advancedSmooth;
+  std::array<float,2> detectorLow{},inputLow{},repeatLow{};
+  float listenBlend=0,monoBlend=0;
   float targetMix = 1, mix = 1, targetOutput = 1, output = 1, smoothing = .002f;
   float envelope = 0, fastEnvelope = 0, slowEnvelope = 0, gainState = 1,
         reduction = 0, heldL = 0, heldR = 0, holdClock = 0;

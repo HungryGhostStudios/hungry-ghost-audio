@@ -5,7 +5,7 @@
     "family": "Space",
     "engine": "OriginalReverb",
     "description": "Sixteen delay lines. One enormous sense of space.",
-    "price": 25,
+    "price": 5.99,
     "controls": [],
     "status": "validated",
     "version": "0.3.0",
@@ -17,7 +17,7 @@
     "family": "Dynamics",
     "engine": "OriginalFeral",
     "description": "Eight bands of dynamic EQ with a stereo bus compressor.",
-    "price": 99,
+    "price": 5.99,
     "controls": [],
     "status": "validated",
     "version": "0.2.0",
@@ -29,7 +29,7 @@
     "family": "Dynamics",
     "engine": "Compressor",
     "description": "A clean feed-forward compressor for precise level control.",
-    "price": 39,
+    "price": 5.99,
     "controls": [
       {
         "name": "Threshold",
@@ -81,7 +81,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/rift.png"
   },
   {
@@ -90,7 +90,7 @@
     "family": "Dynamics",
     "engine": "FastCompressor",
     "description": "Fast peak compression for drums and sharp attacks.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Threshold",
@@ -142,7 +142,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/claw.png"
   },
   {
@@ -151,7 +151,7 @@
     "family": "Dynamics",
     "engine": "RmsCompressor",
     "description": "Slower RMS detection for smooth vocal and instrument levelling.",
-    "price": 39,
+    "price": 5.99,
     "controls": [
       {
         "name": "Threshold",
@@ -203,7 +203,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/velvet.png"
   },
   {
@@ -212,7 +212,7 @@
     "family": "Dynamics",
     "engine": "BusCompressor",
     "description": "A stereo-linked compressor with a filtered detector.",
-    "price": 39,
+    "price": 5.99,
     "controls": [
       {
         "name": "Threshold",
@@ -264,7 +264,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/bond.png"
   },
   {
@@ -273,7 +273,7 @@
     "family": "Dynamics",
     "engine": "ParallelCompressor",
     "description": "Blend intense compression with the original signal.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Threshold",
@@ -325,7 +325,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/crush.png"
   },
   {
@@ -334,7 +334,7 @@
     "family": "Dynamics",
     "engine": "DeEsser",
     "description": "Band-sensitive gain reduction for sibilance.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Threshold",
@@ -386,7 +386,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/hush.png"
   },
   {
@@ -395,7 +395,7 @@
     "family": "Dynamics",
     "engine": "Gate",
     "description": "A downward gate with hysteresis and a controllable floor.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Threshold",
@@ -447,7 +447,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/gate.png"
   },
   {
@@ -456,7 +456,7 @@
     "family": "Dynamics",
     "engine": "Expander",
     "description": "Restore separation with gentle downward expansion.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Threshold",
@@ -508,7 +508,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/bloom.png"
   },
   {
@@ -517,7 +517,7 @@
     "family": "Dynamics",
     "engine": "Transient",
     "description": "Shape the attack and body of drums without a threshold.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Attack",
@@ -569,7 +569,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/punch.png"
   },
   {
@@ -578,7 +578,7 @@
     "family": "Dynamics",
     "engine": "Sustain",
     "description": "Extend or tighten note sustain with a slow envelope.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Sustain",
@@ -630,7 +630,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/tail.png"
   },
   {
@@ -639,7 +639,7 @@
     "family": "Dynamics",
     "engine": "Limiter",
     "description": "A linked sample-peak limiter with a hard safety ceiling.",
-    "price": 39,
+    "price": 5.99,
     "controls": [
       {
         "name": "Ceiling",
@@ -667,7 +667,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/guard.png"
   },
   {
@@ -676,7 +676,7 @@
     "family": "Dynamics",
     "engine": "Clipper",
     "description": "Set a peak ceiling with adjustable soft clipping.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Ceiling",
@@ -704,7 +704,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/edge.png"
   },
   {
@@ -713,7 +713,7 @@
     "family": "Dynamics",
     "engine": "Leveller",
     "description": "A slow automatic level rider with bounded gain.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Target",
@@ -757,7 +757,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/ride.png"
   },
   {
@@ -766,7 +766,7 @@
     "family": "Dynamics",
     "engine": "Ducker",
     "description": "Use an external key to make room for another track.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Threshold",
@@ -810,7 +810,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/duck.png"
   },
   {
@@ -819,7 +819,7 @@
     "family": "Tone",
     "engine": "ParametricEQ",
     "description": "Three fixed-width bell bands for broad tonal shaping.",
-    "price": 39,
+    "price": 5.99,
     "controls": [
       {
         "name": "Frequency",
@@ -871,7 +871,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/shade.png"
   },
   {
@@ -880,7 +880,7 @@
     "family": "Tone",
     "engine": "TiltEQ",
     "description": "Move warmth and brightness around a single pivot.",
-    "price": 15,
+    "price": 5.99,
     "controls": [
       {
         "name": "Frequency",
@@ -900,7 +900,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/tilt.png"
   },
   {
@@ -909,7 +909,7 @@
     "family": "Tone",
     "engine": "LowShelf",
     "description": "A low shelf with an adjustable corner and resonance.",
-    "price": 15,
+    "price": 5.99,
     "controls": [
       {
         "name": "Frequency",
@@ -937,7 +937,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/weight.png"
   },
   {
@@ -946,7 +946,7 @@
     "family": "Tone",
     "engine": "HighShelf",
     "description": "A high shelf for presence, sparkle and darker tops.",
-    "price": 15,
+    "price": 5.99,
     "controls": [
       {
         "name": "Frequency",
@@ -974,7 +974,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/air.png"
   },
   {
@@ -983,7 +983,7 @@
     "family": "Tone",
     "engine": "Notch",
     "description": "A focused rejection filter for problem frequencies.",
-    "price": 15,
+    "price": 5.99,
     "controls": [
       {
         "name": "Frequency",
@@ -1003,7 +1003,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/void.png"
   },
   {
@@ -1012,7 +1012,7 @@
     "family": "Tone",
     "engine": "BandPass",
     "description": "Band-pass filtering with controllable width.",
-    "price": 15,
+    "price": 5.99,
     "controls": [
       {
         "name": "Frequency",
@@ -1032,7 +1032,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/cross.png"
   },
   {
@@ -1041,7 +1041,7 @@
     "family": "Tone",
     "engine": "Cuts",
     "description": "High-pass and low-pass filtering for focused bandwidth.",
-    "price": 15,
+    "price": 5.99,
     "controls": [
       {
         "name": "Low cut",
@@ -1069,7 +1069,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/contour.png"
   },
   {
@@ -1078,7 +1078,7 @@
     "family": "Tone",
     "engine": "MidSideEQ",
     "description": "A bell EQ that independently shapes mid and side channels.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Frequency",
@@ -1114,7 +1114,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/focus.png"
   },
   {
@@ -1123,7 +1123,7 @@
     "family": "Colour",
     "engine": "SoftSaturation",
     "description": "Smooth symmetric saturation with tone filtering.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Drive",
@@ -1143,7 +1143,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/ember.png"
   },
   {
@@ -1152,7 +1152,7 @@
     "family": "Colour",
     "engine": "AsymmetricSaturation",
     "description": "Biased saturation with controllable even harmonics.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Drive",
@@ -1180,7 +1180,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/iron.png"
   },
   {
@@ -1189,7 +1189,7 @@
     "family": "Colour",
     "engine": "TubeSaturation",
     "description": "Two soft nonlinear stages for dense harmonic colour.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Drive",
@@ -1217,7 +1217,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/furnace.png"
   },
   {
@@ -1226,7 +1226,7 @@
     "family": "Colour",
     "engine": "Wavefolder",
     "description": "Fold peaks back into the waveform for complex harmonics.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Drive",
@@ -1254,7 +1254,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/fold.png"
   },
   {
@@ -1263,7 +1263,7 @@
     "family": "Colour",
     "engine": "Rectifier",
     "description": "Blend full-wave rectification into the original waveform.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Amount",
@@ -1291,7 +1291,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/rect.png"
   },
   {
@@ -1300,7 +1300,7 @@
     "family": "Colour",
     "engine": "BitCrusher",
     "description": "Reduce amplitude resolution with optional dither.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Bits",
@@ -1328,7 +1328,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/shards.png"
   },
   {
@@ -1337,7 +1337,7 @@
     "family": "Colour",
     "engine": "RateReducer",
     "description": "Sample-and-hold reduction with a smoothing filter.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Rate",
@@ -1357,7 +1357,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/static.png"
   },
   {
@@ -1366,7 +1366,7 @@
     "family": "Space",
     "engine": "Delay",
     "description": "A clean stereo delay with filtered feedback.",
-    "price": 35,
+    "price": 5.99,
     "controls": [
       {
         "name": "Time",
@@ -1402,7 +1402,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/echo.png"
   },
   {
@@ -1411,7 +1411,7 @@
     "family": "Space",
     "engine": "TapeDelay",
     "description": "A darkened delay with drifting tape-style repeats.",
-    "price": 35,
+    "price": 5.99,
     "controls": [
       {
         "name": "Time",
@@ -1447,7 +1447,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/reel.png"
   },
   {
@@ -1456,7 +1456,7 @@
     "family": "Space",
     "engine": "PingPong",
     "description": "Repeats that cross from one channel to the other.",
-    "price": 35,
+    "price": 5.99,
     "controls": [
       {
         "name": "Time",
@@ -1492,7 +1492,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/ping.png"
   },
   {
@@ -1501,7 +1501,7 @@
     "family": "Space",
     "engine": "SlapDelay",
     "description": "Short doubled reflections for vocals and instruments.",
-    "price": 35,
+    "price": 5.99,
     "controls": [
       {
         "name": "Time",
@@ -1537,7 +1537,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/slap.png"
   },
   {
@@ -1546,7 +1546,7 @@
     "family": "Space",
     "engine": "DubDelay",
     "description": "Saturated feedback with a darkened low-pass tone.",
-    "price": 35,
+    "price": 5.99,
     "controls": [
       {
         "name": "Time",
@@ -1582,7 +1582,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/dub.png"
   },
   {
@@ -1591,7 +1591,7 @@
     "family": "Space",
     "engine": "Comb",
     "description": "A short feedback delay for pitched comb textures.",
-    "price": 35,
+    "price": 5.99,
     "controls": [
       {
         "name": "Time",
@@ -1627,7 +1627,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/teeth.png"
   },
   {
@@ -1636,7 +1636,7 @@
     "family": "Motion",
     "engine": "Chorus",
     "description": "Two modulated delay voices with stereo phase offset.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Rate",
@@ -1672,7 +1672,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/choir.png"
   },
   {
@@ -1681,7 +1681,7 @@
     "family": "Motion",
     "engine": "Flanger",
     "description": "A short modulated feedback delay with moving notches.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Rate",
@@ -1717,7 +1717,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/flux.png"
   },
   {
@@ -1726,7 +1726,7 @@
     "family": "Motion",
     "engine": "Phaser",
     "description": "Six moving all-pass stages with feedback.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Rate",
@@ -1762,7 +1762,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/phase.png"
   },
   {
@@ -1771,7 +1771,7 @@
     "family": "Motion",
     "engine": "Tremolo",
     "description": "Amplitude modulation from gentle motion to hard pulses.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Rate",
@@ -1799,7 +1799,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/pulse.png"
   },
   {
@@ -1808,7 +1808,7 @@
     "family": "Motion",
     "engine": "AutoPan",
     "description": "A moving stereo balance with adjustable motion shape.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Rate",
@@ -1836,7 +1836,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/orbit.png"
   },
   {
@@ -1845,7 +1845,7 @@
     "family": "Motion",
     "engine": "RingMod",
     "description": "Multiply the signal by an oscillator for metallic sidebands.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Frequency",
@@ -1865,7 +1865,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/ring.png"
   },
   {
@@ -1874,7 +1874,7 @@
     "family": "Motion",
     "engine": "Vibrato",
     "description": "Modulated fractional delay for pitch movement.",
-    "price": 25,
+    "price": 5.99,
     "controls": [
       {
         "name": "Rate",
@@ -1902,7 +1902,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/drift.png"
   },
   {
@@ -1911,7 +1911,7 @@
     "family": "Stereo",
     "engine": "Width",
     "description": "Control side energy while keeping the mid signal intact.",
-    "price": 15,
+    "price": 5.99,
     "controls": [
       {
         "name": "Width",
@@ -1931,7 +1931,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/wide.png"
   },
   {
@@ -1940,7 +1940,7 @@
     "family": "Stereo",
     "engine": "MonoBass",
     "description": "Collapse only the low-frequency side information.",
-    "price": 15,
+    "price": 5.99,
     "controls": [
       {
         "name": "Crossover",
@@ -1960,7 +1960,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/center.png"
   },
   {
@@ -1969,7 +1969,7 @@
     "family": "Stereo",
     "engine": "Haas",
     "description": "A small channel delay for the Haas widening effect.",
-    "price": 15,
+    "price": 5.99,
     "controls": [
       {
         "name": "Delay",
@@ -1989,7 +1989,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/shadow.png"
   },
   {
@@ -1998,7 +1998,7 @@
     "family": "Utility",
     "engine": "Gain",
     "description": "Precise gain, stereo balance and channel metering.",
-    "price": 15,
+    "price": 5.99,
     "controls": [
       {
         "name": "Gain",
@@ -2018,7 +2018,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/trim.png"
   },
   {
@@ -2027,7 +2027,7 @@
     "family": "Utility",
     "engine": "Polarity",
     "description": "Independent left and right polarity inversion.",
-    "price": 15,
+    "price": 5.99,
     "controls": [
       {
         "name": "Left invert",
@@ -2047,7 +2047,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/reverse.png"
   },
   {
@@ -2056,7 +2056,7 @@
     "family": "Utility",
     "engine": "DCBlock",
     "description": "Remove DC offset and subsonic energy.",
-    "price": 15,
+    "price": 5.99,
     "controls": [
       {
         "name": "Cutoff",
@@ -2068,7 +2068,7 @@
       }
     ],
     "status": "validated",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "image": "/assets/plugins/clean.png"
   }
 ]

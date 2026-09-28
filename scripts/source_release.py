@@ -18,5 +18,5 @@ with zipfile.ZipFile(args.output,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as ar
  for name in tracked(args.juce):
   file=args.juce/name
   if file.is_file():archive.write(file,'HungryGhostSuite/vendor/JUCE/'+name)
- archive.writestr('HungryGhostSuite/SOURCE-RELEASE.txt','Hungry Ghost Audio suite 0.1.0. Complete AGPLv3 corresponding source with official JUCE 9.0.2. CMake automatically uses vendor/JUCE when present. See README.md and LICENSE.\n')
+ archive.writestr('HungryGhostSuite/SOURCE-RELEASE.txt','Hungry Ghost Audio suite 0.2.0. Complete AGPLv3 corresponding source with official JUCE 9.0.2. CMake automatically uses vendor/JUCE when present. See README.md and LICENSE.\n')
 print('Full corresponding source archive created with JUCE '+juce_version,flush=True)

@@ -4,7 +4,7 @@ A collection of 50 Windows x64 VST3 effects with shared metalwork and individual
 
 ## Current state
 
-Suite 0.1.0 includes REVERB 0.3.0, FERAL 0.2.0 and 48 additional effects. All 50 passed pluginval strictness level 5 (seed 2130, GUI tests disabled). Separate native integration checks render all 50 editors at three sizes. Processor checks cover six sample rates, mono/stereo, oversized buffers, non-finite input recovery, exact bypass latency, external-key ducking and measured oversampling alias suppression. These checks establish the tested behaviours; they do not establish compatibility with every host or a subjective sound-quality ranking.
+Suite 0.2.0 includes REVERB 0.3.0, FERAL 0.2.0 and 48 additional effects. All 50 passed pluginval strictness level 5 (seed 2130, GUI tests disabled). Separate native integration checks render all 50 editors at three sizes. Processor checks cover six sample rates, mono/stereo, oversized buffers, non-finite input recovery, exact bypass latency, external-key ducking and measured oversampling alias suppression. These checks establish the tested behaviours; they do not establish compatibility with every host or a subjective sound-quality ranking.
 
 The catalogue lists the actual controls and processing family of every product. The Cloudflare storefront is in `site/`; all 50 individual products and the complete suite are connected to live Polar checkout. See [launch status](Docs/LAUNCH-STATUS.md) for verification evidence and the remaining end-to-end order check. Read the [user guide](Docs/UserGuide.md) for installation, the 30-day trial, activation and each processing family.
 

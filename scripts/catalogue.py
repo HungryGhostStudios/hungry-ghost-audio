@@ -22,8 +22,8 @@ rows = []
 def add(name, family, kind, description, controls, price=25):
     assert len(controls) <= 6
     rows.append(dict(id=name.lower(), name=name, family=family, engine=kind,
-      description=description, price=price, controls=controls,
-      status='development', version='0.1.0'))
+      description=description, price=5.99, controls=controls,
+      status='development', version='0.2.0'))
 
 add('REVERB','Space','OriginalReverb','Sixteen delay lines. One enormous sense of space.', [],25)
 add('FERAL','Dynamics','OriginalFeral','Eight bands of dynamic EQ with a stereo bus compressor.', [],99)

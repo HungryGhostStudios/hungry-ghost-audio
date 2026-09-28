@@ -37,12 +37,15 @@ public:
   int selectedBank() const { return bank.load(); }
   static constexpr int analysisSize = 4096;
   bool popAnalysis(std::array<float, analysisSize> &,
-                   std::array<float, analysisSize> &);
+                   std::array<float, analysisSize> &,
+                   std::array<float, analysisSize>* left=nullptr,
+                   std::array<float, analysisSize>* right=nullptr);
   const Product &product;
   LicenseManager licence;
   juce::UndoManager undo;
   juce::AudioProcessorValueTreeState state;
   std::atomic<float> inputPeak{0}, outputPeak{0}, reduction{0};
+  std::atomic<float> effectivePrimary{0},effectiveBpm{120};
 
 private:
   static juce::AudioProcessorValueTreeState::ParameterLayout
@@ -56,11 +59,15 @@ private:
   void run(juce::AudioBuffer<float> &, bool hostBypass);
   std::array<std::atomic<float> *, 6> controls{};
   std::atomic<float> *wet = nullptr, *out = nullptr, *bypass = nullptr;
+  std::atomic<float> *tempoSync=nullptr,*division=nullptr,*fallbackBpm=nullptr,
+      *detectorCut=nullptr,*keyListen=nullptr,*inputCut=nullptr,*repeatCut=nullptr,*monoListen=nullptr;
+  std::array<std::atomic<float>*,3> bandQ{};
   std::array<juce::ValueTree, 2> banks;
   juce::CriticalSection bankLock;
   std::atomic<int> bank{0};
   std::array<float, analysisSize> preFifo{}, postFifo{}, preFrame{},
       postFrame{};
+  std::array<float,analysisSize> leftFifo{},rightFifo{},leftFrame{},rightFrame{};
   int fifoIndex = 0;
   std::atomic<bool> frameReady{false};
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SuiteProcessor)

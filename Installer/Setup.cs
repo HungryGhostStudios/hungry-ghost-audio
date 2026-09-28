@@ -60,7 +60,7 @@ internal static class Package {
                 progress((index+1)*100/chosen.Length,chosen[index]);
             }
             string record=Path.Combine(backup,"installation.txt");Directory.CreateDirectory(backup);
-            File.WriteAllText(record,"Hungry Ghost Audio 0.1.0\r\nDestination: "+root+"\r\n"+String.Join("\r\n",chosen)+"\r\n",Encoding.UTF8);
+            File.WriteAllText(record,"Hungry Ghost Audio 0.2.0\r\nDestination: "+root+"\r\n"+String.Join("\r\n",chosen)+"\r\n",Encoding.UTF8);
             return backup;
         } catch {
             foreach(var item in Enumerable.Reverse(changed)) {
@@ -85,8 +85,13 @@ internal sealed class SetupWindow:Form {
         Text="Hungry Ghost Audio · Windows VST3 setup"; ClientSize=new Size(800,680);
         StartPosition=FormStartPosition.CenterScreen; FormBorderStyle=FormBorderStyle.FixedDialog;
         MaximizeBox=false; BackColor=Color.FromArgb(12,17,17); ForeColor=paper; Font=new Font("Segoe UI",10);
-        AddText("HUNGRY GHOST AUDIO",26,22,740,40,24,true,paper);
-        AddText("50 effects. One common language.",28,69,740,25,12,false,jade);
+        using(var iconStream=Assembly.GetExecutingAssembly().GetManifestResourceStream("brand-icon")) Icon=new Icon(iconStream);
+        using(var markStream=Assembly.GetExecutingAssembly().GetManifestResourceStream("brand-mark")) {
+            var mark=new PictureBox{Image=new Bitmap(markStream),SizeMode=PictureBoxSizeMode.Zoom};
+            mark.SetBounds(28,24,64,64);Controls.Add(mark);
+        }
+        AddText("HUNGRY GHOST AUDIO",108,22,660,40,24,true,paper);
+        AddText("50 effects. One common language.",110,69,658,25,12,false,jade);
         AddText("Select your plugins. Close your audio host before installing.",28,111,740,24,10,false,paper);
         selection.SetBounds(28,147,744,298);selection.BackColor=panel;selection.ForeColor=paper;
         selection.BorderStyle=BorderStyle.FixedSingle;selection.CheckOnClick=true;selection.MultiColumn=true;selection.ColumnWidth=180;

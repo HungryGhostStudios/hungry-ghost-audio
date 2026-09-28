@@ -31,6 +31,24 @@ SuiteProcessor::layout(const Product &p) {
       juce::AudioParameterFloatAttributes().withLabel("dB")));
   result.add(std::make_unique<juce::AudioParameterBool>(
       juce::ParameterID("bypass", 1), "Bypass", false));
+  auto extra=[&](const char* id,const char* name,float lo,float hi,float start,float skew=1.f){result.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID(id,1),name,juce::NormalisableRange<float>(lo,hi,0,skew),start));};
+  if(hasTempoSync(p.kind)){
+    result.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID("tempo_sync",1),"Tempo sync",false));
+    result.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID("beat_division",1),"Note division",juce::StringArray{"1/1","1/2","1/4","1/8","1/16","1/32","1/4 dotted","1/8 dotted","1/16 dotted","1/4 triplet","1/8 triplet","1/16 triplet"},2));
+    extra("fallback_bpm","Fallback tempo",20,400,120);
+  }
+  if(hasDetector(p.kind)){
+    if(p.kind!=Kind::BusCompressor)extra("key_highpass","Detector high-pass",0,1000,0,.5f);
+    result.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID("key_listen",1),"Audition detector",false));
+  }
+  if(p.kind==Kind::ParametricEQ||p.kind==Kind::TiltEQ){
+    extra("band_q0",p.kind==Kind::TiltEQ?"Shelf shape Q":"Low band Q",.1f,12,.707f,.4f);
+    if(p.kind==Kind::ParametricEQ){extra("band_q1","Mid band Q",.1f,12,.707f,.4f);extra("band_q2","High band Q",.1f,12,.707f,.4f);}
+  }
+  if(hasColourFilter(p.kind))extra("input_lowcut","Pre-drive low cut",0,1000,0,.5f);
+  if(hasRepeatFilter(p.kind))extra("repeat_lowcut","Repeat low cut",0,1000,0,.5f);
+  if(p.kind==Kind::Width||p.kind==Kind::MonoBass||p.kind==Kind::Haas||p.kind==Kind::Polarity)
+    result.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID("mono_listen",1),"Audition mono",false));
   return result;
 }
 SuiteProcessor::SuiteProcessor(int index)
@@ -50,6 +68,9 @@ SuiteProcessor::SuiteProcessor(int index)
   wet = state.getRawParameterValue("mix");
   out = state.getRawParameterValue("output");
   bypass = state.getRawParameterValue("bypass");
+  tempoSync=state.getRawParameterValue("tempo_sync");division=state.getRawParameterValue("beat_division");fallbackBpm=state.getRawParameterValue("fallback_bpm");
+  detectorCut=state.getRawParameterValue("key_highpass");keyListen=state.getRawParameterValue("key_listen");inputCut=state.getRawParameterValue("input_lowcut");repeatCut=state.getRawParameterValue("repeat_lowcut");monoListen=state.getRawParameterValue("mono_listen");
+  for(int i=0;i<3;++i)bandQ[i]=state.getRawParameterValue("band_q"+juce::String(i));
   banks[0] = state.copyState();
   banks[1] = banks[0].createCopy();
 }
@@ -105,7 +126,7 @@ void SuiteProcessor::reset() {
 }
 double SuiteProcessor::getTailLengthSeconds() const {
   if (product.kind >= Kind::Delay && product.kind <= Kind::Comb) {
-    const double time = static_cast<double>(controls[0]->load()) * .001;
+    const double time = static_cast<double>(tempoSync&&tempoSync->load()>.5f?(effectivePrimary.load()>0?effectivePrimary.load():syncedControl(product.kind,fallbackBpm->load(),static_cast<int>(division->load()))):controls[0]->load()) * .001;
     const double feedback =
         std::min(.95, std::abs(static_cast<double>(controls[1]->load()) * .01));
     return time *
@@ -145,6 +166,20 @@ void SuiteProcessor::run(juce::AudioBuffer<float> &buffer, bool hostBypass) {
   std::array<float, 6> values{};
   for (int j = 0; j < product.controlCount; ++j)
     values[j] = controls[j]->load();
+  AdvancedSettings advanced;
+  for(int i=0;i<3;++i)if(bandQ[i])advanced.bandQ[i]=bandQ[i]->load();
+  if(detectorCut)advanced.detectorCut=detectorCut->load();
+  if(inputCut)advanced.inputCut=inputCut->load();
+  if(repeatCut)advanced.repeatCut=repeatCut->load();
+  if(keyListen)advanced.listenKey=keyListen->load()>.5f;
+  if(monoListen)advanced.monoListen=monoListen->load()>.5f;
+  if(tempoSync&&tempoSync->load()>.5f){
+    double bpm=fallbackBpm->load();
+    if(auto* head=getPlayHead())if(auto position=head->getPosition())if(auto tempo=position->getBpm())bpm=*tempo;
+    effectiveBpm.store(static_cast<float>(bpm));advanced.syncedValue=syncedControl(product.kind,bpm,juce::roundToInt(division->load()));
+  }
+  effectivePrimary.store(advanced.syncedValue>0?advanced.syncedValue:values[0]);
+  engine.setAdvanced(advanced);
   engine.setControls(values, wet->load(), out->load());
   auto key = getBusBuffer(buffer, true, 1);
   const float *keyL =
@@ -203,11 +238,15 @@ void SuiteProcessor::run(juce::AudioBuffer<float> &buffer, bool hostBypass) {
       }
       preFifo[fifoIndex] = input[i];
       postFifo[fifoIndex] = sum / static_cast<float>(audio.getNumChannels());
+      leftFifo[fifoIndex]=audio.getSample(0,offset+i);
+      rightFifo[fifoIndex]=audio.getSample(audio.getNumChannels()>1?1:0,offset+i);
       if (++fifoIndex == analysisSize) {
         fifoIndex = 0;
         if (!frameReady.load(std::memory_order_acquire)) {
           preFrame = preFifo;
           postFrame = postFifo;
+          leftFrame=leftFifo;
+          rightFrame=rightFifo;
           frameReady.store(true, std::memory_order_release);
         }
       }
@@ -222,11 +261,15 @@ void SuiteProcessor::processBlockBypassed(juce::AudioBuffer<float> &buffer,
   run(buffer, true);
 }
 bool SuiteProcessor::popAnalysis(std::array<float, analysisSize> &pre,
-                                 std::array<float, analysisSize> &post) {
+                                 std::array<float, analysisSize> &post,
+                                 std::array<float,analysisSize>* left,
+                                 std::array<float,analysisSize>* right) {
   if (!frameReady.load(std::memory_order_acquire))
     return false;
   pre = preFrame;
   post = postFrame;
+  if(left) *left=leftFrame;
+  if(right) *right=rightFrame;
   frameReady.store(false, std::memory_order_release);
   return true;
 }
@@ -256,8 +299,21 @@ void SuiteProcessor::setStateInformation(const void *data, int size) {
     if (!root.getChild(i).hasType(state.state.getType()))
       return;
   juce::ScopedLock lock(bankLock);
-  for (int i = 0; i < 2; ++i)
+  for (int i = 0; i < 2; ++i) {
     banks[i] = root.getChild(i).createCopy();
+    // Older sessions have no advanced parameters. Restore neutral defaults,
+    // rather than retaining whatever advanced settings were previously loaded.
+    for (auto* parameter : getParameters()) if (auto* p = dynamic_cast<juce::RangedAudioParameter*>(parameter)) {
+      bool found = false;
+      for (auto child : banks[i]) if (child["id"].toString() == p->paramID) { found = true; break; }
+      if (!found) {
+        juce::ValueTree child("PARAM");
+        child.setProperty("id", p->paramID, nullptr);
+        child.setProperty("value", p->convertFrom0to1(p->getDefaultValue()), nullptr);
+        banks[i].addChild(child, -1, nullptr);
+      }
+    }
+  }
   bank.store(juce::jlimit(0, 1, static_cast<int>(root["bank"])));
   state.replaceState(banks[bank.load()].createCopy());
 }

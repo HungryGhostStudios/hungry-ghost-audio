@@ -1,3 +1,15 @@
+# Suite 0.2.0
+
+- Fix controls missing on first editor open; checks now run before any resize.
+- Individual layouts for compression, EQ, distortion, delay, modulation, stereo and utility tools, with real measured meters and scopes.
+- Original Blender-rendered REEL spools, including fixed-light rotation frames and editable source scene.
+- Factory and two musical starting presets for the 48 newer tools.
+- Host tempo synchronisation, note divisions and fallback tempo for delay and rhythmic modulation. Key filtering/audition, pre-drive and repeat low cuts, EQ widths and mono audition where relevant.
+- Preserve previous free-time controls and load legacy sessions with neutral advanced defaults.
+- HG branding for the installer, website and Polar; individual purchases $5.99 USD and the suite $74.99 USD, before checkout tax rules.
+
+See [InterfaceUpdate.md](InterfaceUpdate.md) for the control and display audit. Validation records and package hashes accompany the release.
+
 # Suite 0.1.0
 
 Initial Windows x64 VST3 release with 50 effects. REVERB updates to 0.3.0 and FERAL to 0.2.0 while keeping their previous plugin identities and saved-state layouts.

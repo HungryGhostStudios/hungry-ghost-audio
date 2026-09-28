@@ -39,7 +39,7 @@ void SuiteEngine::prepare(double rate) {
   sr = std::clamp(rate, 8000., 384000.);
   smoothing = static_cast<float>(1. - std::exp(-1. / (.01 * sr)));
   for (auto &d : delay)
-    d.assign(usesDelay() ? static_cast<std::size_t>(sr * 2.2) + 8 : 8, 0.f);
+    d.assign(usesDelay()?static_cast<std::size_t>(sr*(kind==Kind::SlapDelay?13.7:kind>=Kind::Delay&&kind<=Kind::DubDelay?12.2:kind==Kind::Comb?.075:.25))+8:8,0.f);
   reset();
 }
 void SuiteEngine::reset() {
@@ -63,6 +63,10 @@ void SuiteEngine::reset() {
   holdSamples = 0;
   gateOpen = false;
   smooth = target;
+  advancedSmooth=advanced;
+  detectorLow.fill(0);inputLow.fill(0);repeatLow.fill(0);
+  listenBlend=advanced.listenKey?1.f:0.f;
+  monoBlend=advanced.monoListen?1.f:0.f;
   mix = targetMix;
   output = targetOutput;
   updateFilters();
@@ -76,6 +80,8 @@ void SuiteEngine::setControls(const std::array<float, 6> &values, float wet,
             clamp(finite(values[i]), p.controls[i].min, p.controls[i].max);
       break;
     }
+  if(hasTempoSync(kind)&&advanced.syncedValue>0)
+    target[0]=clamp(advanced.syncedValue,kind>=Kind::Delay&&kind<=Kind::DubDelay?1.f:.01f,kind>=Kind::Delay&&kind<=Kind::DubDelay?12000.f:40.f);
   targetMix = clamp(finite(wet), 0, 1);
   targetOutput = db(clamp(finite(out), -60, 24));
 }
@@ -84,6 +90,15 @@ float SuiteEngine::random() noexcept {
   noise ^= noise >> 17;
   noise ^= noise << 5;
   return static_cast<float>(noise) * (1.f / 4294967296.f) - .5f;
+}
+void SuiteEngine::setAdvanced(const AdvancedSettings& a){
+  for(int i=0;i<3;++i)advanced.bandQ[i]=clamp(finite(a.bandQ[i]),.1f,12.f);
+  advanced.detectorCut=clamp(finite(a.detectorCut),0,1000);
+  advanced.inputCut=clamp(finite(a.inputCut),0,1000);
+  advanced.repeatCut=clamp(finite(a.repeatCut),0,1000);
+  advanced.listenKey=a.listenKey&&hasDetector(kind);
+  advanced.monoListen=a.monoListen;
+  advanced.syncedValue=std::max(0.f,finite(a.syncedValue));
 }
 void SuiteEngine::configure(Biquad &f, int type, float hz, float quality,
                             float gain) noexcept {
@@ -164,11 +179,11 @@ void SuiteEngine::updateFilters() noexcept {
       break;
     case Kind::ParametricEQ:
       for (int i = 0; i < 3; ++i)
-        configure(bank[i], 4, smooth[i * 2], .707f, smooth[i * 2 + 1]);
+        configure(bank[i], 4, smooth[i * 2], advancedSmooth.bandQ[i], smooth[i * 2 + 1]);
       break;
     case Kind::TiltEQ:
-      configure(bank[0], 5, smooth[0], .707f, -smooth[1]);
-      configure(bank[1], 6, smooth[0], .707f, smooth[1]);
+      configure(bank[0], 5, smooth[0], advancedSmooth.bandQ[0], -smooth[1]);
+      configure(bank[1], 6, smooth[0], advancedSmooth.bandQ[0], smooth[1]);
       break;
     case Kind::LowShelf:
       configure(bank[0], 5, smooth[0], smooth[2], smooth[1]);
@@ -216,12 +231,26 @@ void SuiteEngine::process(float *left, float *right, const float *keyLeft,
       smooth[j] += smoothing * (target[j] - smooth[j]);
     mix += smoothing * (targetMix - mix);
     output += smoothing * (targetOutput - output);
+    for(int j=0;j<3;++j)advancedSmooth.bandQ[j]+=smoothing*(advanced.bandQ[j]-advancedSmooth.bandQ[j]);
+    advancedSmooth.detectorCut+=smoothing*(advanced.detectorCut-advancedSmooth.detectorCut);
+    advancedSmooth.inputCut+=smoothing*(advanced.inputCut-advancedSmooth.inputCut);
+    advancedSmooth.repeatCut+=smoothing*(advanced.repeatCut-advancedSmooth.repeatCut);
+    listenBlend+=smoothing*((advanced.listenKey?1.f:0.f)-listenBlend);
+    monoBlend+=smoothing*((advanced.monoListen?1.f:0.f)-monoBlend);
     if ((counter++ & 15u) == 0)
       updateFilters();
     float l = finite(left[i]), r = stereo ? finite(right[i]) : l;
     const float dryL = l, dryR = r;
     float kl = keyLeft ? finite(keyLeft[i]) : l,
           kr = keyRight ? finite(keyRight[i]) : r;
+    auto cut=[&](float& a,float& b,std::array<float,2>& low,float hz){
+      if(hz<.000001f)return;
+      const float c=1-std::exp(-2.f*static_cast<float>(pi)*std::max(1.f,hz)/srF);
+      low[0]+=c*(a-low[0]);low[1]+=c*(b-low[1]);
+      const float blend=clamp(hz,0,1);a-=low[0]*blend;b-=low[1]*blend;
+    };
+    if(hasDetector(kind)&&kind!=Kind::BusCompressor)cut(kl,kr,detectorLow,advancedSmooth.detectorCut);
+    if(hasColourFilter(kind))cut(l,r,inputLow,advancedSmooth.inputCut);
     switch (kind) {
     case Kind::Compressor:
     case Kind::FastCompressor:
@@ -501,9 +530,11 @@ void SuiteEngine::process(float *left, float *right, const float *keyLeft,
                              clamp(smooth[2], 20, srF * .45f) / srF);
       toneL += a * (dl - toneL);
       toneR += a * (dr - toneR);
+      float repeatL=toneL,repeatR=toneR;
+      cut(repeatL,repeatR,repeatLow,advancedSmooth.repeatCut);
       float fb = smooth[1] * .01f;
-      float nextL = l + fb * (kind == Kind::PingPong ? toneR : toneL),
-            nextR = r + fb * (kind == Kind::PingPong ? toneL : toneR);
+      float nextL = l + fb * (kind == Kind::PingPong ? repeatR : repeatL),
+            nextR = r + fb * (kind == Kind::PingPong ? repeatL : repeatR);
       if (kind == Kind::TapeDelay || kind == Kind::DubDelay) {
         const float drive = kind == Kind::DubDelay ? 1.8f : 1.f;
         nextL = std::tanh(nextL * drive) / drive;
@@ -511,8 +542,8 @@ void SuiteEngine::process(float *left, float *right, const float *keyLeft,
       }
       delay[0][writeIndex] = clamp(nextL, -8, 8);
       delay[1][writeIndex] = clamp(nextR, -8, 8);
-      l = toneL;
-      r = toneR;
+      l = repeatL;
+      r = repeatR;
       break;
     }
     case Kind::Chorus:
@@ -630,8 +661,10 @@ void SuiteEngine::process(float *left, float *right, const float *keyLeft,
       phase = std::fmod(phase, 2 * pi);
     if (usesDelay())
       writeIndex = (writeIndex + 1) % delay[0].size();
-    float outL = finite((dryL + (l - dryL) * mix) * output),
-          outR = finite((dryR + (r - dryR) * mix) * output);
+    float mixedL=dryL+(l-dryL)*mix,mixedR=dryR+(r-dryR)*mix;
+    float outL = finite((mixedL+(kl-mixedL)*listenBlend) * output),
+          outR = finite((mixedR+(kr-mixedR)*listenBlend) * output);
+    const float mono=outL*.5f+outR*.5f;outL+=monoBlend*(mono-outL);outR+=monoBlend*(mono-outR);
     left[i] = outL;
     if (stereo)
       right[i] = outR;

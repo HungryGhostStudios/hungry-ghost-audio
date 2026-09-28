@@ -10,3 +10,5 @@ node_modules/
 releases/
 vendor/JUCE/
 /Design/Installer.png
+/Design/Blender/reel-frames/
+*.blend1

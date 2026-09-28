@@ -11,10 +11,13 @@ $suiteCompileArguments = @(
   '/nologo', '/target:winexe', '/platform:x64', '/optimize+',
   '/r:System.Windows.Forms.dll', '/r:System.Drawing.dll',
   '/r:System.IO.Compression.dll', '/r:System.IO.Compression.FileSystem.dll',
+  ('/win32icon:' + (Join-Path $suiteSourceRoot 'Design\Brand\hungry-ghost.ico')),
+  ('/resource:' + (Join-Path $suiteSourceRoot 'Design\Brand\hungry-ghost.ico') + ',brand-icon'),
+  ('/resource:' + (Join-Path $suiteSourceRoot 'Design\Brand\hungry-ghost-mark.png') + ',brand-mark'),
   ('/win32manifest:' + (Join-Path $suiteSourceRoot 'Installer\app.manifest')),
-  ('/resource:' + (Join-Path $suiteReleaseRoot 'HungryGhostSuite-0.1.0-Windows-VST3.zip') + ',payload'),
+  ('/resource:' + (Join-Path $suiteReleaseRoot 'HungryGhostSuite-0.2.0-Windows-VST3.zip') + ',payload'),
   ('/resource:' + $suiteHashesPath + ',hashes'),
-  ('/out:' + (Join-Path $suiteReleaseRoot 'HungryGhostSuite-0.1.0-Setup.exe')),
+  ('/out:' + (Join-Path $suiteReleaseRoot 'HungryGhostSuite-0.2.0-Setup.exe')),
   (Join-Path $suiteSourceRoot 'Installer\Setup.cs')
 )
 & $suiteCompilerPath @suiteCompileArguments

@@ -12,6 +12,56 @@ int find(Kind kind) {
   for (int i = 2; i < 50; ++i) if (products[i].kind == kind) return i;
   throw std::runtime_error("Missing product");
 }
+struct TempoHost final:juce::AudioPlayHead {
+  double bpm=240;
+  juce::Optional<PositionInfo> getPosition()const override { PositionInfo p;p.setBpm(bpm);return p; }
+};
+void advancedTests() {
+  juce::MidiBuffer midi;
+  SuiteProcessor echo(find(Kind::Delay)); TempoHost host;
+  echo.prepareToPlay(48000,512);echo.setPlayHead(&host);
+  set(echo,"control0",400);set(echo,"tempo_sync",1);set(echo,"beat_division",2);
+  juce::AudioBuffer<float> b(2,512);b.clear();echo.processBlock(b,midi);
+  require(std::abs(echo.effectivePrimary.load()-250)<.01f,"Host tempo ignored");
+  require(std::abs(echo.state.getRawParameterValue("control0")->load()-400)<.01f,"Sync overwrote free time");
+  echo.setPlayHead(nullptr);set(echo,"fallback_bpm",100);b.clear();echo.processBlock(b,midi);
+  require(std::abs(echo.effectivePrimary.load()-600)<.01f,"Fallback tempo ignored");
+  set(echo,"tempo_sync",0);b.clear();echo.processBlock(b,midi);
+  require(std::abs(echo.effectivePrimary.load()-400)<.01f,"Free time did not return");
+  require(std::abs(syncedControl(Kind::Delay,120,6)-750)<.01f,"Dotted division wrong");
+  require(std::abs(syncedControl(Kind::Delay,120,9)-333.333f)<.01f,"Triplet division wrong");
+  // Loading a legacy two-bank session must neutralise newly added controls.
+  juce::MemoryBlock saved;echo.getStateInformation(saved);
+  auto xml=juce::AudioProcessor::getXmlFromBinary(saved.getData(),static_cast<int>(saved.getSize()));
+  auto tree=juce::ValueTree::fromXml(*xml);
+  for(auto bank:tree)for(int i=bank.getNumChildren()-1;i>=0;--i){auto id=bank.getChild(i)["id"].toString();if(!id.startsWith("control")&&id!="mix"&&id!="output"&&id!="bypass")bank.removeChild(i,nullptr);}
+  auto legacy=tree.createXml();juce::MemoryBlock old;juce::AudioProcessor::copyXmlToBinary(*legacy,old);
+  set(echo,"repeat_lowcut",700);set(echo,"tempo_sync",1);
+  echo.setStateInformation(old.getData(),static_cast<int>(old.getSize()));
+  require(echo.state.getRawParameterValue("repeat_lowcut")->load()==0&&echo.state.getRawParameterValue("tempo_sync")->load()==0,"Legacy session retained advanced values");
+  echo.selectBank(1);require(echo.state.getRawParameterValue("repeat_lowcut")->load()==0,"Legacy B bank retained advanced values");
+  // Compare actual processed signals, including a bass-heavy detector and band width.
+  auto render=[](Kind kind,AdvancedSettings a,std::array<float,6> controls,double hz,bool anti=false){
+    SuiteEngine e(kind);e.prepare(48000);e.setAdvanced(a);e.setControls(controls,1,0);e.reset();
+    std::vector<float> l(52800),r(52800);for(int i=0;i<52800;++i){l[i]=.5f*std::sin(juce::MathConstants<double>::twoPi*hz*i/48000.);r[i]=anti?-l[i]:l[i];}
+    e.process(l.data(),r.data(),nullptr,nullptr,static_cast<int>(l.size()));
+    double energy=0;for(int i=4800;i<52800;++i)energy+=l[i]*l[i];return std::sqrt(energy/48000.);
+  };
+  AdvancedSettings neutral,filtered;filtered.detectorCut=1000;
+  const std::array<float,6> comp{-30,8,.1f,120,0,0};
+  require(render(Kind::Compressor,filtered,comp,50)>render(Kind::Compressor,neutral,comp,50)*2,"Detector filter failed to reduce bass pumping");
+  filtered={};filtered.inputCut=1000;
+  require(render(Kind::SoftSaturation,filtered,{0,20000,0,0,0,0},50)<render(Kind::SoftSaturation,neutral,{0,20000,0,0,0,0},50)*.1,"Pre-drive cut did not remove bass");
+  filtered={};filtered.repeatCut=1000;
+  require(render(Kind::Delay,filtered,{100,0,20000,0,0,0},50)<render(Kind::Delay,neutral,{100,0,20000,0,0,0},50)*.1,"Repeat filter did not remove bass");
+  filtered={};filtered.bandQ[1]=.3f;neutral.bandQ[1]=8;
+  require(render(Kind::ParametricEQ,filtered,{120,0,1000,12,6000,0},500)>render(Kind::ParametricEQ,neutral,{120,0,1000,12,6000,0},500)*1.5,"Band width did not affect the response");
+  filtered={};filtered.monoListen=true;
+  require(render(Kind::Width,filtered,{150,120,0,0,0,0},500,true)<1.e-5,"Mono audition failed to cancel antiphase audio");
+  filtered={};filtered.listenKey=true;
+  require(render(Kind::Compressor,filtered,comp,1000)>.3,"Key audition still output compressed programme");
+  std::cout<<"PASS: sync, fallback, free-time retention, legacy banks, detector audition/filter, pre-drive/repeat cuts, Q and mono audition\n";
+}
 double amplitude(const std::vector<float>& samples, double hz) {
   double re = 0, im = 0;
   for (size_t i = 4800; i < samples.size(); ++i) {
@@ -24,6 +74,7 @@ double amplitude(const std::vector<float>& samples, double hz) {
 int main() {
   juce::ScopedJuceInitialiser_GUI init;
   try {
+    advancedTests();
     juce::MidiBuffer midi;
     // Exercise prepare/reprepare with mono/stereo and oversampling changes.
     for (int index = 2; index < 50; ++index) {

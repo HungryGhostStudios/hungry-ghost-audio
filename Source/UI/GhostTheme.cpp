@@ -9,6 +9,14 @@ juce::Font type(float height, bool bold = false) {
       "Segoe UI", height, bold ? juce::Font::bold : juce::Font::plain));
 }
 } // namespace
+void GhostTheme::paintReel(juce::Graphics& g, juce::Rectangle<float> bounds, int frame) const {
+  if (!reelAtlas.isValid()) return;
+  frame = ((frame % 24) + 24) % 24;
+  const auto cell = reelAtlas.getWidth() / 6;
+  g.drawImage(reelAtlas, juce::roundToInt(bounds.getX()), juce::roundToInt(bounds.getY()),
+              juce::roundToInt(bounds.getWidth()), juce::roundToInt(bounds.getHeight()),
+              (frame % 6) * cell, (frame / 6) * cell, cell, cell);
+}
 juce::Colour GhostTheme::background() { return juce::Colour(0xff0c100f); }
 juce::Colour GhostTheme::panel() { return juce::Colour(0xff1c2421); }
 juce::Colour GhostTheme::ink() { return juce::Colour(0xffebe7db); }
@@ -28,7 +36,8 @@ GhostTheme::GhostTheme()
           BinaryData::monolithbutton_png, BinaryData::monolithbutton_pngSize)),
       selectedKeycap(juce::ImageCache::getFromMemory(
           BinaryData::monolithbuttonactive_png,
-          BinaryData::monolithbuttonactive_pngSize)) {
+          BinaryData::monolithbuttonactive_pngSize)),
+      reelAtlas(juce::ImageCache::getFromMemory(BinaryData::reelspool_png, BinaryData::reelspool_pngSize)) {
   setColour(juce::Slider::textBoxTextColourId, ink());
   setColour(juce::Slider::textBoxBackgroundColourId,
             juce::Colours::transparentBlack);
@@ -84,6 +93,7 @@ void GhostTheme::drawRotarySlider(juce::Graphics &g, int x, int y, int width,
   const auto body =
       juce::Rectangle<float>(cx - size / 2, cy - size / 2, size, size);
   const bool enabled = slider.isEnabled();
+  const auto dialAccent=slider.findColour(juce::Slider::thumbColourId);
   juce::Path shadow;
   shadow.addEllipse(body.reduced(size * .09f));
   juce::DropShadow(juce::Colours::black.withAlpha(.65f),
@@ -97,9 +107,9 @@ void GhostTheme::drawRotarySlider(juce::Graphics &g, int x, int y, int width,
   g.strokePath(track, juce::PathStrokeType(7 * scale));
   g.setColour(line());
   g.strokePath(track, juce::PathStrokeType(3.4f * scale));
-  g.setColour(accent().withAlpha(enabled ? .09f : .03f));
+  g.setColour(dialAccent.withAlpha(enabled ? .09f : .03f));
   g.strokePath(active, juce::PathStrokeType(8 * scale));
-  g.setColour(accent().withAlpha(enabled ? .95f : .25f));
+  g.setColour(dialAccent.withAlpha(enabled ? .95f : .25f));
   g.strokePath(active, juce::PathStrokeType(3.2f * scale));
   // Select a camera render; never rotate a baked bitmap and its lighting.
   const int frame = juce::jlimit(0, 95, juce::roundToInt(position * 95));
@@ -179,20 +189,35 @@ void GhostTheme::positionComboBoxText(juce::ComboBox &box, juce::Label &label) {
 }
 void GhostTheme::drawLinearSlider(juce::Graphics &g, int x, int y, int width,
                                   int height, float position, float, float,
-                                  juce::Slider::SliderStyle, juce::Slider &) {
+                                  juce::Slider::SliderStyle style, juce::Slider &slider) {
+  const auto tint=slider.findColour(juce::Slider::trackColourId);
+  if(style==juce::Slider::LinearVertical||style==juce::Slider::LinearBarVertical){
+    const float cx=x+width*.5f;
+    auto track=juce::Rectangle<float>(cx-5*scale,(float)y,10*scale,(float)height);
+    g.setColour(juce::Colours::black.withAlpha(.8f));g.fillRoundedRectangle(track,3*scale);
+    g.setColour(line());g.drawRoundedRectangle(track,3*scale,scale);
+    g.setColour(tint.withAlpha(.5f));g.fillRect(cx-2*scale,position,4*scale,y+height-position);
+    for(int i=0;i<=10;++i){float py=y+height*i/10.f;g.setColour(muted().withAlpha(.4f));g.drawLine(cx-22*scale,py,cx-12*scale,py,scale);g.drawLine(cx+12*scale,py,cx+22*scale,py,scale);}
+    auto cap=juce::Rectangle<float>(cx-20*scale,position-11*scale,40*scale,22*scale);
+    g.setColour(juce::Colours::black.withAlpha(.7f));g.fillRoundedRectangle(cap.translated(0,3*scale),3*scale);
+    g.setGradientFill(juce::ColourGradient(juce::Colour(0xffaab1aa),cx,cap.getY(),juce::Colour(0xff303933),cx,cap.getBottom(),false));g.fillRoundedRectangle(cap,3*scale);
+    g.setColour(juce::Colours::black.withAlpha(.5f));g.drawRoundedRectangle(cap,3*scale,scale);g.drawLine(cap.getX()+5*scale,position,cap.getRight()-5*scale,position,2*scale);
+    g.setColour(tint);g.drawLine(cap.getX()+5*scale,position-scale,cap.getRight()-5*scale,position-scale,scale);
+    return;
+  }
   const float cy = y + height * .5f;
   g.setColour(juce::Colours::black.withAlpha(.65f));
   g.drawLine((float)x, cy, (float)(x + width), cy, 4 * scale);
   g.setColour(line());
   g.drawLine((float)x, cy + scale, (float)(x + width), cy + scale, scale);
-  g.setColour(accent().withAlpha(.65f));
+  g.setColour(tint.withAlpha(.65f));
   g.drawLine((float)x, cy, position, cy, 2 * scale);
   const float r = 4 * scale;
   g.setColour(juce::Colours::black.withAlpha(.7f));
   g.fillEllipse(position - r - scale, cy - r + scale, 2 * r + 2 * scale,
                 2 * r + 2 * scale);
-  g.setGradientFill(juce::ColourGradient(accent().brighter(.15f), position,
-                                         cy - r, accent().darker(.25f),
+  g.setGradientFill(juce::ColourGradient(tint.brighter(.15f), position,
+                                         cy - r, tint.darker(.25f),
                                          position, cy + r, false));
   g.fillEllipse(position - r, cy - r, 2 * r, 2 * r);
 }
@@ -202,7 +227,8 @@ juce::Font GhostTheme::getComboBoxFont(juce::ComboBox &) {
 juce::Font GhostTheme::getLabelFont(juce::Label &label) {
   if (auto *slider = dynamic_cast<juce::Slider *>(label.getParentComponent())) {
     if (static_cast<bool>(slider->getProperties()["suite"]))
-      return type(20 * scale, true);
+      return type((static_cast<bool>(slider->getProperties()["compact"])?14.f:
+                   static_cast<bool>(slider->getProperties()["primary"])?28.f:18.f)*scale,true);
     const bool detail = static_cast<bool>(slider->getProperties()["detail"]);
     return type(static_cast<bool>(slider->getProperties()["large"])
                     ? 42 * scale

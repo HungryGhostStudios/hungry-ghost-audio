@@ -9,13 +9,20 @@ juce::Font font(float h, bool bold = false) {
 float decibel(float x) { return juce::Decibels::gainToDecibels(x, -90.f); }
 } // namespace
 SuiteEditor::SuiteEditor(SuiteProcessor &p)
-    : AudioProcessorEditor(p), processor(p) {
+    : AudioProcessorEditor(p), processor(p),design(designFor(p.product.kind)),presets(presetsFor(p.product)) {
   setLookAndFeel(&theme);
   addAndMakeVisible(licenceButton);
-  setSize(940, 660);
+  setSize(design.width, design.height);
   setResizable(true, true);
-  setResizeLimits(760, 534, 1410, 990);
-  getConstrainer()->setFixedAspectRatio(940. / 660.);
+  setResizeLimits(juce::roundToInt(design.width*.85),juce::roundToInt(design.height*.85),
+                 juce::roundToInt(design.width*1.5),juce::roundToInt(design.height*1.5));
+  getConstrainer()->setFixedAspectRatio(double(design.width)/design.height);
+  presetMenu.setComponentID("preset");
+  presetMenu.setTooltip("Musical starting points. Parameters remain fully editable and automatable.");
+  for(int i=0;i<3;++i) presetMenu.addItem(presets[i].name,i+1);
+  presetMenu.setSelectedId(1,juce::dontSendNotification);
+  presetMenu.onChange=[this]{applyPreset(presetMenu.getSelectedId()-1);};
+  addAndMakeVisible(presetMenu);
   for (int i = 0; i < 8; ++i) {
     const bool parameter = i < processor.product.controlCount || i >= 6;
     if (!parameter)
@@ -25,6 +32,10 @@ SuiteEditor::SuiteEditor(SuiteProcessor &p)
                                      : "output";
     const auto *control = i < 6 ? &processor.product.controls[i] : nullptr;
     knobs[i].setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    knobs[i].setComponentID(id);
+    knobs[i].setName(control?control->name:i==6?"Dry / wet":"Output");
+    knobs[i].setColour(juce::Slider::thumbColourId,design.accent);
+    knobs[i].setColour(juce::Slider::trackColourId,design.accent);
     knobs[i].getProperties().set("suite", true);
     knobs[i].setTextBoxStyle(juce::Slider::TextBoxBelow, false, 100, 28);
     knobs[i].setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
@@ -45,7 +56,8 @@ SuiteEditor::SuiteEditor(SuiteProcessor &p)
         std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             processor.state, id, knobs[i]);
     const bool polarity = processor.product.kind == Kind::Polarity && i < 2;
-    knobs[i].textFromValueFunction = [control, i, polarity](double v) {
+    knobs[i].textFromValueFunction = [this,control, i, polarity](double v) {
+      if(i==0)if(auto* sync=processor.state.getRawParameterValue("tempo_sync"))if(sync->load()>.5f&&processor.effectivePrimary.load()>0)v=processor.effectivePrimary.load();
       if (polarity)
         return juce::String(v >= .5 ? "Inverted" : "Normal");
       if (i == 6)
@@ -94,11 +106,24 @@ SuiteEditor::SuiteEditor(SuiteProcessor &p)
   bankA.onClick = [this] { processor.selectBank(0); };
   bankB.onClick = [this] { processor.selectBank(1); };
   copy.onClick = [this] { processor.copyBank(); };
-  resetButton.onClick = [this] { processor.factoryReset(); };
+  resetButton.onClick = [this] { processor.factoryReset();presetMenu.setSelectedId(1,juce::dontSendNotification); };
   bypassButton.setClickingTogglesState(true);
   bypassAttachment =
       std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
           processor.state, "bypass", bypassButton);
+  if(processor.product.kind==Kind::Polarity) for(int i=0;i<2;++i){
+    polarityButtons[i].setComponentID("polarity"+juce::String(i));
+    polarityButtons[i].setClickingTogglesState(true);
+    polarityButtons[i].setTooltip("Invert this channel's polarity. This is not a time-alignment control.");
+    polarityButtons[i].onClick=[this,i]{auto* p=processor.state.getParameter("control"+juce::String(i));p->beginChangeGesture();p->setValueNotifyingHost(polarityButtons[i].getToggleState()?1.f:0.f);p->endChangeGesture();};
+    addAndMakeVisible(polarityButtons[i]);
+  }
+  if(processor.getParameters().size()>processor.product.controlCount+3){
+    advancedPanel=std::make_unique<AdvancedPanel>(processor);addChildComponent(*advancedPanel);
+    advancedButton.setComponentID("advanced");addAndMakeVisible(advancedButton);
+    advancedButton.setTooltip("Focused extra controls for this processor. Existing parameters and automation are preserved.");
+    advancedButton.onClick=[this]{advancedPanel->setVisible(!advancedPanel->isVisible());advancedPanel->toFront(true);};
+  }
   for (int i = 0; i < 4096; ++i)
     window[i] = .5f - .5f * std::cos(juce::MathConstants<float>::twoPi *
                                      static_cast<float>(i) / 4095.f);
@@ -106,34 +131,12 @@ SuiteEditor::SuiteEditor(SuiteProcessor &p)
   spectrumPost.fill(-90);
   lastFrame = juce::Time::getMillisecondCounterHiRes();
   startTimerHz(30);
+  resized();
+  timerCallback();
 }
 SuiteEditor::~SuiteEditor() {
   stopTimer();
   setLookAndFeel(nullptr);
-}
-void SuiteEditor::resized() {
-  float s = static_cast<float>(getWidth()) / 940.f;
-  theme.scale = s;
-  display = {35 * s, 105 * s, 870 * s, 235 * s};
-  bankA.setBounds(650 * s, 39 * s, 42 * s, 30 * s);
-  bankB.setBounds(695 * s, 39 * s, 42 * s, 30 * s);
-  copy.setBounds(742 * s, 39 * s, 65 * s, 30 * s);
-  bypassButton.setBounds(815 * s, 39 * s, 88 * s, 30 * s);
-  resetButton.setBounds(785 * s, 567 * s, 110 * s, 31 * s);
-  licenceButton.setBounds(juce::roundToInt(663 * s), juce::roundToInt(616 * s),
-                          juce::roundToInt(230 * s), juce::roundToInt(26 * s));
-  int count = processor.product.controlCount + 2;
-  float gap = 830.f / static_cast<float>(count);
-  int n = 0;
-  for (int i = 0; i < 8; ++i) {
-    if (!attachments[i])
-      continue;
-    float x = 55.f + gap * n++;
-    knobs[i].setBounds(juce::roundToInt(x * s), juce::roundToInt(387 * s),
-                       juce::roundToInt(gap * s), juce::roundToInt(146 * s));
-    labels[i].setBounds(juce::roundToInt(x * s), juce::roundToInt(540 * s),
-                        juce::roundToInt(gap * s), juce::roundToInt(22 * s));
-  }
 }
 void SuiteEditor::drawSpectrum(juce::Graphics &g,
                                const std::array<float, 2048> &spectrum,
@@ -159,91 +162,5 @@ void SuiteEditor::drawSpectrum(juce::Graphics &g,
   g.setColour(colour);
   g.strokePath(path, juce::PathStrokeType(1.5f * theme.scale,
                                           juce::PathStrokeType::curved));
-}
-void SuiteEditor::paint(juce::Graphics &g) {
-  float s = theme.scale;
-  theme.paintChassis(g, getLocalBounds().toFloat());
-  g.setColour(GhostTheme::muted());
-  g.setFont(font(11 * s));
-  g.drawText("HUNGRY GHOST / " +
-                 juce::String(processor.product.family).toUpperCase(),
-             42 * s, 25 * s, 580 * s, 18 * s, juce::Justification::left);
-  g.setColour(GhostTheme::ink());
-  g.setFont(font(30 * s, true));
-  g.drawText(processor.product.name, 42 * s, 44 * s, 570 * s, 40 * s,
-             juce::Justification::left);
-  theme.paintDisplay(g, display);
-  auto plot = display.reduced(22 * s, 25 * s);
-  g.setColour(GhostTheme::line().withAlpha(.5f));
-  for (int j = 1; j < 4; ++j)
-    g.drawHorizontalLine(
-        static_cast<int>(plot.getY() + plot.getHeight() * j / 4.f), plot.getX(),
-        plot.getRight());
-  for (float hz : {100.f, 1000.f, 10000.f}) {
-    float x =
-        plot.getX() + plot.getWidth() * std::log(hz / 20.f) / std::log(1000.f);
-    g.drawVerticalLine(static_cast<int>(x), plot.getY(), plot.getBottom());
-  }
-  drawSpectrum(g, spectrumPre, GhostTheme::muted().withAlpha(.4f));
-  drawSpectrum(g, spectrumPost, GhostTheme::accent());
-  g.setFont(font(10 * s));
-  g.setColour(GhostTheme::muted());
-  g.drawText("20 Hz", plot.getX(), display.getBottom() - 21 * s, 80 * s, 15 * s,
-             juce::Justification::left);
-  g.drawText("INPUT / OUTPUT SPECTRUM", plot.getCentreX() - 120 * s,
-             display.getY() + 8 * s, 240 * s, 15 * s,
-             juce::Justification::centred);
-  const auto upperFrequency = std::min(20000., (processor.getSampleRate() > 0 ? processor.getSampleRate() : 48000.) * .45);
-  g.drawText(juce::String(upperFrequency / 1000., upperFrequency == 20000. ? 0 : 1) + " kHz", plot.getRight() - 80 * s, display.getBottom() - 21 * s,
-             80 * s, 15 * s, juce::Justification::right);
-  g.setFont(font(12 * s));
-  g.drawText("IN  " + juce::String(decibel(peakIn), 1) + " dBFS", 47 * s,
-             357 * s, 215 * s, 20 * s, juce::Justification::left);
-  g.drawText("GR  " + juce::String(gr, 1) + " dB", 362 * s, 357 * s, 215 * s,
-             20 * s, juce::Justification::centred);
-  g.drawText("OUT  " + juce::String(decibel(peakOut), 1) + " dBFS", 677 * s,
-             357 * s, 215 * s, 20 * s, juce::Justification::right);
-  g.setColour(GhostTheme::muted());
-  g.setFont(font(11 * s));
-  g.drawText(processor.product.description, 45 * s, 572 * s, 715 * s, 26 * s,
-             juce::Justification::left);
-  g.setFont(font(10 * s));
-  g.drawText("HUNGRY GHOST AUDIO / 0.1.0", 42 * s, 620 * s, 560 * s, 18 * s,
-             juce::Justification::left);
-}
-void SuiteEditor::timerCallback() {
-  peakIn = std::max(processor.inputPeak.load(), peakIn * .87f);
-  peakOut = std::max(processor.outputPeak.load(), peakOut * .87f);
-  gr = processor.reduction.load();
-  bankA.setToggleState(processor.selectedBank() == 0,
-                       juce::dontSendNotification);
-  bankB.setToggleState(processor.selectedBank() == 1,
-                       juce::dontSendNotification);
-  std::array<float, 4096> pre{}, post{};
-  if (processor.popAnalysis(pre, post)) {
-    fftPre.fill(0);
-    fftPost.fill(0);
-    for (int i = 0; i < 4096; ++i) {
-      fftPre[i] = pre[i] * window[i];
-      fftPost[i] = post[i] * window[i];
-    }
-    fft.performFrequencyOnlyForwardTransform(fftPre.data());
-    fft.performFrequencyOnlyForwardTransform(fftPost.data());
-    for (int i = 0; i < 2048; ++i) {
-      float a = decibel(fftPre[i] * 4.f / 4096.f),
-            b = decibel(fftPost[i] * 4.f / 4096.f);
-      spectrumPre[i] +=
-          (a > spectrumPre[i] ? .7f : .16f) * (a - spectrumPre[i]);
-      spectrumPost[i] +=
-          (b > spectrumPost[i] ? .7f : .16f) * (b - spectrumPost[i]);
-    }
-    lastFrame = juce::Time::getMillisecondCounterHiRes();
-  } else if (juce::Time::getMillisecondCounterHiRes() - lastFrame > 300) {
-    for (auto &x : spectrumPre)
-      x += .1f * (-90 - x);
-    for (auto &x : spectrumPost)
-      x += .1f * (-90 - x);
-  }
-  repaint();
 }
 } // namespace hungryghost
