@@ -6,12 +6,15 @@ def run(command, private=False, **kwargs):
     # CalledProcessError includes every command argument, including P12 and
     # keychain passwords. Keep credential failures out of public CI logs.
     if private:
-        kwargs['stdout'] = subprocess.DEVNULL
-        kwargs['stderr'] = subprocess.DEVNULL
+        kwargs['stdout'] = subprocess.PIPE
+        kwargs['stderr'] = subprocess.PIPE
     result = subprocess.run(command, **kwargs)
     if result.returncode:
+        category = ''
+        if private and b'MAC verification failed' in (result.stderr or b''):
+            category = '; PKCS12 password or encryption format was rejected'
         raise RuntimeError('Signing operation failed: ' + Path(command[0]).name + ' ' + command[1]
-                           + ' (exit ' + str(result.returncode) + ')')
+                           + ' (exit ' + str(result.returncode) + ')' + category)
     return result
 
 p = argparse.ArgumentParser()
@@ -33,6 +36,7 @@ run(['security', 'set-keychain-settings', '-lut', '21600', str(keychain)], priva
 run(['security', 'unlock-keychain', '-p', password, str(keychain)], private=True)
 run(['security', 'list-keychains', '-d', 'user', '-s', str(keychain)], private=True)
 for variable in ['MACOS_APPLICATION_P12', 'MACOS_INSTALLER_P12']:
+    print('Importing ' + variable, flush=True)
     file = a.scratch / (variable + '.p12')
     file.write_bytes(base64.b64decode(os.environ[variable], validate=True)); file.chmod(0o600)
     try:
@@ -40,6 +44,7 @@ for variable in ['MACOS_APPLICATION_P12', 'MACOS_INSTALLER_P12']:
                                 if variable == 'MACOS_INSTALLER_P12' else None) or os.environ['MACOS_CERTIFICATE_PASSWORD']
         run(['security', 'import', str(file), '-k', str(keychain), '-P', certificate_password,
              '-T', '/usr/bin/codesign', '-T', '/usr/bin/productbuild', '-T', '/usr/bin/productsign'], private=True)
+        print('Imported ' + variable, flush=True)
     finally:
         file.unlink()
 run(['security', 'set-key-partition-list', '-S', 'apple-tool:,apple:,codesign:', '-s', '-k', password, str(keychain)], private=True)
