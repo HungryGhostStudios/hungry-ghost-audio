@@ -73,5 +73,41 @@ installer as a second file benefit in Polar without removing the Windows file;
 the same benefit is already attached to all 51 products. The website should
 offer explicitly labelled Windows and macOS downloads.
 
+## Large installer downloads
+
+The tested universal installer preview is 2,603,406,456 bytes. GitHub release
+assets must each be smaller than 2 GiB, so the final `.pkg` is hosted in the
+private Cloudflare R2 bucket `hungry-ghost-audio-releases`, bound to the storefront
+as `RELEASES`. Keep the source archive and small validation reports on GitHub.
+Do not make the bucket itself public or upload signing material into it.
+
+After the signed workflow succeeds, verify the final installer SHA-256 against
+`macOS-manifest.json` and the Accepted notarization report. Upload that exact
+stapled file using multipart transfer, verify the downloaded object's complete
+checksum, and only then add these fields to the trusted release configuration:
+
+```js
+downloads: {
+  macInstaller: 'https://hungryghostaudio.com/downloads/macos/0.2.0/<sha256>/HungryGhostSuite-0.2.0-macOS-Universal.pkg',
+  macArtifact: {
+    path: '/downloads/macos/0.2.0/<sha256>/HungryGhostSuite-0.2.0-macOS-Universal.pkg',
+    key: 'macos/0.2.0/<sha256>/HungryGhostSuite-0.2.0-macOS-Universal.pkg',
+    bytes: /* exact final file size */,
+    sha256: /* exact final file SHA-256 */,
+    signed: true,
+    notarized: true
+  }
+}
+```
+
+The download route requires matching versioned paths, SHA-256 metadata and size.
+It streams the file and supports single byte ranges for resumed downloads,
+HEAD and conditional requests. With no published artifact configured it returns
+404. The route does not publish or authenticate artifacts itself: the release
+operator must finish the signing, notarization and upload checks first.
+
+References: [GitHub release size limits](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)
+and [Cloudflare R2 Workers API](https://developers.cloudflare.com/r2/api/workers/workers-api-reference/).
+
 Apple references: [Developer ID certificates](https://developer.apple.com/help/account/certificates/create-developer-id-certificates)
 and [customizing notarization](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow).

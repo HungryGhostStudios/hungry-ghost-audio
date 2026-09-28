@@ -1,5 +1,6 @@
 export const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 import releaseConfiguration from './release-config.mjs';
+import {releaseDownload} from './release-download.mjs';
 export function configuration(env){try{return env.STORE_CONFIG?JSON.parse(env.STORE_CONFIG):releaseConfiguration;}catch{return {ready:false,products:{}};}}
 export function checkoutDestination(value){const url=new URL(value);if(url.protocol!=='https:'||url.username||url.password||!((url.hostname==='polar.sh'&&url.pathname.startsWith('/checkout/'))||(url.hostname==='buy.polar.sh'&&/^\/polar_cl_[A-Za-z0-9]+$/.test(url.pathname))))throw Error('Invalid checkout destination');return url.href;}
 export function b64url(bytes){let value='';for(const b of new Uint8Array(bytes))value+=String.fromCharCode(b);return btoa(value).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
@@ -38,4 +39,4 @@ export async function api(request,env){
  }
  return json({error:'Not found'},404);
 }
-export default {async fetch(request,env){const url=new URL(request.url);if(url.hostname==='www.hungryghostaudio.com')return Response.redirect('https://hungryghostaudio.com'+url.pathname+url.search,308);let response;if(url.pathname.startsWith('/api/')){try{response=await api(request,env);}catch{return json({error:'Service temporarily unavailable'},503);}}else response=await env.ASSETS.fetch(request);const headers=new Headers(response.headers);for(const [key,value] of Object.entries(security))headers.set(key,value);return new Response(response.body,{status:response.status,headers});}};
+export default {async fetch(request,env){const url=new URL(request.url);if(url.hostname==='www.hungryghostaudio.com')return Response.redirect('https://hungryghostaudio.com'+url.pathname+url.search,308);let response;if(url.pathname.startsWith('/api/')){try{response=await api(request,env);}catch{return json({error:'Service temporarily unavailable'},503);}}else if(url.pathname.startsWith('/downloads/')){try{response=await releaseDownload(request,env,configuration(env));}catch{return json({error:'Download temporarily unavailable'},503);}}else response=await env.ASSETS.fetch(request);const headers=new Headers(response.headers);for(const [key,value] of Object.entries(security))headers.set(key,value);return new Response(response.body,{status:response.status,headers});}};
