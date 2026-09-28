@@ -23,7 +23,9 @@ for variable in ['MACOS_APPLICATION_P12', 'MACOS_INSTALLER_P12']:
     file = a.scratch / (variable + '.p12')
     file.write_bytes(base64.b64decode(os.environ[variable], validate=True)); file.chmod(0o600)
     try:
-        subprocess.run(['security', 'import', str(file), '-k', str(keychain), '-P', os.environ['MACOS_CERTIFICATE_PASSWORD'],
+        certificate_password = (os.environ.get('MACOS_INSTALLER_CERTIFICATE_PASSWORD')
+                                if variable == 'MACOS_INSTALLER_P12' else None) or os.environ['MACOS_CERTIFICATE_PASSWORD']
+        subprocess.run(['security', 'import', str(file), '-k', str(keychain), '-P', certificate_password,
                         '-T', '/usr/bin/codesign', '-T', '/usr/bin/productbuild', '-T', '/usr/bin/productsign'], check=True)
     finally:
         file.unlink()

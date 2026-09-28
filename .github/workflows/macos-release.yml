@@ -22,6 +22,7 @@ jobs:
           MACOS_APPLICATION_P12: ${{ secrets.MACOS_APPLICATION_P12 }}
           MACOS_INSTALLER_P12: ${{ secrets.MACOS_INSTALLER_P12 }}
           MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          MACOS_INSTALLER_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_INSTALLER_CERTIFICATE_PASSWORD }}
           MACOS_APPLICATION_IDENTITY: ${{ secrets.MACOS_APPLICATION_IDENTITY }}
           MACOS_INSTALLER_IDENTITY: ${{ secrets.MACOS_INSTALLER_IDENTITY }}
           MACOS_APPLE_ID: ${{ secrets.MACOS_APPLE_ID }}
@@ -64,6 +65,7 @@ jobs:
           MACOS_APPLICATION_P12: ${{ secrets.MACOS_APPLICATION_P12 }}
           MACOS_INSTALLER_P12: ${{ secrets.MACOS_INSTALLER_P12 }}
           MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          MACOS_INSTALLER_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_INSTALLER_CERTIFICATE_PASSWORD }}
           MACOS_APPLICATION_IDENTITY: ${{ secrets.MACOS_APPLICATION_IDENTITY }}
           MACOS_INSTALLER_IDENTITY: ${{ secrets.MACOS_INSTALLER_IDENTITY }}
         run: python3 scripts/macos/sign.py --stage mac-stage --keychain "$RUNNER_TEMP/hungryghost.keychain-db" --scratch "$RUNNER_TEMP/certificates"
@@ -133,6 +135,7 @@ jobs:
           MACOS_APPLICATION_P12: ${{ secrets.MACOS_APPLICATION_P12 }}
           MACOS_INSTALLER_P12: ${{ secrets.MACOS_INSTALLER_P12 }}
           MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          MACOS_INSTALLER_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_INSTALLER_CERTIFICATE_PASSWORD }}
           MACOS_APPLICATION_IDENTITY: ${{ secrets.MACOS_APPLICATION_IDENTITY }}
           MACOS_INSTALLER_IDENTITY: ${{ secrets.MACOS_INSTALLER_IDENTITY }}
         run: python3 scripts/macos/sign.py --import-only --stage empty-stage --keychain "$RUNNER_TEMP/hungryghost.keychain-db" --scratch "$RUNNER_TEMP/certificates"

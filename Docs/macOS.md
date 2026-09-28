@@ -39,7 +39,8 @@ secrets in **HungryGhostStudios/hungry-ghost-audio**, never public repository fi
 | --- | --- |
 | `MACOS_APPLICATION_P12` | Base64 of the Developer ID Application certificate and matching private key in an encrypted PKCS#12 file |
 | `MACOS_INSTALLER_P12` | Base64 of the Developer ID Installer certificate and matching private key in an encrypted PKCS#12 file |
-| `MACOS_CERTIFICATE_PASSWORD` | Password shared by those two encrypted PKCS#12 files |
+| `MACOS_CERTIFICATE_PASSWORD` | Password protecting the Application PKCS#12 file; also used for Installer unless its separate password is supplied |
+| `MACOS_INSTALLER_CERTIFICATE_PASSWORD` | Optional separate password for the Installer PKCS#12 file |
 | `MACOS_APPLICATION_IDENTITY` | Full `Developer ID Application: …` identity from the certificate |
 | `MACOS_INSTALLER_IDENTITY` | Full `Developer ID Installer: …` identity from the certificate |
 | `MACOS_APPLE_ID` | Apple ID used for notarization |
