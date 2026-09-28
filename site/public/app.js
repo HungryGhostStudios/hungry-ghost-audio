@@ -3,12 +3,38 @@ let products=[], family='All', config={ready:false,products:{}};
 const money = value => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(value);
 const safe = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const notice = message => {$('#notice').textContent=message;$('#notice').hidden=false;setTimeout(()=>$('#notice').hidden=true,9000);};
+const categories = {
+ All: {description:'The complete collection',shape:'<path d="M3 3h5v5H3zm9 0h5v5h-5zM3 12h5v5H3zm9 0h5v5h-5z"/>'},
+ Dynamics: {description:'Control impact and level',shape:'<path d="M2 10h3l2-6 4 12 2-6h5"/>'},
+ Tone: {description:'Shape the frequency balance',shape:'<path d="M5 3v14M10 3v14M15 3v14M3 7h4m1 6h4m1-8h4"/>'},
+ Colour: {description:'Add grit and harmonics',shape:'<path d="M4 16V9m6 7V3m6 13V6M2 17h16"/>'},
+ Space: {description:'Build depth and atmosphere',shape:'<circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="3"/><path d="M10 1v2m0 14v2M1 10h2m14 0h2"/>'},
+ Motion: {description:'Bring the sound to life',shape:'<path d="M2 10c3-12 5 12 8 0s5 12 8 0"/>'},
+ Stereo: {description:'Place and widen the image',shape:'<path d="M3 5h5v10H3zm9 0h5v10h-5zM9 10h2"/>'},
+ Utility: {description:'The essentials for every session',shape:'<path d="M4 4h12v12H4zM10 7v6m-3-3h6"/>'}
+};
+const categoryIcon = name => `<svg class="category-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${categories[name]?.shape||categories.All.shape}</svg>`;
+function renderCategoryFilters(){
+ document.querySelectorAll('[data-family]').forEach(button=>{
+  const name=button.dataset.family, count=name==='All'?products.length:products.filter(p=>p.family===name).length;
+  button.classList.add('category-filter');button.dataset.category=name;
+  button.setAttribute('aria-label',`${name==='All'?'All tools':name}, ${count} tools`);
+  button.innerHTML=`<span class="category-filter-top">${categoryIcon(name)}<strong>${name==='All'?'All tools':safe(name)}</strong><span class="category-count">${count}</span></span><span class="category-filter-description">${safe(categories[name].description)}</span>`;
+ });
+}
+function productCard(p){
+ return `<article class="product-card" data-category="${safe(p.family)}"><div class="card-top"><span class="category-badge">${categoryIcon(p.family)}${safe(p.family)}</span><span class="product-index">${String(products.indexOf(p)+1).padStart(2,'0')} / VST3</span></div><h4>${safe(p.name)}</h4><p>${safe(p.description)}</p><div class="card-bottom"><span>${money(p.price)}</span><span class="build-state">${config.products[p.id]?.ready?'EXPLORE ↗':p.status==='validated'?'VALIDATED BUILD ↗':'IN DEVELOPMENT ↗'}</span></div><button aria-label="Explore ${safe(p.name)}" data-product="${safe(p.id)}">Explore ${safe(p.name)}</button></article>`;
+}
 function render(){
+ renderCategoryFilters();
  const term=$('#search').value.toLowerCase().trim();
  const shown=products.filter(p=>(family==='All'||p.family===family)&&`${p.name} ${p.family} ${p.description}`.toLowerCase().includes(term));
  $('#result-count').textContent=`${shown.length} ${shown.length===1?'tool':'tools'}${family==='All'?'':` in ${family.toLowerCase()}`}`;
  $('#empty').hidden=shown.length!==0;
- $('#product-grid').innerHTML=shown.map(p=>`<article class="product-card"><div class="card-top"><span>${String(products.indexOf(p)+1).padStart(2,'0')} / ${safe(p.family.toUpperCase())}</span><span>VST3</span></div><h3>${safe(p.name)}</h3><p>${safe(p.description)}</p><div class="card-bottom"><span>${money(p.price)}</span><span class="build-state">${config.products[p.id]?.ready?'EXPLORE ↗':p.status==='validated'?'VALIDATED BUILD ↗':'IN DEVELOPMENT ↗'}</span></div><button aria-label="Explore ${safe(p.name)}" data-product="${safe(p.id)}">Explore ${safe(p.name)}</button></article>`).join('');
+ $('#product-grid').innerHTML=Object.keys(categories).filter(name=>name!=='All').map(name=>{
+  const group=shown.filter(p=>p.family===name);if(!group.length)return '';
+  return `<section class="category-group" data-category="${safe(name)}" aria-labelledby="category-${name.toLowerCase()}"><div class="category-heading"><span class="category-heading-icon">${categoryIcon(name)}</span><div><h3 id="category-${name.toLowerCase()}">${safe(name)}</h3><p>${safe(categories[name].description)}</p></div><span class="category-total">${group.length} ${group.length===1?'tool':'tools'}</span></div><div class="product-grid">${group.map(productCard).join('')}</div></section>`;
+ }).join('');
 }
 async function checkout(id, button){
  const old=button.textContent;button.disabled=true;button.textContent='Opening secure checkout…';
@@ -16,6 +42,7 @@ async function checkout(id, button){
 }
 function openProduct(id){
  const p=products.find(p=>p.id===id);if(!p)return;const release=config.products[p.id];
+ $('#product-dialog').dataset.category=p.family;
  const controls=p.controls.length?p.controls.map(c=>c.name):p.id==='feral'?['Eight EQ bands','Per-band dynamics','Mid / side','External key','Bus compressor','A / B']:['Room / Chamber / Hall / Plate / Cloud','Decay','Damping','Motion','Duck','Freeze'];
  $('#dialog-content').innerHTML=`<p class="eyebrow">${safe(p.family.toUpperCase())} / HUNGRY GHOST AUDIO</p><h2 class="dialog-title" id="dialog-title">${safe(p.name)}</h2><p class="dialog-description">${safe(p.description)}</p>${p.image?`<img class="dialog-image" src="${safe(p.image)}" alt="Actual ${safe(p.name)} plugin interface">`:''}<div class="control-list">${controls.map(c=>`<span>${safe(c)}</span>`).join('')}</div><p class="small-note">Windows x64 · VST3 · Version ${safe(p.version)} · AGPLv3 source</p><div class="dialog-bottom"><div><strong>${money(p.price)}</strong><p>Perpetual purchase · Two devices<br>Taxes calculated at checkout.</p></div><button class="button solid" id="dialog-buy" ${release?.ready?'':'disabled'}>${release?.ready?'Buy '+safe(p.name)+' ↗':'Purchasing opens soon'}</button></div>${release?.download?`<p class="trial-link"><a class="button solid" href="${safe(release.download)}">Try ${safe(p.name)} ↗</a></p>`:`<p class="small-note">${p.status==='validated'?'The native build has passed our current test suite. Store licensing and delivery are being prepared.':'This processor is in development. Purchasing will open after its build and release are validated.'}</p>`}`;
  if(release?.ready)$('#dialog-buy').addEventListener('click',e=>checkout(p.id,e.currentTarget));

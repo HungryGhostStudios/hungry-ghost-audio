@@ -10,7 +10,7 @@ Updated 28 September 2026. This file records verified release evidence and remai
 - The installer passed payload verification, individual selection, replacement backup and rollback after a blocked copy. The installed binaries in REAPER's configured VST3 scan folder match all 50 release-manifest hashes. Installed REVERB, FERAL and RIFT also passed pluginval at strictness 5. A listening session in REAPER has not been completed.
 - All 55 published release assets have GitHub SHA256 digests matching local files. Complete-source ZIP integrity and an offline build using its bundled JUCE source were checked.
 - [hungryghostaudio.com](https://hungryghostaudio.com) serves the Cloudflare storefront, 50 native plugin screenshots and verified download links. The mobile 390-pixel layout has no horizontal overflow or broken images. The www hostname redirects to the canonical domain, preserving paths and queries.
-- Thirteen storefront/API tests passed, including checkout destination checks, purchase gating, standard RSA SHA-256 interoperability, device binding, entitlement expiry and provider failure handling.
+- Fourteen storefront/API tests passed, including all 51 configured checkouts and licence coverage, checkout destination checks, purchase gating, standard RSA SHA-256 interoperability, device binding, entitlement expiry and provider failure handling.
 - Polar has 50 individual products and a complete-suite product, with 51 checkout links and separate perpetual licence benefits. Each benefit allows two activations and customer-controlled device deactivation. The production signing service rejects invalid keys through Polar.
 
 The [full CI run for the release integration](https://github.com/HungryGhostStudios/hungry-ghost-audio/actions/runs/36357462119) passed. Both subsequent full builds covering the www [redirect](https://github.com/HungryGhostStudios/hungry-ghost-audio/actions/runs/36358395433) and [routing](https://github.com/HungryGhostStudios/hungry-ghost-audio/actions/runs/36358593840) also passed. Local storefront checks and deployed redirect checks passed after those changes.
@@ -21,10 +21,10 @@ The storefront includes six dry/processed audio previews rendered through the ex
 
 Launch prices are $15–$99 for individual effects and $299 for the complete suite. REVERB is $25, compared with [Valhalla VintageVerb's $50 list price](https://valhalladsp.com/shop/reverb/valhalla-vintage-verb/). FERAL is $99, compared with [FabFilter Pro-Q 4's $199 list price](https://www.fabfilter.com/shop/pro-q-4-equalizer-plug-in?currency=USD). The same FabFilter shop currently lists its Total Bundle at $1,069. These are price-positioning references checked on 28 September 2026; they are not claims of identical features, platform support or sound quality. Sales, account discounts and taxes can change the comparison.
 
-## Required before paid purchasing opens
+## Purchasing and remaining verification
 
-- The merchant must connect their own payout account and provide a support email at [Polar's account-review page](https://polar.sh/dashboard/hungry-ghost-audio/finance/account). Submit for review is disabled while these are missing. Polar may require review time after submission.
-- Confirm that real checkout accepts payment, then verify an order, customer licence delivery, two-device activation, customer deactivation, signed native activation and refresh against the real purchased key.
-- Enable each product's purchase gate only after those checks succeed. The live configuration intentionally remains `ready:false`.
+- Polar's account-review page now shows **Account approved** and **Identity verified**. The user reported completing payout setup. The REVERB and complete-suite checkout links display live payment forms at $25 and $299, without the previous payments-unavailable message.
+- The website's 50 individual purchase gates and complete-suite gate are enabled. Checkout links and licence benefit mappings are configured for all 51 products.
+- A completed order, customer licence delivery, two-device activation, customer deactivation, signed native activation and refresh against a real purchased key remain unverified. No purchase was made during this setup.
 
-Paid purchasing and real customer key delivery are not yet verified. This is a published trial/source release, not a completed paid launch. The signed offline cache is an entitlement check; the AGPL licence preserves users' rights to inspect, modify and rebuild the software, and no claim of uncrackable protection is made.
+The storefront is connected to live Polar checkout. Successful payment and real customer key delivery still require an end-to-end order check. The signed offline cache is an entitlement check; the AGPL licence preserves users' rights to inspect, modify and rebuild the software, and no claim of uncrackable protection is made.
