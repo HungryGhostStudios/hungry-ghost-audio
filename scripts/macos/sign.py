@@ -1,6 +1,19 @@
 """Import CI certificates into an ephemeral keychain and sign plugin bundles."""
 import argparse, base64, hashlib, json, os, plistlib, secrets, subprocess
 from pathlib import Path
+
+def run(command, private=False, **kwargs):
+    # CalledProcessError includes every command argument, including P12 and
+    # keychain passwords. Keep credential failures out of public CI logs.
+    if private:
+        kwargs['stdout'] = subprocess.DEVNULL
+        kwargs['stderr'] = subprocess.DEVNULL
+    result = subprocess.run(command, **kwargs)
+    if result.returncode:
+        raise RuntimeError('Signing operation failed: ' + Path(command[0]).name + ' ' + command[1]
+                           + ' (exit ' + str(result.returncode) + ')')
+    return result
+
 p = argparse.ArgumentParser()
 p.add_argument('--stage', type=Path, required=True)
 p.add_argument('--keychain', type=Path, required=True)
@@ -15,21 +28,21 @@ assert os.environ['MACOS_INSTALLER_IDENTITY'].startswith('Developer ID Installer
 a.scratch.mkdir(parents=True, exist_ok=True)
 password = secrets.token_hex(24)
 keychain = a.keychain.resolve()
-subprocess.run(['security', 'create-keychain', '-p', password, str(keychain)], check=True)
-subprocess.run(['security', 'set-keychain-settings', '-lut', '21600', str(keychain)], check=True)
-subprocess.run(['security', 'unlock-keychain', '-p', password, str(keychain)], check=True)
-subprocess.run(['security', 'list-keychains', '-d', 'user', '-s', str(keychain)], check=True)
+run(['security', 'create-keychain', '-p', password, str(keychain)], private=True)
+run(['security', 'set-keychain-settings', '-lut', '21600', str(keychain)], private=True)
+run(['security', 'unlock-keychain', '-p', password, str(keychain)], private=True)
+run(['security', 'list-keychains', '-d', 'user', '-s', str(keychain)], private=True)
 for variable in ['MACOS_APPLICATION_P12', 'MACOS_INSTALLER_P12']:
     file = a.scratch / (variable + '.p12')
     file.write_bytes(base64.b64decode(os.environ[variable], validate=True)); file.chmod(0o600)
     try:
         certificate_password = (os.environ.get('MACOS_INSTALLER_CERTIFICATE_PASSWORD')
                                 if variable == 'MACOS_INSTALLER_P12' else None) or os.environ['MACOS_CERTIFICATE_PASSWORD']
-        subprocess.run(['security', 'import', str(file), '-k', str(keychain), '-P', certificate_password,
-                        '-T', '/usr/bin/codesign', '-T', '/usr/bin/productbuild', '-T', '/usr/bin/productsign'], check=True)
+        run(['security', 'import', str(file), '-k', str(keychain), '-P', certificate_password,
+             '-T', '/usr/bin/codesign', '-T', '/usr/bin/productbuild', '-T', '/usr/bin/productsign'], private=True)
     finally:
         file.unlink()
-subprocess.run(['security', 'set-key-partition-list', '-S', 'apple-tool:,apple:,codesign:', '-s', '-k', password, str(keychain)], check=True, stdout=subprocess.DEVNULL)
+run(['security', 'set-key-partition-list', '-S', 'apple-tool:,apple:,codesign:', '-s', '-k', password, str(keychain)], private=True)
 if a.import_only:
     print('Imported certificates into the temporary CI keychain.')
     raise SystemExit(0)
