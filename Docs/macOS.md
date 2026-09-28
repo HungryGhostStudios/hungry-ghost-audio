@@ -86,6 +86,15 @@ After the signed workflow succeeds, verify the final installer SHA-256 against
 stapled file using multipart transfer, verify the downloaded object's complete
 checksum, and only then add these fields to the trusted release configuration:
 
+`node scripts/macos/upload_release.mjs /path/to/the/final.pkg` performs this
+transfer using a temporary, isolated Worker and the existing Wrangler login.
+Its bearer credential expires after two hours, each 32 MiB part is checksummed,
+and the full remote file is read back to verify SHA-256. The helper Worker and
+its credential are removed afterward; the object stays private until configured
+for the storefront. The helper writes `macOS-download.json` next to the release
+only after full verification. It rejects preview manifests and missing Accepted
+notarization reports. Never pass signing secrets to the upload service.
+
 ```js
 downloads: {
   macInstaller: 'https://hungryghostaudio.com/downloads/macos/0.2.0/<sha256>/HungryGhostSuite-0.2.0-macOS-Universal.pkg',
