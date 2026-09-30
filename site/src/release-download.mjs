@@ -1,7 +1,12 @@
 // Versioned installers live in private object storage. Only a signed,
 // notarized artifact explicitly included in the release configuration is public.
 export async function releaseDownload(request, env, config) {
- const url = new URL(request.url), artifact = config.downloads?.macArtifact;
+ const url = new URL(request.url);
+ // History is an explicit trusted allowlist, not a prefix or bucket lookup.
+ // Keep exactly one record per immutable path, including the current artifact.
+ const history = Array.isArray(config.downloads?.macArtifacts) ? config.downloads.macArtifacts : [];
+ const matches = [config.downloads?.macArtifact, ...history].filter(item => item?.path === url.pathname);
+ const artifact = matches.length === 1 ? matches[0] : null;
  const unavailable = () => new Response('Download not found', {status:404});
  if (!artifact || artifact.signed !== true || artifact.notarized !== true || !env.RELEASES
      || artifact.path !== url.pathname || !/^[a-f0-9]{64}$/.test(artifact.sha256 || '')

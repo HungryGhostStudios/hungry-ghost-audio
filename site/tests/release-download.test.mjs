@@ -59,3 +59,71 @@ test('range offsets above 2 GiB stay accurate without buffering the installer',a
  assert.equal(r.headers.get('Content-Range'),'bytes 2400000000-2400000003/2603406456');assert.equal(r.headers.get('Content-Length'),'4');
  assert.deepEqual(f.calls,[['head',key]]);
 });
+
+function historyFixture(change={}) {
+ const previous={signed:true,notarized:true,path,key,sha256,bytes:bytes.length};
+ const nextHash='b'.repeat(64), nextBytes=new TextEncoder().encode('NEW-RELEASE-030');
+ const nextKey=`macos/0.3.0/${nextHash}/HungryGhostSuite-0.3.0-macOS-Universal.pkg`;
+ const current={signed:true,notarized:true,path:'/downloads/'+nextKey,key:nextKey,sha256:nextHash,bytes:nextBytes.length};
+ const calls=[], objects=new Map([[key,{body:bytes,hash:sha256}],[nextKey,{body:nextBytes,hash:nextHash}]]);
+ const downloads={macArtifact:current,macArtifacts:[{...previous,...change}]};
+ const env={STORE_CONFIG:JSON.stringify({downloads}),RELEASES:{
+  async head(k){calls.push(['head',k]);const o=objects.get(k);return o?{size:o.body.length,customMetadata:{sha256:o.hash}}:null;},
+  async get(k,options){calls.push(['get',k,options]);const o=objects.get(k);if(!o)return null;const range=options?.range;
+   return {size:o.body.length,customMetadata:{sha256:o.hash},body:range?o.body.slice(range.offset,range.offset+range.length):o.body};}
+ }};
+ return {calls,env,downloads,previous,current,objects,
+  fetch:(p,headers={},method='GET')=>worker.fetch(new Request('https://hungryghostaudio.com'+p,{headers,method}),env)};
+}
+
+test('verified current and historical installers keep independent immutable downloads',async()=>{
+ const f=historyFixture();
+ for(const [artifact,content] of [[f.previous,'0123456789'],[f.current,'NEW-RELEASE-030']]){
+  const response=await f.fetch(artifact.path);assert.equal(response.status,200);assert.equal(await response.text(),content);
+  assert.equal(response.headers.get('ETag'),'"'+artifact.sha256+'"');
+  assert.equal(response.headers.get('Content-Length'),String(artifact.bytes));
+  assert.equal(response.headers.get('Cache-Control'),'public, max-age=31536000, immutable');
+  assert.ok(response.headers.get('Content-Disposition').includes(artifact.key.split('/').at(-1)));
+ }
+ assert.deepEqual(f.calls.map(c=>c.slice(0,2)),[['head',f.previous.key],['get',f.previous.key],['head',f.current.key],['get',f.current.key]]);
+ const head=await f.fetch(f.previous.path,{},'HEAD');assert.equal(head.status,200);assert.equal(await head.text(),'');
+ assert.deepEqual(f.calls.at(-1),['head',f.previous.key]);
+});
+
+test('unknown and invalid historical artifacts fail before any storage access',async()=>{
+ for(const change of [{signed:false},{notarized:false},{sha256:'bad'},{sha256:'c'.repeat(64)},
+     {bytes:0},{bytes:1.5},{key:'macos/../'+key},{path:'/downloads/unrelated.pkg'}]){
+  const f=historyFixture(change), response=await f.fetch(f.previous.path);
+  assert.equal(response.status,404);assert.deepEqual(f.calls,[]);
+ }
+ const f=historyFixture();
+ assert.equal((await f.fetch('/downloads/macos/0.4.0/'+sha256+'/HungryGhostSuite-0.4.0-macOS-Universal.pkg')).status,404);
+ assert.deepEqual(f.calls,[]);
+ for(const invalidHistory of [null,{},'all',[null,false,{}]]){
+  f.env.STORE_CONFIG=JSON.stringify({downloads:{macArtifact:f.current,macArtifacts:invalidHistory}});
+  assert.equal((await f.fetch(f.previous.path)).status,404);assert.deepEqual(f.calls,[]);
+ }
+});
+
+test('historical paths retain exact range and conditional responses after current release changes',async()=>{
+ for(const [range,body,contentRange] of [['bytes=2-5','2345','bytes 2-5/10'],['bytes=-3','789','bytes 7-9/10'],['bytes=7-','789','bytes 7-9/10']]){
+  const f=historyFixture(), response=await f.fetch(f.previous.path,{Range:range,'If-Range':'"'+sha256+'"'});
+  assert.equal(response.status,206);assert.equal(await response.text(),body);
+  assert.equal(response.headers.get('Content-Range'),contentRange);
+  assert.equal(response.headers.get('Content-Length'),String(body.length));
+  assert.equal(f.calls[1][1],f.previous.key);
+ }
+ const f=historyFixture(), cached=await f.fetch(f.previous.path,{'If-None-Match':'"'+sha256+'"'});
+ assert.equal(cached.status,304);assert.deepEqual(f.calls,[['head',f.previous.key]]);
+ const stale=await f.fetch(f.previous.path,{Range:'bytes=5-','If-Range':'"'+f.current.sha256+'"'});
+ assert.equal(stale.status,200);assert.equal(await stale.text(),'0123456789');
+});
+
+test('historical downloads retain storage guards and reject ambiguous allowlist paths',async()=>{
+ const mismatch=historyFixture();mismatch.objects.get(key).hash='c'.repeat(64);
+ assert.equal((await mismatch.fetch(path)).status,503);assert.deepEqual(mismatch.calls,[['head',key]]);
+ const method=historyFixture();assert.equal((await method.fetch(path,{},'POST')).status,405);assert.deepEqual(method.calls,[]);
+ const duplicate=historyFixture();duplicate.downloads.macArtifacts.push({...duplicate.previous,bytes:99});
+ duplicate.env.STORE_CONFIG=JSON.stringify({downloads:duplicate.downloads});
+ assert.equal((await duplicate.fetch(path)).status,404);assert.deepEqual(duplicate.calls,[]);
+});

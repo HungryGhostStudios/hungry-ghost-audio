@@ -1,8 +1,30 @@
 # macOS release
 
-## 0.3.0 release preparation
+## Published and verified 0.3.0 installer
 
-Suite 0.3.0 includes REVERB 0.3.1 and version 0.3.0 of the other 49 effects. The new interfaces and BOND Precision require a fresh universal build, native validation on both architectures, Developer ID signing and notarization. The existing 0.2.0 artifact below remains the public download until the new installer passes all checks and complete remote checksum verification.
+Suite 0.3.0 includes REVERB 0.3.1 and version 0.3.0 of the other 49 effects. Its new interfaces and BOND Precision have passed universal validation, Developer ID signing and Apple notarization. The installer is published after complete remote checksum verification. The previous 0.2.0 artifact below remains available at its immutable URL.
+
+[Download the signed Mac 0.3.0 installer](https://hungryghostaudio.com/downloads/macos/0.3.0/2138d85a37b0c36b49334ee2a6c55e37f87a7ca46625dc7e2a19cba263b0e24d/HungryGhostSuite-0.3.0-macOS-Universal.pkg).
+
+- [Universal build 36679329788](https://github.com/HungryGhostStudios/hungry-ghost-audio/actions/runs/36679329788): native revision `c49a3de580e33d8159ddc4647050e629ec8a13f5`.
+- [Signed release 36683669264](https://github.com/HungryGhostStudios/hungry-ghost-audio/actions/runs/36683669264): revision `475944b3d3a82577187fe6ffbad2a05a040ac750`, using the verified native inputs from that universal build.
+- All 100 signed VST3 / AU bundles passed Intel and Apple Silicon validation. The downloaded reports independently match every executable hash and product version.
+- Apple notarization returned Accepted; stapling and Gatekeeper assessment passed. Apple's installer exposed all 100 choices and installed exactly CRUSH and REEL in both formats, with matching signed hashes and no unselected bundles.
+
+The final artifact and its manifest agree on the following evidence. The complete uploaded object was read back from private R2 storage, with its size and SHA-256 matching the local installer.
+
+| Artifact field | Verified value |
+| --- | --- |
+| Installer | `HungryGhostSuite-0.3.0-macOS-Universal.pkg` |
+| Bytes | `2615474937` |
+| SHA-256 | `2138d85a37b0c36b49334ee2a6c55e37f87a7ca46625dc7e2a19cba263b0e24d` |
+| Notarization ID | `cf100466-6800-4b8b-b966-53312e5eb121` |
+| Notarization result | `Accepted` |
+| Validation evidence | `HungryGhostSuite-0.3.0-macOS-validation.json` |
+
+Website deployment `8887a60d-e42a-48c9-87ef-de8de8a9a93b` exposes the verified installer. Live HEAD requests for both 0.3.0 and the retained 0.2.0 download returned 200; three range requests, including one above 2 GiB, returned 206 with exact bytes.
+
+The 31 storefront/API tests cover both current and historical installer delivery, including range and conditional requests; eight release-metadata checks pass. Refreshing Polar's existing customer download attachments remains pending. CI checks do not substitute for a new customer session in Logic Pro or REAPER.
 
 Versioned filenames come from `CMakeLists.txt` and the staged release manifest. `scripts/release_metadata.py --check` verifies both catalogues before CI builds. Mac bundle validation also checks each bundle's actual version, and the signing workflow rejects a build whose native source differs from the selected successful run. Only catalogue `status` and `image` metadata may change while validation and gallery preparation finish.
 
@@ -16,9 +38,9 @@ and Apple Silicon, Apple notarization, stapling and selected-installation checks
 The exact 2,604,372,347-byte installer was transferred to private R2 storage and
 read back in full; its SHA-256 is
 `e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e`.
-The trusted storefront configuration enables this verified artifact only.
+This verified installer remains available at its immutable URL after the 0.3.0 publication.
 
-[Download the signed Mac installer](https://hungryghostaudio.com/downloads/macos/0.2.0/e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e/HungryGhostSuite-0.2.0-macOS-Universal.pkg).
+[Download the previous signed Mac 0.2.0 installer](https://hungryghostaudio.com/downloads/macos/0.2.0/e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e/HungryGhostSuite-0.2.0-macOS-Universal.pkg).
 
 ## Formats and architectures
 
@@ -91,8 +113,8 @@ offer explicitly labelled Windows and macOS downloads.
 
 ## Large installer downloads
 
-The final universal installer is 2,604,372,347 bytes. GitHub release
-assets must each be smaller than 2 GiB, so the final `.pkg` is hosted in the
+The verified 0.3.0 installer is 2,615,474,937 bytes. GitHub release
+assets must each be smaller than 2 GiB, so universal `.pkg` installers are hosted in the
 private Cloudflare R2 bucket `hungry-ghost-audio-releases`, bound to the storefront
 as `RELEASES`. Keep the source archive and small validation reports on GitHub.
 Do not make the bucket itself public or upload signing material into it.
@@ -116,17 +138,25 @@ notarization reports. Never pass signing secrets to the upload service.
 
 ```js
 downloads: {
-  macInstaller: 'https://hungryghostaudio.com/downloads/macos/0.2.0/<sha256>/HungryGhostSuite-0.2.0-macOS-Universal.pkg',
+  macInstaller: 'https://hungryghostaudio.com/downloads/macos/0.3.0/<sha256>/HungryGhostSuite-0.3.0-macOS-Universal.pkg',
   macArtifact: {
-    path: '/downloads/macos/0.2.0/<sha256>/HungryGhostSuite-0.2.0-macOS-Universal.pkg',
-    key: 'macos/0.2.0/<sha256>/HungryGhostSuite-0.2.0-macOS-Universal.pkg',
+    path: '/downloads/macos/0.3.0/<sha256>/HungryGhostSuite-0.3.0-macOS-Universal.pkg',
+    key: 'macos/0.3.0/<sha256>/HungryGhostSuite-0.3.0-macOS-Universal.pkg',
     bytes: /* exact final file size */,
     sha256: /* exact final file SHA-256 */,
     signed: true,
     notarized: true
-  }
+  },
+  macArtifacts: [
+    /* Complete, previously verified artifact records with distinct immutable paths. */
+  ]
 }
 ```
+
+Before promoting a new current artifact, retain the complete previous verified record
+in `macArtifacts`. Each immutable path must occur exactly once across that history
+and `macArtifact`; duplicate paths fail closed. No path is inferred from a version
+number or discovered by listing the bucket.
 
 The download route requires matching versioned paths, SHA-256 metadata and size.
 It streams the file and supports single byte ranges for resumed downloads,

@@ -512,15 +512,25 @@ export default {
     "installer": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhostSuite-0.3.0-Setup.exe",
     "suite": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhostSuite-0.3.0-Windows-VST3.zip",
     "source": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhostSuite-0.3.0-Complete-Source.zip",
-    "macInstaller": "https://hungryghostaudio.com/downloads/macos/0.2.0/e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e/HungryGhostSuite-0.2.0-macOS-Universal.pkg",
+    "macInstaller": "https://hungryghostaudio.com/downloads/macos/0.3.0/2138d85a37b0c36b49334ee2a6c55e37f87a7ca46625dc7e2a19cba263b0e24d/HungryGhostSuite-0.3.0-macOS-Universal.pkg",
     "macArtifact": {
-      "path": "/downloads/macos/0.2.0/e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e/HungryGhostSuite-0.2.0-macOS-Universal.pkg",
-      "key": "macos/0.2.0/e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e/HungryGhostSuite-0.2.0-macOS-Universal.pkg",
-      "bytes": 2604372347,
-      "sha256": "e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e",
+      "path": "/downloads/macos/0.3.0/2138d85a37b0c36b49334ee2a6c55e37f87a7ca46625dc7e2a19cba263b0e24d/HungryGhostSuite-0.3.0-macOS-Universal.pkg",
+      "key": "macos/0.3.0/2138d85a37b0c36b49334ee2a6c55e37f87a7ca46625dc7e2a19cba263b0e24d/HungryGhostSuite-0.3.0-macOS-Universal.pkg",
+      "bytes": 2615474937,
+      "sha256": "2138d85a37b0c36b49334ee2a6c55e37f87a7ca46625dc7e2a19cba263b0e24d",
       "signed": true,
       "notarized": true
-    }
+    },
+    "macArtifacts": [
+      {
+        "path": "/downloads/macos/0.2.0/e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e/HungryGhostSuite-0.2.0-macOS-Universal.pkg",
+        "key": "macos/0.2.0/e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e/HungryGhostSuite-0.2.0-macOS-Universal.pkg",
+        "bytes": 2604372347,
+        "sha256": "e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e",
+        "signed": true,
+        "notarized": true
+      }
+    ]
   },
   "suite": {
     "ready": true,
