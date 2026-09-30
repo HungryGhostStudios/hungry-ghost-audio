@@ -22,6 +22,17 @@ void SuiteEditor::applyPreset(int index){
   auto set=[this](const juce::String& id,float v){auto* p=processor.state.getParameter(id);p->beginChangeGesture();p->setValueNotifyingHost(p->convertTo0to1(v));p->endChangeGesture();};
   for(int i=0;i<processor.product.controlCount;++i)set("control"+juce::String(i),presets[index].values[i]);
   set("mix",presets[index].mix);set("output",0);
+  if(processor.product.kind==Kind::BusCompressor){
+    // Presets describe complete signal behaviour, including the Precision engine.
+    constexpr float topology[]={1,0,0},detector[]={1,0,1},link[]={100,75,100},
+        knee[]={6,4,9},range[]={6,9,18},lowpass[]={16000,20000,12000},automatic[]={1,0,1};
+    set("bond_model",1);set("bond_topology",topology[index]);set("bond_detector",detector[index]);
+    set("bond_link",link[index]);set("bond_knee",knee[index]);set("bond_range",range[index]);
+    set("bond_key_lowpass",lowpass[index]);set("bond_auto_release",automatic[index]);set("key_listen",0);
+    bondPresetValues.clear();
+    for(auto* parameter:processor.getParameters())bondPresetValues.push_back(parameter->getValue());
+    bondPresetBank=processor.selectedBank();
+  }
 }
 void SuiteEditor::place(int i,juce::Rectangle<float> r,bool fader){
   const float s=theme.scale;
@@ -41,6 +52,17 @@ void SuiteEditor::resized(){
   const float w=static_cast<float>(design.width),h=static_cast<float>(design.height);
   theme.scale=static_cast<float>(getWidth())/w;
   const float s=theme.scale;
+  if(bondPanel){
+    bondPanel->setBounds(getLocalBounds());
+    auto set=[s](juce::Component& c,float x,float y,float ww,float hh){c.setBounds(juce::Rectangle<float>(x,y,ww,hh).transformedBy(juce::AffineTransform::scale(s)).toNearestInt());};
+    set(presetMenu,730,29,230,28);
+    set(bankA,977,29,34,28);set(bankB,1014,29,34,28);set(copy,1055,29,69,28);
+    set(bypassButton,1014,66,110,26);set(resetButton,1047,681,77,24);
+    set(licenceButton,34,680,240,24);
+    for(int i=0;i<8;++i){knobs[i].setVisible(false);labels[i].setVisible(false);}
+    advancedButton.setVisible(false);display={};secondaryDisplay={};
+    return;
+  }
   presetMenu.setBounds(juce::Rectangle<float>(w-280,22,244,30).transformedBy(juce::AffineTransform::scale(s)).toNearestInt());
   bankA.setBounds(juce::Rectangle<float>(w-280,64,36,28).transformedBy(juce::AffineTransform::scale(s)).toNearestInt());
   bankB.setBounds(juce::Rectangle<float>(w-240,64,36,28).transformedBy(juce::AffineTransform::scale(s)).toNearestInt());
@@ -139,10 +161,8 @@ void SuiteEditor::text(juce::Graphics& g,const juce::String& t,juce::Rectangle<f
 }
 void SuiteEditor::panel(juce::Graphics& g,juce::Rectangle<float> r,const juce::String& name,bool screen){
   const float s=theme.scale;
-  g.setColour(juce::Colours::black.withAlpha(.5f));g.fillRoundedRectangle(r.translated(0,3*s),5*s);
   if(screen)theme.paintDisplay(g,r);
-  else{g.setGradientFill(juce::ColourGradient(design.metal.brighter(.12f),r.getX(),r.getY(),design.metal.darker(.35f),r.getRight(),r.getBottom(),false));g.fillRoundedRectangle(r,4*s);}
-  g.setColour(design.accent.withAlpha(.25f));g.drawRoundedRectangle(r.reduced(s),4*s,s);
+  else theme.paintPanel(g,r,design.metal);
   if(!name.isEmpty())text(g,name,r.reduced(16*s).withHeight(20*s),10,design.accent,true);
 }
 void SuiteEditor::waveform(juce::Graphics& g,juce::Rectangle<float> r,bool compare){
@@ -259,17 +279,17 @@ void SuiteEditor::stereo(juce::Graphics& g){
   text(g,"OUTPUT CORRELATION  "+correlation,{r.getX(),display.getBottom()-27*s,r.getWidth(),20*s},11,design.accent,true,juce::Justification::centred);
 }
 void SuiteEditor::paint(juce::Graphics& g){
+  if(bondPanel){g.fillAll(juce::Colour(0xff101714));return;}
   const float s=theme.scale,w=static_cast<float>(design.width),h=static_cast<float>(design.height);
   auto bounds=getLocalBounds().toFloat();theme.paintChassis(g,bounds);
-  g.setGradientFill(juce::ColourGradient(design.metal.withAlpha(.84f),0,0,design.metal.darker(.55f).withAlpha(.74f),0,getHeight(),false));g.fillRect(bounds.reduced(18*s));
-  // Fine metal striations stay subdued behind the screenprinted controls.
-  for(float y=19*s;y<getHeight()-18*s;y+=3*s){g.setColour(juce::Colours::white.withAlpha(.018f));g.drawLine(19*s,y,getWidth()-19*s,y,.5f*s);}
-  for(float x:{25.f,w-25})for(float y:{25.f,h-25}){g.setColour(juce::Colours::black.withAlpha(.7f));g.fillEllipse((x-4)*s,(y-4)*s,8*s,8*s);g.setColour(GhostTheme::muted().withAlpha(.35f));g.drawLine((x-2)*s,(y-1)*s,(x+2)*s,(y+1)*s,s);}
+  // Family tint stays transparent enough to retain the shared blackened steel.
+  g.setGradientFill(juce::ColourGradient(design.metal.withAlpha(.19f),0,0,design.metal.darker(.55f).withAlpha(.10f),0,getHeight(),false));g.fillRect(bounds.reduced(18*s));
   auto r=[&](float x,float y,float ww,float hh){return juce::Rectangle<float>(x,y,ww,hh).transformedBy(juce::AffineTransform::scale(s));};
-  text(g,"HUNGRY GHOST AUDIO / "+juce::String(processor.product.family).toUpperCase(),r(36,21,w-340,17),10,GhostTheme::muted(),true);
-  text(g,processor.product.name,r(34,40,w-330,51),40,GhostTheme::ink(),true);
+  text(g,"HUNGRY GHOST AUDIO / "+juce::String(processor.product.family).toUpperCase(),r(36,21,w-445,17),10,GhostTheme::muted(),true);
+  theme.paintWordmark(g,processor.product.name,r(34,44,w-445,42),38*s);
+  theme.paintSpectralMark(g,r(w-390,23,82,37),design.accent);
   text(g,design.instrument,r(36,92,w-72,16),10,design.accent,true);
-  g.setColour(design.accent.withAlpha(.28f));g.drawLine(36*s,109*s,(w-36)*s,109*s,s);
+  g.setColour(juce::Colour(0xff986a4e).withAlpha(.47f));g.drawLine(36*s,109*s,(w-36)*s,109*s,s);
   switch(design.layout){
   case L::Precision:{
     panel(g,display,"TRANSFER / THRESHOLD",true);panel(g,secondaryDisplay,"LIVE GAIN REDUCTION",true);
@@ -376,6 +396,22 @@ void SuiteEditor::mouseDown(const juce::MouseEvent& e){
 void SuiteEditor::mouseDrag(const juce::MouseEvent& e){editGraph(e);}
 void SuiteEditor::mouseUp(const juce::MouseEvent&){if(dragParameter>=0){processor.state.getParameter("control"+juce::String(dragParameter))->endChangeGesture();dragParameter=-1;}}
 void SuiteEditor::timerCallback(){
+  if(bondPanel){
+    bankA.setToggleState(processor.selectedBank()==0,juce::dontSendNotification);
+    bankB.setToggleState(processor.selectedBank()==1,juce::dontSendNotification);
+    if(presetMenu.getSelectedId()>0){
+      const auto& parameters=processor.getParameters();
+      bool changed=bondPresetBank!=processor.selectedBank() || bondPresetValues.size()!=static_cast<size_t>(parameters.size());
+      if(!changed)for(int i=0;i<parameters.size();++i){
+        if(parameters[i]->getValue()!=bondPresetValues[static_cast<size_t>(i)]){changed=true;break;}
+      }
+      if(changed){
+        presetMenu.setSelectedId(0,juce::dontSendNotification);
+        bondPresetValues.clear();bondPresetBank=-1;
+      }
+    }
+    return;
+  }
   if(auto* sync=processor.state.getRawParameterValue("tempo_sync")){bool free=sync->load()<.5f;knobs[0].setEnabled(free);knobs[0].updateText();}
   peakIn=std::max(processor.inputPeak.load(),peakIn*.87f);peakOut=std::max(processor.outputPeak.load(),peakOut*.87f);gr=processor.reduction.load();
   reductionHistory[historyWrite++]=gr;historyWrite%=200;

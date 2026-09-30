@@ -1,3 +1,21 @@
+# Suite 0.3.0 — release candidate
+
+This update combines BOND Precision with the Hungry Ghost interface treatment across the complete collection. REVERB advances to 0.3.1; the other 49 plugins are 0.3.0. Public downloads remain on the previous release until the new artifacts complete native validation and packaging; Mac publication also requires signing, notarization and verified upload.
+
+- Shared blackened metal, etched detail, recessed controls and readable numeric fields, with each plugin retaining its own layout and purpose.
+- Existing plugin identities, primary parameter IDs, saved sessions, purchases and trial policy are preserved. Processing outside BOND is unchanged by the interface rollout.
+
+## BOND Precision
+
+- Dedicated scalable metal interface with calibrated dials, independent left/right reduction meters, bus peak readings and separate compression, detector and output sections.
+- Hungry Ghost finish with blackened metal, restrained edge wear, etched spectral artwork and recessed controls. The character pass retains the Precision preview's processing and parameter behaviour.
+- Precision engine adds independent channel detection, variable stereo linking, Peak/RMS detection, feed-forward/feedback modes, knee, maximum reduction, detector low-pass and programme-dependent release.
+- Three complete starting presets: Mix glue, Open drum bus and Parallel weight.
+- Earlier sessions retain Original processing in both A/B banks. Existing primary automation parameters and plugin identity are preserved.
+- Windows x64 VST3 and universal macOS VST3 / Audio Units are included in the suite release pipeline. The standalone remains a developer preview target.
+
+See [BondPrecision.md](BondPrecision.md) for control behaviour and compatibility.
+
 # Suite 0.2.0
 
 - Fix controls missing on first editor open; checks now run before any resize.

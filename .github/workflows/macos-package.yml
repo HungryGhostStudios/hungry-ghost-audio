@@ -20,9 +20,12 @@ jobs:
           BUILD_RUN: ${{ inputs.build_run }}
         run: |
           python3 - <<'PY'
-          import json, os, subprocess
+          import json, os, subprocess, sys
+          sys.path.insert(0,'scripts')
+          from release_metadata import verify_native_source
           run=json.loads(subprocess.check_output(['gh','api','repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['BUILD_RUN']]))
           assert run['path'] in {'.github/workflows/macos.yml', '.github/workflows/macos-validate-built.yml'} and run['head_branch']=='main' and run['conclusion']=='success'
+          verify_native_source(run['head_sha'])
           PY
       - uses: actions/download-artifact@v4
         with:
@@ -49,7 +52,9 @@ jobs:
       - name: Build installer preview
         run: python3 scripts/macos/package.py --stage mac-stage --output mac-release --preview
       - name: Verify selectable installation on disposable CI Mac
-        run: python3 scripts/macos/check_installer.py --package mac-release/HungryGhostSuite-0.2.0-macOS-Universal-Preview.pkg --manifest mac-stage/manifest.json --output installer-checks
+        run: |
+          version=$(python3 scripts/release_metadata.py)
+          python3 scripts/macos/check_installer.py --package "mac-release/HungryGhostSuite-${version}-macOS-Universal-Preview.pkg" --manifest mac-stage/manifest.json --output installer-checks
       - uses: actions/upload-artifact@v4
         with:
           name: mac-installer-preview

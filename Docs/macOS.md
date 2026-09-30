@@ -1,5 +1,15 @@
 # macOS release
 
+## 0.3.0 release preparation
+
+Suite 0.3.0 includes REVERB 0.3.1 and version 0.3.0 of the other 49 effects. The new interfaces and BOND Precision require a fresh universal build, native validation on both architectures, Developer ID signing and notarization. The existing 0.2.0 artifact below remains the public download until the new installer passes all checks and complete remote checksum verification.
+
+Versioned filenames come from `CMakeLists.txt` and the staged release manifest. `scripts/release_metadata.py --check` verifies both catalogues before CI builds. Mac bundle validation also checks each bundle's actual version, and the signing workflow rejects a build whose native source differs from the selected successful run. Only catalogue `status` and `image` metadata may change while validation and gallery preparation finish.
+
+See [the release procedure](Releasing.md) for exact build, publication and storefront update order.
+
+## Verified 0.2.0 baseline
+
 The [signed 0.2.0 Mac release](https://github.com/HungryGhostStudios/hungry-ghost-audio/actions/runs/36408294229)
 passed the checks below, including all 100 universal VST3 / AU bundles on Intel
 and Apple Silicon, Apple notarization, stapling and selected-installation checks.

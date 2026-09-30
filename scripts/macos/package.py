@@ -1,6 +1,8 @@
 """Build Apple's selectable installer from validated universal plugin bundles."""
-import argparse, hashlib, json, plistlib, shutil, subprocess, tempfile, xml.etree.ElementTree as ET
+import argparse, hashlib, json, plistlib, shutil, subprocess, sys, tempfile, xml.etree.ElementTree as ET
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from release_metadata import suite_version
 
 p = argparse.ArgumentParser()
 p.add_argument('--stage', type=Path, required=True)
@@ -16,6 +18,7 @@ if not a.preview and not all([a.installer_identity, a.application_identity, a.no
     p.error('A public installer requires Application/Installer identities and a notary profile')
 manifest = json.loads((a.stage / 'manifest.json').read_text(encoding='utf-8'))
 assert len(manifest['products']) == 100 and all(r['passed'] for r in manifest['products'])
+assert manifest['suiteVersion'] == suite_version(root), 'Staged release version differs from source'
 a.output.mkdir(parents=True, exist_ok=True)
 with tempfile.TemporaryDirectory(prefix='hungryghost-mac-') as scratch:
     scratch = Path(scratch)
@@ -81,7 +84,7 @@ with tempfile.TemporaryDirectory(prefix='hungryghost-mac-') as scratch:
             ET.SubElement(dist, 'pkg-ref', {'id': package_id, 'version': record['version']}).text = package_name
     distribution = scratch / 'distribution.xml'
     ET.ElementTree(dist).write(distribution, encoding='utf-8', xml_declaration=True)
-    name = 'HungryGhostSuite-0.2.0-macOS-Universal' + ('-Preview' if a.preview else '') + '.pkg'
+    name = 'HungryGhostSuite-' + manifest['suiteVersion'] + '-macOS-Universal' + ('-Preview' if a.preview else '') + '.pkg'
     package = a.output.resolve() / name
     command = ['productbuild', '--distribution', str(distribution), '--resources', str(resources),
                '--package-path', str(packages)]

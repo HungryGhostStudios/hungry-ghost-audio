@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 internal static class Package {
+    internal static readonly string Version = Text("version").Trim();
     internal static readonly Dictionary<string,string> Hashes = Text("hashes").Split(new[]{'\n'},StringSplitOptions.RemoveEmptyEntries)
         .Select(line=>line.TrimEnd('\r').Split('\t')).ToDictionary(parts=>parts[0],parts=>parts[1],StringComparer.Ordinal);
     internal static readonly string[] Bundles = Hashes.Keys.Select(path=>path.Split('/')[1]).Distinct().OrderBy(name=>name).ToArray();
@@ -60,7 +61,7 @@ internal static class Package {
                 progress((index+1)*100/chosen.Length,chosen[index]);
             }
             string record=Path.Combine(backup,"installation.txt");Directory.CreateDirectory(backup);
-            File.WriteAllText(record,"Hungry Ghost Audio 0.2.0\r\nDestination: "+root+"\r\n"+String.Join("\r\n",chosen)+"\r\n",Encoding.UTF8);
+            File.WriteAllText(record,"Hungry Ghost Audio "+Version+"\r\nDestination: "+root+"\r\n"+String.Join("\r\n",chosen)+"\r\n",Encoding.UTF8);
             return backup;
         } catch {
             foreach(var item in Enumerable.Reverse(changed)) {

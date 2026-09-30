@@ -30,13 +30,16 @@ jobs:
           MACOS_NOTARY_PASSWORD: ${{ secrets.MACOS_NOTARY_PASSWORD }}
         run: |
           python3 - <<'PY'
-          import json, os, subprocess
+          import json, os, subprocess, sys
+          sys.path.insert(0,'scripts')
+          from release_metadata import verify_native_source
           keys=['MACOS_APPLICATION_P12','MACOS_INSTALLER_P12','MACOS_CERTIFICATE_PASSWORD','MACOS_APPLICATION_IDENTITY','MACOS_INSTALLER_IDENTITY','MACOS_APPLE_ID','MACOS_TEAM_ID','MACOS_NOTARY_PASSWORD']
           missing=[k for k in keys if not os.environ.get(k)]
           assert not missing, 'Missing repository secrets: '+', '.join(missing)
           assert os.environ['BUILD_RUN'].isdigit()
           r=json.loads(subprocess.check_output(['gh','api','repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['BUILD_RUN']]))
           assert r['path'] in {'.github/workflows/macos.yml', '.github/workflows/macos-validate-built.yml'} and r['head_branch']=='main' and r['conclusion']=='success'
+          verify_native_source(r['head_sha'])
           PY
       - uses: actions/download-artifact@v4
         with:
@@ -150,7 +153,9 @@ jobs:
           xcrun notarytool store-credentials hungryghost-notary --apple-id "$MACOS_APPLE_ID" --team-id "$MACOS_TEAM_ID" --password "$MACOS_NOTARY_PASSWORD" --keychain "$RUNNER_TEMP/hungryghost.keychain-db"
           python3 scripts/macos/package.py --stage mac-stage --output mac-release --application-identity "$MACOS_APPLICATION_IDENTITY" --installer-identity "$MACOS_INSTALLER_IDENTITY" --notary-profile hungryghost-notary --notary-keychain "$RUNNER_TEMP/hungryghost.keychain-db"
       - name: Verify selectable installation
-        run: python3 scripts/macos/check_installer.py --package mac-release/HungryGhostSuite-0.2.0-macOS-Universal.pkg --manifest mac-stage/manifest.json --output installer-checks
+        run: |
+          version=$(python3 scripts/release_metadata.py)
+          python3 scripts/macos/check_installer.py --package "mac-release/HungryGhostSuite-${version}-macOS-Universal.pkg" --manifest mac-stage/manifest.json --output installer-checks
       - uses: actions/upload-artifact@v4
         with:
           name: mac-signed-release

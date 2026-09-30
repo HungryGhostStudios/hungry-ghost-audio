@@ -4,6 +4,7 @@
 #include "UI/ProductDesign.h"
 #include "UI/ProductPresets.h"
 #include "UI/AdvancedPanel.h"
+#include "UI/BondPanel.h"
 #include <juce_dsp/juce_dsp.h>
 namespace hungryghost {
 class SuiteEditor final : public juce::AudioProcessorEditor,
@@ -25,6 +26,9 @@ private:
   juce::ComboBox presetMenu;
   juce::TextButton advancedButton{"Shape +"};
   std::unique_ptr<AdvancedPanel> advancedPanel;
+  std::unique_ptr<BondPanel> bondPanel;
+  std::vector<float> bondPresetValues;
+  int bondPresetBank = -1;
   juce::TooltipWindow tips{this,600};
   std::array<juce::TextButton,2> polarityButtons;
   LicenseButton licenceButton{processor.licence};

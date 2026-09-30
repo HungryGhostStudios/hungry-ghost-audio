@@ -74,13 +74,13 @@ void AfterKnob::resized() {
 void TailView::paint(juce::Graphics &g) {
   const auto p = processor.readParameters();
   const float viewScale = getWidth() / 624.0f;
+  if (auto *theme = dynamic_cast<AfterLook *>(&getLookAndFeel()))
+    theme->paintDisplay(g, getLocalBounds().toFloat());
   const juce::Graphics::ScopedSaveState save(g);
   g.addTransform(juce::AffineTransform::scale(viewScale));
   const float viewHeight = getHeight() / viewScale;
   const auto outer = juce::Rectangle<float>(0, 0, 624, viewHeight);
   constexpr float sc = 1;
-  if (auto *theme = dynamic_cast<AfterLook *>(&getLookAndFeel()))
-    theme->paintDisplay(g, outer);
   g.setFont(font(14 * sc));
   g.setColour(AfterLook::muted());
   g.drawText("TAIL SHAPE",
@@ -348,6 +348,23 @@ void AfterEditor::timerCallback() {
 void AfterEditor::paint(juce::Graphics &g) {
   const float s = look.scale;
   look.paintChassis(g, getLocalBounds().toFloat());
+  const auto copper = juce::Colour(0xffbd825e);
+  const auto rect = [s](float x, float y, float w, float h) {
+    return juce::Rectangle<float>(x * s, y * s, w * s, h * s);
+  };
+  // Plates follow the live control bounds, including the expanded Shape view.
+  // Their edges sit outside the controls and never cross the tail display.
+  auto characterPlate = characters.front().getBounds();
+  for (const auto &button : characters)
+    characterPlate = characterPlate.getUnion(button.getBounds());
+  look.paintPanel(g, characterPlate.toFloat().expanded(7 * s, 5 * s), copper);
+  look.paintPanel(g, knobs[0]->getBounds().toFloat().expanded(9 * s, 3 * s),
+                  copper);
+  auto controlPlate = knobs[1]->getBounds();
+  for (int i = 2; i < 6; ++i)
+    controlPlate = controlPlate.getUnion(knobs[i]->getBounds());
+  look.paintPanel(g, controlPlate.toFloat().expanded(4 * s, 4 * s),
+                  AfterLook::accent());
   const auto seam = [&](float y) {
     g.setColour(juce::Colours::black.withAlpha(.8f));
     g.drawLine(20 * s, y, getWidth() - 20 * s, y, 2 * s);
@@ -355,23 +372,19 @@ void AfterEditor::paint(juce::Graphics &g) {
     g.drawLine(20 * s, y + 2 * s, getWidth() - 20 * s, y + 2 * s, .8f * s);
   };
   seam(86 * s);
-  g.setColour(AfterLook::ink().withAlpha(.9f));
-  auto wordmark = font(33 * s, true);
-  wordmark.setExtraKerningFactor(.10f);
-  g.setFont(wordmark);
-  g.drawText("HUNGRY GHOST",
-             juce::Rectangle<float>(44 * s, 23 * s, 380 * s, 34 * s),
+  g.setFont(font(9.5f * s, true));
+  g.setColour(AfterLook::muted());
+  g.drawText("HUNGRY GHOST AUDIO", rect(44, 15, 285, 12),
              juce::Justification::left);
-  auto tagline = font(10.5f * s, true);
-  tagline.setExtraKerningFactor(.45f);
-  g.setFont(tagline);
-  g.setColour(AfterLook::accent().withAlpha(.88f));
-  g.drawText("DEVOUR THE SILENCE",
-             juce::Rectangle<float>(45 * s, 55 * s, 340 * s, 15 * s),
+  look.paintWordmark(g, "REVERB", rect(41, 28, 288, 39), 36 * s);
+  g.setFont(font(9 * s, true));
+  g.setColour(AfterLook::muted().interpolatedWith(copper, .3f));
+  g.drawText("ALGORITHMIC SPACE / DEVOUR THE SILENCE", rect(44, 65, 306, 12),
              juce::Justification::left);
+  look.paintSpectralMark(g, rect(359, 18, 77, 59), copper);
   const int footer = getHeight() - static_cast<int>(52 * s);
-  g.setColour(juce::Colours::black.withAlpha(.16f));
-  g.fillRect(20 * s, (float)footer, getWidth() - 40 * s, 38 * s);
+  look.paintPanel(g, {20 * s, (float)footer, getWidth() - 40 * s, 38 * s},
+                  copper);
   seam((float)footer);
   g.setColour(AfterLook::muted());
   g.setFont(font(11 * s));
@@ -381,8 +394,13 @@ void AfterEditor::paint(juce::Graphics &g) {
              static_cast<int>(40 * s), juce::Justification::left);
   const int actionY = shape.getY() - static_cast<int>(12 * s);
   seam((float)actionY);
-  if (shapeOpen)
+  if (shapeOpen) {
+    const float panelY = shape.getBottom() + 13 * s;
+    look.paintPanel(g, {20 * s, panelY, getWidth() - 40 * s,
+                       juce::jmax(0.f, footer - panelY - 4 * s)},
+                    AfterLook::accent());
     seam(shape.getBottom() + 12 * s);
+  }
 }
 void AfterEditor::resized() {
   look.scale = static_cast<float>(getWidth()) / 920.0f;

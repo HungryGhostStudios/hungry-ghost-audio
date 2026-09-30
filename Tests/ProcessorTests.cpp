@@ -62,6 +62,37 @@ void advancedTests() {
   require(render(Kind::Compressor,filtered,comp,1000)>.3,"Key audition still output compressed programme");
   std::cout<<"PASS: sync, fallback, free-time retention, legacy banks, detector audition/filter, pre-drive/repeat cuts, Q and mono audition\n";
 }
+
+void bondStateTests() {
+  SuiteProcessor p(find(Kind::BusCompressor));
+  auto get=[&](const char* id){return p.state.getRawParameterValue(id)->load();};
+  require(get("bond_model")==1,"New BOND instance must use Precision");
+  set(p,"bond_topology",1);set(p,"bond_detector",1);set(p,"bond_link",37);
+  set(p,"bond_knee",9);set(p,"bond_range",12);set(p,"bond_key_lowpass",4200);set(p,"bond_auto_release",1);
+  // The skewed Hz parameter round-trips through normalized host values. Capture
+  // the accepted value so the save/load check still requires exact preservation.
+  const float savedLowpass=get("bond_key_lowpass");
+  require(std::abs(savedLowpass-4200)<.002f,"BOND low-pass host conversion inaccurate");
+  p.copyBank();p.selectBank(1);set(p,"bond_link",82);
+  juce::MemoryBlock saved;p.getStateInformation(saved);
+  p.factoryReset();p.setStateInformation(saved.getData(),static_cast<int>(saved.getSize()));
+  require(p.selectedBank()==1&&get("bond_link")==82&&get("bond_topology")==1,"BOND new B bank state lost");
+  p.selectBank(0);
+  require(get("bond_link")==37&&get("bond_key_lowpass")==savedLowpass&&get("bond_auto_release")==1,"BOND A bank state lost");
+  auto xml=juce::AudioProcessor::getXmlFromBinary(saved.getData(),static_cast<int>(saved.getSize()));
+  auto tree=juce::ValueTree::fromXml(*xml);
+  for(auto bank:tree)for(int i=bank.getNumChildren()-1;i>=0;--i)
+    if(bank.getChild(i)["id"].toString().startsWith("bond_"))bank.removeChild(i,nullptr);
+  auto legacy=tree.createXml();juce::MemoryBlock old;juce::AudioProcessor::copyXmlToBinary(*legacy,old);
+  p.setStateInformation(old.getData(),static_cast<int>(old.getSize()));
+  require(get("bond_model")==0&&get("bond_link")==100&&get("bond_auto_release")==0,"Legacy BOND B bank changed model or retained new settings");
+  p.selectBank(0);require(get("bond_model")==0,"Legacy BOND A bank changed model");
+  p.factoryReset();require(get("bond_model")==1,"Factory reset did not restore Precision");
+  // Existing automation identities and ranges are unchanged.
+  for(int i=0;i<6;++i){auto* q=p.state.getParameter("control"+juce::String(i));require(q!=nullptr,"BOND old automation ID missing");
+    require(q->convertFrom0to1(0)==p.product.controls[i].min&&q->convertFrom0to1(1)==p.product.controls[i].max,"BOND old automation range changed");}
+  std::cout<<"PASS: BOND new defaults, A/B roundtrip, legacy migration and automation identities\n";
+}
 double amplitude(const std::vector<float>& samples, double hz) {
   double re = 0, im = 0;
   for (size_t i = 4800; i < samples.size(); ++i) {
@@ -75,6 +106,7 @@ int main() {
   juce::ScopedJuceInitialiser_GUI init;
   try {
     advancedTests();
+    bondStateTests();
     juce::MidiBuffer midi;
     // Exercise prepare/reprepare with mono/stereo and oversampling changes.
     for (int index = 2; index < 50; ++index) {

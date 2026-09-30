@@ -596,23 +596,35 @@ void FeralEditor::paint(juce::Graphics &original) {
   juce::Graphics::ScopedSaveState save(original);
   original.addTransform(juce::AffineTransform::scale(getWidth() / 1120.0f));
   auto &g = original;
-  g.setFont(font(24, true));
-  g.setColour(juce::Colours::black.withAlpha(.75f));
-  g.drawText("HUNGRY GHOST", 31, 24, 280, 31, juce::Justification::left);
+  const auto copper = juce::Colour(0xffbd825e);
+  const auto selectionColour = boundSelection >= 0
+                                   ? colours[boundSelection]
+                                   : Theme::accent();
+  // Separate machined modules retain FERAL's wide graph and dense inspector.
+  theme.paintPanel(g, {24, 86, 1072, 39}, copper);
+  theme.paintPanel(g, {24, 478, 1072, 87}, selectionColour);
+  theme.paintPanel(g, {24, 566, 920, 161}, selectionColour);
+  theme.paintPanel(g, {24, 732, 1072, 42}, copper);
+  g.setFont(font(9.5f, true));
+  g.setColour(Theme::muted());
+  g.drawText("HUNGRY GHOST AUDIO", 33, 17, 277, 13,
+             juce::Justification::left);
+  theme.paintWordmark(g, "FERAL", {29, 32, 207, 44}, 39);
+  g.setFont(font(10.5f, true));
   g.setColour(Theme::ink());
-  g.drawText("HUNGRY GHOST", 31, 23, 280, 31, juce::Justification::left);
-  g.setFont(font(10));
-  g.setColour(Theme::accent().withAlpha(.85f));
-  g.drawText("PRECISION DYNAMICS", 33, 58, 250, 17, juce::Justification::left);
-  g.setFont(font(35, true));
-  g.setColour(Theme::ink());
-  g.drawText("FERAL", 321, 25, 165, 44, juce::Justification::left);
+  g.drawText("DYNAMIC EQ + COMPRESSION", 239, 40, 190, 15,
+             juce::Justification::left);
+  g.setFont(font(8.5f, true));
+  g.setColour(Theme::muted().interpolatedWith(copper, .3f));
+  g.drawText("EIGHT BANDS / MID-SIDE / BUS", 239, 59, 191, 12,
+             juce::Justification::left);
+  theme.paintSpectralMark(g, {443, 18, 66, 58}, copper);
   g.setColour(Theme::line().withAlpha(.6f));
   g.drawLine(31, 82, 1088, 82);
   // Inspector lettering occupies its own machined strip, outside the graph
   // glass.
   g.setFont(font(12, true));
-  g.setColour(boundSelection >= 0 ? colours[boundSelection] : Theme::accent());
+  g.setColour(selectionColour);
   g.drawText(boundSelection >= 0 ? "BAND " + juce::String(boundSelection + 1)
                                  : "BUS",
              35, 485, 85, 23, juce::Justification::left);
@@ -623,10 +635,11 @@ void FeralEditor::paint(juce::Graphics &original) {
         juce::String::fromUTF8("Full-band compression  •  stereo linked"), 32,
         524, 495, 24, juce::Justification::left);
   }
-  g.setColour(juce::Colours::black.withAlpha(.35f));
-  g.fillRoundedRectangle(957, 569, 132, 156, 5);
-  g.setColour(Theme::line());
-  g.drawRoundedRectangle(957, 569, 132, 156, 5, .8f);
+  theme.paintPanel(g, {957, 569, 132, 156}, copper);
+  g.setGradientFill(juce::ColourGradient(juce::Colour(0xff050d0d), 960, 572,
+                                        juce::Colour(0xff111c1b), 1086, 722,
+                                        false));
+  g.fillRoundedRectangle(960, 572, 126, 150, 2);
   const float gr = boundSelection >= 0
                        ? processor.reductions[boundSelection].load()
                        : processor.busReduction.load();

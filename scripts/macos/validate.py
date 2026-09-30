@@ -1,6 +1,8 @@
 """Check both slices and validate all VST3/Audio Unit bundles on the running Mac."""
-import argparse, concurrent.futures, hashlib, json, os, platform, plistlib, shutil, subprocess, threading, time
+import argparse, concurrent.futures, hashlib, json, os, platform, plistlib, shutil, subprocess, sys, threading, time
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from release_metadata import catalogue
 
 p = argparse.ArgumentParser()
 p.add_argument('--build', type=Path)
@@ -14,7 +16,7 @@ if bool(a.build) == bool(a.stage): p.error('Supply either --build or --stage')
 if a.system_au_install and os.environ.get('GITHUB_ACTIONS') != 'true':
     p.error('--system-au-install is restricted to disposable GitHub Actions runners')
 root = Path(__file__).resolve().parents[2]
-products = json.loads((root / 'catalogue.json').read_text(encoding='utf-8'))
+products = catalogue(root)
 a.output.mkdir(parents=True, exist_ok=True)
 inventory = []
 for product in products:
@@ -24,6 +26,7 @@ for product in products:
                   else (a.stage / 'Library/Audio/Plug-Ins' / ('VST3' if fmt == 'VST3' else 'Components'))) / (name + '.' + ext)
         bundle = bundle.resolve()
         with (bundle / 'Contents/Info.plist').open('rb') as f: info = plistlib.load(f)
+        assert info.get('CFBundleShortVersionString') == product['version'], (product['id'], fmt, 'Built version differs from catalogue')
         binary = bundle / 'Contents/MacOS' / info['CFBundleExecutable']
         arches = subprocess.check_output(['lipo', '-archs', str(binary)], text=True).split()
         assert set(arches) == {'arm64', 'x86_64'}, (product['id'], fmt, arches)

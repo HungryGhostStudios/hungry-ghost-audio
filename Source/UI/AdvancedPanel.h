@@ -47,7 +47,7 @@ public:
     for(auto& entry:entries){entry.label->setBounds(18,y,getWidth()-36,20);entry.slider->setBounds(22,y+22,getWidth()-44,27);y+=57;}
   }
   void paint(juce::Graphics& g)override{
-    g.fillAll(juce::Colour(0xff1c2521));g.setColour(juce::Colour(0xff718879));g.drawRect(getLocalBounds(),1);g.setColour(GhostTheme::muted());g.setFont(juce::Font(juce::FontOptions("Segoe UI",12.f,juce::Font::plain)));
+    g.fillAll(GhostTheme::background());localTheme.paintPanel(g,getLocalBounds().toFloat(),juce::Colour(0xff29312c));g.setColour(GhostTheme::muted());g.setFont(juce::Font(juce::FontOptions("Segoe UI",12.f,juce::Font::plain)));
     g.drawFittedText(explanation,getLocalBounds().withY(getHeight()-58).withHeight(48).reduced(18,0),juce::Justification::topLeft,3);
   }
 private:

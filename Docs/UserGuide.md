@@ -1,11 +1,11 @@
 # Hungry Ghost Audio · Windows and macOS
 
-Suite release 0.2.0. Windows 10 or 11 uses x64 VST3. macOS 11 and later uses universal VST3 and Audio Units on Intel and Apple Silicon. Choose Audio Units for Logic Pro and VST3 for REAPER or other compatible hosts. REVERB is version 0.3.0; FERAL is 0.2.0; the remaining effects are 0.2.0. The same purchase covers both platforms.
+Suite release 0.3.0. Windows 10 or 11 uses x64 VST3. macOS 11 and later uses universal VST3 and Audio Units on Intel and Apple Silicon. Choose Audio Units for Logic Pro and VST3 for REAPER or other compatible hosts. REVERB is version 0.3.1; the other 49 effects are 0.3.0. The same purchase covers both platforms. See [release notes](ReleaseNotes.md) for current publication and validation status.
 
 ## Install on Windows
 
 1. Close your audio host. The installer never closes it for you.
-2. Run `HungryGhostSuite-0.2.0-Setup.exe`, select your effects and choose Install. The default is your standard user VST3 folder: `%LOCALAPPDATA%\Programs\Common\VST3`. Installing there does not require administrator access.
+2. Run `HungryGhostSuite-0.3.0-Setup.exe`, select your effects and choose Install. The default is your standard user VST3 folder: `%LOCALAPPDATA%\Programs\Common\VST3`. Installing there does not require administrator access.
 3. Open your host and rescan that folder. In REAPER, open Preferences → Plug-ins → VST, add the folder to the scan paths if needed, and use Re-scan.
 
 The ZIP downloads provide the same tested binaries for manual installation. Copy the folders **inside** `VST3` to your user VST3 folder, or to `C:\Program Files\Common Files\VST3` with administrator access. Copy each whole `.vst3` folder, including Contents; do not extract just the inner binary. Choose either the user location or shared location for an installation to avoid duplicate versions.
@@ -16,7 +16,7 @@ These initial releases are not signed with a Windows code-signing certificate. R
 
 ## Install on Mac
 
-1. Close your audio hosts and download `HungryGhostSuite-0.2.0-macOS-Universal.pkg` from the website's Mac download.
+1. Close your audio hosts and download `HungryGhostSuite-0.3.0-macOS-Universal.pkg` when offered by the website's Mac download.
 2. Open the package in Apple's Installer. Use Customize to select the effects and VST3 / Audio Unit formats you want. Administrator approval is required for the shared plugin folders.
 3. Complete installation, reopen your audio host and rescan plugins if needed.
 
@@ -55,7 +55,7 @@ Double-click the graph to add a band. Drag its node to adjust frequency and gain
 
 ## Dynamics
 
-RIFT provides clean peak compression. CLAW adds a fast peak detector and programme-dependent release. VELVET uses a slower RMS detector for gentler levelling. BOND filters the detector's bass energy before bus compression. CRUSH starts with parallel blending for stronger compression alongside the original signal. Threshold determines where reduction starts; ratio, knee, attack and release shape its response. Makeup is separate from final Output.
+RIFT provides clean peak compression. CLAW adds a fast peak detector and programme-dependent release. VELVET uses a slower RMS detector for gentler levelling. BOND Precision adds Peak/RMS detection, feed-forward/internal feedback, filtered key audition, variable stereo linking, soft knee, maximum reduction and automatic release; older BOND sessions retain their Original model. Read [the BOND guide](BondPrecision.md) for its detector and model behaviour. CRUSH starts with parallel blending for stronger compression alongside the original signal. Threshold determines where reduction starts; ratio, knee, attack and release shape its response. Makeup is separate from final Output.
 
 HUSH detects the selected sibilance region and applies bounded reduction. GATE uses threshold, hysteresis, hold and floor; BLOOM applies gentler downward expansion. PUNCH shapes fast attacks and slower body; TAIL focuses on sustain while protecting attack. RIDE slowly changes level within its set range and ignores signals below its noise floor. DUCK accepts an external sidechain to reduce the main signal; without a routed key it uses the main signal as its detector.
 

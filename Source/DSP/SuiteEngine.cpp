@@ -20,6 +20,26 @@ float SuiteEngine::Biquad::tick(float x) noexcept {
   return static_cast<float>(y);
 }
 void SuiteEngine::Biquad::clear() noexcept { z1 = z2 = 0; }
+float SuiteEngine::BondKeyFilter::tick(float x, float hpG, float lpG) noexcept {
+  // Topology-preserving state-variable Butterworth sections remain stable
+  // while their cutoff is automated. Each section is 12 dB/octave.
+  const auto section = [](float input, float g, float& state1, float& state2,
+                          bool highpass) noexcept {
+    constexpr float k = 1.4142135623730951f;
+    const float a1 = 1.f / (1.f + g * (g + k));
+    const float a2 = g * a1, a3 = g * a2;
+    const float v3 = input - state2;
+    const float v1 = a1 * state1 + a2 * v3;
+    const float v2 = state2 + a2 * state1 + a3 * v3;
+    state1 = 2.f * v1 - state1;
+    state2 = 2.f * v2 - state2;
+    // Denormal suppression also makes a reset-to-silence deterministic.
+    if (std::abs(state1) < 1.e-20f) state1 = 0;
+    if (std::abs(state2) < 1.e-20f) state2 = 0;
+    return highpass ? input - k * v1 - v2 : v2;
+  };
+  return section(section(x, hpG, hp1, hp2, true), lpG, lp1, lp2, false);
+}
 float SuiteEngine::db(float x) noexcept { return std::pow(10.f, x * .05f); }
 float SuiteEngine::toDb(float x) noexcept {
   return 20.f * std::log10(std::max(x, 1.e-9f));
@@ -38,6 +58,8 @@ bool SuiteEngine::usesDelay() const noexcept {
 void SuiteEngine::prepare(double rate) {
   sr = std::clamp(rate, 8000., 384000.);
   smoothing = static_cast<float>(1. - std::exp(-1. / (.01 * sr)));
+  bondPowerCoefficient = static_cast<float>(1. - std::exp(-1. / (.015 * sr)));
+  bondHistoryCoefficient = static_cast<float>(1. - std::exp(-1. / (.25 * sr)));
   for (auto &d : delay)
     d.assign(usesDelay()?static_cast<std::size_t>(sr*(kind==Kind::SlapDelay?13.7:kind>=Kind::Delay&&kind<=Kind::DubDelay?12.2:kind==Kind::Comb?.075:.25))+8:8,0.f);
   reset();
@@ -67,6 +89,13 @@ void SuiteEngine::reset() {
   detectorLow.fill(0);inputLow.fill(0);repeatLow.fill(0);
   listenBlend=advanced.listenKey?1.f:0.f;
   monoBlend=advanced.monoListen?1.f:0.f;
+  bondPaths = {};
+  bondReduction.fill(0);
+  bondModelBlend=static_cast<float>(advanced.bondModel);
+  bondTopologyBlend=static_cast<float>(advanced.bondTopology);
+  bondDetectorBlend=static_cast<float>(advanced.bondDetector);
+  bondAutoBlend=advanced.bondAutoRelease?1.f:0.f;
+  bondExternalBlend=0;
   mix = targetMix;
   output = targetOutput;
   updateFilters();
@@ -99,6 +128,85 @@ void SuiteEngine::setAdvanced(const AdvancedSettings& a){
   advanced.listenKey=a.listenKey&&hasDetector(kind);
   advanced.monoListen=a.monoListen;
   advanced.syncedValue=std::max(0.f,finite(a.syncedValue));
+  advanced.bondModel=std::clamp(a.bondModel,0,1);
+  advanced.bondTopology=std::clamp(a.bondTopology,0,1);
+  advanced.bondDetector=std::clamp(a.bondDetector,0,1);
+  advanced.bondLink=clamp(finite(a.bondLink),0,1);
+  advanced.bondKnee=clamp(finite(a.bondKnee),0,24);
+  advanced.bondRange=clamp(finite(a.bondRange),0,60);
+  advanced.bondKeyLowpass=clamp(finite(a.bondKeyLowpass),200,20000);
+  advanced.bondAutoRelease=a.bondAutoRelease;
+}
+std::array<float,4> SuiteEngine::processBondPrecision(float left, float right,
+    float keyLeft, float keyRight, bool externalKey) noexcept {
+  advancedSmooth.bondLink+=smoothing*(advanced.bondLink-advancedSmooth.bondLink);
+  advancedSmooth.bondKnee+=smoothing*(advanced.bondKnee-advancedSmooth.bondKnee);
+  advancedSmooth.bondRange+=smoothing*(advanced.bondRange-advancedSmooth.bondRange);
+  advancedSmooth.bondKeyLowpass+=smoothing*(advanced.bondKeyLowpass-advancedSmooth.bondKeyLowpass);
+  bondModelBlend+=smoothing*(static_cast<float>(advanced.bondModel)-bondModelBlend);
+  bondTopologyBlend+=smoothing*(static_cast<float>(advanced.bondTopology)-bondTopologyBlend);
+  bondDetectorBlend+=smoothing*(static_cast<float>(advanced.bondDetector)-bondDetectorBlend);
+  bondAutoBlend+=smoothing*((advanced.bondAutoRelease?1.f:0.f)-bondAutoBlend);
+  bondExternalBlend+=smoothing*((externalKey?1.f:0.f)-bondExternalBlend);
+  // Avoid persistent tiny blends after a mode transition. In particular, a
+  // settled Legacy selection must execute its exact original output path.
+  if (std::abs(bondModelBlend-static_cast<float>(advanced.bondModel))<1.e-5f)
+    bondModelBlend=static_cast<float>(advanced.bondModel);
+  const float srF=static_cast<float>(sr);
+  const float hpG=std::tan(static_cast<float>(pi)*clamp(smooth[4],1,srF*.45f)/srF);
+  const float lpG=std::tan(static_cast<float>(pi)*clamp(advancedSmooth.bondKeyLowpass,1,srF*.45f)/srF);
+  const float ratio=std::max(1.f,smooth[1]);
+  const float knee=advancedSmooth.bondKnee;
+  const float range=advancedSmooth.bondRange;
+  const float input[2]{left,right}, key[2]{keyLeft,keyRight};
+  float audition[2][2]{};
+  for (int topology=0;topology<2;++topology) {
+    auto& path=bondPaths[static_cast<std::size_t>(topology)];
+    const bool feedback=topology==1&&!externalKey;
+    float levels[2]{};
+    for (int ch=0;ch<2;++ch) {
+      // Internal feedback observes the gain stage before makeup, mix and
+      // output trim. Its previous gain makes the loop causal without adding
+      // latency to the audio. An external sidechain always uses feed-forward
+      // detection: the external signal cannot observe our gain stage.
+      const float source=clamp(feedback?input[ch]*path.gain[ch]:key[ch],-1.e6f,1.e6f);
+      const float filtered=path.key[ch].tick(source,hpG,lpG);
+      audition[topology][ch]=filtered;
+      const float peak=std::abs(filtered);
+      path.power[ch]+=bondPowerCoefficient*(peak*peak-path.power[ch]);
+      if (path.power[ch]<1.e-20f) path.power[ch]=0;
+      const float rms=std::sqrt(std::max(0.f,path.power[ch]));
+      levels[ch]=peak+bondDetectorBlend*(rms-peak);
+    }
+    const float linked=std::max(levels[0],levels[1]);
+    for (int ch=0;ch<2;++ch) {
+      const float detector=levels[ch]+advancedSmooth.bondLink*(linked-levels[ch]);
+      const float over=toDb(detector)-smooth[0];
+      float above=std::max(0.f,over);
+      if (knee>1.e-4f&&over>-knee*.5f&&over<knee*.5f)
+        above=(over+knee*.5f)*(over+knee*.5f)/(2.f*knee);
+      // The feedback law needs ratio-1 to reach the same steady-state ratio
+      // as feed-forward. Scaling its integration time by ratio keeps that
+      // negative-feedback loop stable, including fastest attack at 8 kHz.
+      const float slope=feedback?ratio-1.f:1.f-1.f/ratio;
+      const float requested=std::min(range,above*slope);
+      path.sustained[ch]+=bondHistoryCoefficient*(requested-path.sustained[ch]);
+      const float autoFactor=.35f+1.65f*clamp(path.sustained[ch]/12.f,0,1);
+      const float release=smooth[3]*(1.f+bondAutoBlend*(autoFactor-1.f));
+      const float milliseconds=requested>path.reductionDb[ch]?smooth[2]:release;
+      const float timeScale=feedback?ratio:1.f;
+      const float coefficient=1.f-std::exp(-1.f/(std::max(.1f,milliseconds)*.001f*srF*timeScale));
+      path.reductionDb[ch]+=coefficient*(requested-path.reductionDb[ch]);
+      path.reductionDb[ch]=clamp(path.reductionDb[ch],0,range);
+      if (path.reductionDb[ch]<1.e-8f) path.reductionDb[ch]=0;
+      path.gain[ch]=db(-path.reductionDb[ch]);
+    }
+  }
+  const float topology=bondTopologyBlend*(1.f-bondExternalBlend);
+  return {bondPaths[0].gain[0]+topology*(bondPaths[1].gain[0]-bondPaths[0].gain[0]),
+          bondPaths[0].gain[1]+topology*(bondPaths[1].gain[1]-bondPaths[0].gain[1]),
+          audition[0][0]+topology*(audition[1][0]-audition[0][0]),
+          audition[0][1]+topology*(audition[1][1]-audition[0][1])};
 }
 void SuiteEngine::configure(Biquad &f, int type, float hz, float quality,
                             float gain) noexcept {
@@ -259,10 +367,22 @@ void SuiteEngine::process(float *left, float *right, const float *keyLeft,
     case Kind::ParallelCompressor:
     case Kind::Ducker:
     case Kind::DeEsser: {
+      std::array<float,4> precision{};
+      if (kind == Kind::BusCompressor) {
+        const bool externalKey=keyLeft!=nullptr||keyRight!=nullptr;
+        const float precisionKeyL=keyLeft?finite(keyLeft[i]):keyRight?finite(keyRight[i]):l;
+        const float precisionKeyR=keyRight?finite(keyRight[i]):keyLeft?finite(keyLeft[i]):r;
+        precision=processBondPrecision(l,r,precisionKeyL,precisionKeyR,externalKey);
+      }
       if (kind == Kind::BusCompressor) {
         float a = 1 - std::exp(-2.f * static_cast<float>(pi) * smooth[4] / srF);
         keyLowL += a * (kl - keyLowL);
         keyLowR += a * (kr - keyLowR);
+        // Host input may be finite yet large enough to overflow the state
+        // update. Recover instead of allowing a NaN key to poison audition
+        // or the parallel model blend after normal audio resumes.
+        if (!std::isfinite(keyLowL)) keyLowL = 0;
+        if (!std::isfinite(keyLowR)) keyLowR = 0;
         kl -= keyLowL;
         kr -= keyLowR;
       }
@@ -316,6 +436,20 @@ void SuiteEngine::process(float *left, float *right, const float *keyLeft,
           kind == Kind::DeEsser || kind == Kind::Ducker ? 1.f : db(smooth[5]);
       l *= gainState * m;
       r *= gainState * m;
+      if (kind == Kind::BusCompressor) {
+        if (bondModelBlend>0) {
+          const float gainL=gainState+bondModelBlend*(precision[0]-gainState);
+          const float gainR=gainState+bondModelBlend*(precision[1]-gainState);
+          l=dryL*(gainL*m);
+          r=dryR*(gainR*m);
+          kl+=bondModelBlend*(precision[2]-kl);
+          kr+=bondModelBlend*(precision[3]-kr);
+          bondReduction={-toDb(gainL),-toDb(gainR)};
+          reduction=std::max(bondReduction[0],bondReduction[1]);
+        } else {
+          bondReduction={reduction,reduction};
+        }
+      }
       break;
     }
     case Kind::Gate: {

@@ -49,6 +49,16 @@ SuiteProcessor::layout(const Product &p) {
   if(hasRepeatFilter(p.kind))extra("repeat_lowcut","Repeat low cut",0,1000,0,.5f);
   if(p.kind==Kind::Width||p.kind==Kind::MonoBass||p.kind==Kind::Haas||p.kind==Kind::Polarity)
     result.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID("mono_listen",1),"Audition mono",false));
+  if(p.kind==Kind::BusCompressor){
+    result.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID("bond_model",1),"Model",juce::StringArray{"Original","Precision"},1));
+    result.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID("bond_topology",1),"Topology",juce::StringArray{"Feed-forward","Feedback"},0));
+    result.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID("bond_detector",1),"Detector",juce::StringArray{"Peak","RMS"},0));
+    extra("bond_link","Stereo link",0,100,100);
+    extra("bond_knee","Knee",0,24,3);
+    extra("bond_range","Maximum reduction",0,60,60);
+    extra("bond_key_lowpass","Detector low-pass",1000,20000,20000,.4f);
+    result.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID("bond_auto_release",1),"Auto release",false));
+  }
   return result;
 }
 SuiteProcessor::SuiteProcessor(int index)
@@ -71,6 +81,10 @@ SuiteProcessor::SuiteProcessor(int index)
   tempoSync=state.getRawParameterValue("tempo_sync");division=state.getRawParameterValue("beat_division");fallbackBpm=state.getRawParameterValue("fallback_bpm");
   detectorCut=state.getRawParameterValue("key_highpass");keyListen=state.getRawParameterValue("key_listen");inputCut=state.getRawParameterValue("input_lowcut");repeatCut=state.getRawParameterValue("repeat_lowcut");monoListen=state.getRawParameterValue("mono_listen");
   for(int i=0;i<3;++i)bandQ[i]=state.getRawParameterValue("band_q"+juce::String(i));
+  bondModel=state.getRawParameterValue("bond_model");bondTopology=state.getRawParameterValue("bond_topology");
+  bondDetector=state.getRawParameterValue("bond_detector");bondLink=state.getRawParameterValue("bond_link");
+  bondKnee=state.getRawParameterValue("bond_knee");bondRange=state.getRawParameterValue("bond_range");
+  bondKeyLowpass=state.getRawParameterValue("bond_key_lowpass");bondAutoRelease=state.getRawParameterValue("bond_auto_release");
   banks[0] = state.copyState();
   banks[1] = banks[0].createCopy();
 }
@@ -173,6 +187,14 @@ void SuiteProcessor::run(juce::AudioBuffer<float> &buffer, bool hostBypass) {
   if(repeatCut)advanced.repeatCut=repeatCut->load();
   if(keyListen)advanced.listenKey=keyListen->load()>.5f;
   if(monoListen)advanced.monoListen=monoListen->load()>.5f;
+  if(bondModel){
+    advanced.bondModel=juce::roundToInt(bondModel->load());
+    advanced.bondTopology=juce::roundToInt(bondTopology->load());
+    advanced.bondDetector=juce::roundToInt(bondDetector->load());
+    advanced.bondLink=bondLink->load()*.01f;advanced.bondKnee=bondKnee->load();
+    advanced.bondRange=bondRange->load();advanced.bondKeyLowpass=bondKeyLowpass->load();
+    advanced.bondAutoRelease=bondAutoRelease->load()>.5f;
+  }
   if(tempoSync&&tempoSync->load()>.5f){
     double bpm=fallbackBpm->load();
     if(auto* head=getPlayHead())if(auto position=head->getPosition())if(auto tempo=position->getBpm())bpm=*tempo;
@@ -255,6 +277,8 @@ void SuiteProcessor::run(juce::AudioBuffer<float> &buffer, bool hostBypass) {
   inputPeak.store(peakIn);
   outputPeak.store(peakOut);
   reduction.store(processing ? engine.gainReduction() : 0);
+  reductionLeft.store(processing ? engine.gainReductionLeft() : 0);
+  reductionRight.store(processing ? engine.gainReductionRight() : 0);
 }
 void SuiteProcessor::processBlockBypassed(juce::AudioBuffer<float> &buffer,
                                           juce::MidiBuffer &) {
@@ -309,7 +333,9 @@ void SuiteProcessor::setStateInformation(const void *data, int size) {
       if (!found) {
         juce::ValueTree child("PARAM");
         child.setProperty("id", p->paramID, nullptr);
-        child.setProperty("value", p->convertFrom0to1(p->getDefaultValue()), nullptr);
+        // Existing BOND projects retain the original detector and gain law in
+        // both A/B banks. New instances and factory reset use Precision.
+        child.setProperty("value", p->paramID=="bond_model" ? 0.f : p->convertFrom0to1(p->getDefaultValue()), nullptr);
         banks[i].addChild(child, -1, nullptr);
       }
     }

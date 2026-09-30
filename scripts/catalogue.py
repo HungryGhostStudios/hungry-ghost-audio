@@ -1,6 +1,7 @@
 """One reviewed catalogue drives the native products and storefront."""
 from pathlib import Path
 import json, argparse
+from release_metadata import product_version
 
 ROOT = Path(__file__).resolve().parents[1]
 def p(name, lo, hi, default, unit='', skew=1):
@@ -23,17 +24,17 @@ def add(name, family, kind, description, controls, price=25):
     assert len(controls) <= 6
     rows.append(dict(id=name.lower(), name=name, family=family, engine=kind,
       description=description, price=5.99, controls=controls,
-      status='development', version='0.2.0'))
+      status='development', version=product_version(name.lower())))
 
 add('REVERB','Space','OriginalReverb','Sixteen delay lines. One enormous sense of space.', [],25)
 add('FERAL','Dynamics','OriginalFeral','Eight bands of dynamic EQ with a stereo bus compressor.', [],99)
-rows[0].update(version='0.3.0',status='development',image='/assets/reverb.png')
-rows[1].update(version='0.2.0',status='development',image='/assets/feral.png')
+rows[0].update(status='development',image='/assets/reverb.png')
+rows[1].update(status='development',image='/assets/feral.png')
 for name, kind, text, defaults in [
  ('RIFT','Compressor','A clean feed-forward compressor for precise level control.',[threshold,ratio,attack,release,knee,makeup]),
  ('CLAW','FastCompressor','Fast peak compression for drums and sharp attacks.',[p('Threshold',-60,0,-12,'dB'),ratio,p('Attack',.1,20,.5,'ms',.4),release,knee,makeup]),
  ('VELVET','RmsCompressor','Slower RMS detection for smooth vocal and instrument levelling.',[threshold,ratio,attack,release,knee,makeup]),
- ('BOND','BusCompressor','A stereo-linked compressor with a filtered detector.',[threshold,p('Ratio',1,10,2,':1'),attack,release,p('Key high-pass',20,500,100,'Hz',.4),makeup]),
+ ('BOND','BusCompressor','A stereo bus compressor with precise detector, envelope and stereo control.',[threshold,p('Ratio',1,10,2,':1'),attack,release,p('Key high-pass',20,500,100,'Hz',.4),makeup]),
  ('CRUSH','ParallelCompressor','Blend intense compression with the original signal.',[p('Threshold',-60,0,-30,'dB'),p('Ratio',1,20,12,':1'),attack,release,knee,makeup]),
  ('HUSH','DeEsser','Band-sensitive gain reduction for sibilance.',[threshold,freq(6500),p('Bandwidth',.3,5,1.5,'Q'),release,p('Range',0,24,6,'dB'),attack]),
  ('GATE','Gate','A downward gate with hysteresis and a controllable floor.',[p('Threshold',-80,0,-40,'dB'),p('Floor',-90,0,-70,'dB'),attack,release,p('Hysteresis',0,12,3,'dB'),p('Hold',0,500,40,'ms')]),
@@ -99,6 +100,7 @@ if args.validated:
  assert set(valid)==set(r['id'] for r in rows), 'All 50 products must pass'
  for row in rows:
   check=valid[row['id']]
+  assert check.get('version')==row['version'], 'Validation version differs from current catalogue: '+row['id']
   assert hashlib.sha256(Path(check['binary']).read_bytes()).hexdigest()==check['sha256'], 'Binary changed after validation'
   row.update(status='validated',image='/assets/plugins/'+row['id']+'.png')
 (ROOT/'site/public/catalogue.json').write_text(json.dumps(rows,indent=2)+'\n')

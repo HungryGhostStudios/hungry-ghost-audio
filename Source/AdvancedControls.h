@@ -20,5 +20,14 @@ struct AdvancedSettings {
   bool listenKey=false;
   bool monoListen=false;
   float syncedValue=0;
+  // Model zero retains BOND's original transfer curve for existing sessions.
+  int bondModel=0;
+  int bondTopology=0; // 0: feed-forward, 1: internal feedback (pre-makeup).
+  int bondDetector=0; // 0: peak, 1: 15 ms RMS.
+  float bondLink=1;
+  float bondKnee=3;
+  float bondRange=60;
+  float bondKeyLowpass=20000;
+  bool bondAutoRelease=false;
 };
 } // namespace hungryghost

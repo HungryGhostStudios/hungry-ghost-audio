@@ -7,9 +7,9 @@
     "description": "Sixteen delay lines. One enormous sense of space.",
     "price": 5.99,
     "controls": [],
-    "status": "validated",
-    "version": "0.3.0",
-    "image": "/assets/plugins/reverb.png"
+    "status": "development",
+    "version": "0.3.1",
+    "image": "/assets/reverb.png"
   },
   {
     "id": "feral",
@@ -19,9 +19,9 @@
     "description": "Eight bands of dynamic EQ with a stereo bus compressor.",
     "price": 5.99,
     "controls": [],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/feral.png"
+    "status": "development",
+    "version": "0.3.0",
+    "image": "/assets/feral.png"
   },
   {
     "id": "rift",
@@ -80,9 +80,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/rift.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "claw",
@@ -141,9 +140,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/claw.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "velvet",
@@ -202,16 +200,15 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/velvet.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "bond",
     "name": "BOND",
     "family": "Dynamics",
     "engine": "BusCompressor",
-    "description": "A stereo-linked compressor with a filtered detector.",
+    "description": "A stereo bus compressor with precise detector, envelope and stereo control.",
     "price": 5.99,
     "controls": [
       {
@@ -263,9 +260,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/bond.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "crush",
@@ -324,9 +320,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/crush.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "hush",
@@ -385,9 +380,8 @@
         "skew": 0.4
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/hush.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "gate",
@@ -446,9 +440,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/gate.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "bloom",
@@ -507,9 +500,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/bloom.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "punch",
@@ -568,9 +560,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/punch.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "tail",
@@ -629,9 +620,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/tail.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "guard",
@@ -666,9 +656,8 @@
         "skew": 0.4
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/guard.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "edge",
@@ -703,9 +692,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/edge.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "ride",
@@ -756,9 +744,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/ride.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "duck",
@@ -809,9 +796,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/duck.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "shade",
@@ -870,9 +856,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/shade.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "tilt",
@@ -899,9 +884,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/tilt.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "weight",
@@ -936,9 +920,8 @@
         "skew": 0.4
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/weight.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "air",
@@ -973,9 +956,8 @@
         "skew": 0.4
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/air.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "void",
@@ -1002,9 +984,8 @@
         "skew": 0.4
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/void.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "cross",
@@ -1031,9 +1012,8 @@
         "skew": 0.4
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/cross.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "contour",
@@ -1068,9 +1048,8 @@
         "skew": 0.4
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/contour.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "focus",
@@ -1113,9 +1092,8 @@
         "skew": 0.4
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/focus.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "ember",
@@ -1142,9 +1120,8 @@
         "skew": 0.3
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/ember.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "iron",
@@ -1179,9 +1156,8 @@
         "skew": 0.3
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/iron.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "furnace",
@@ -1216,9 +1192,8 @@
         "skew": 0.3
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/furnace.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "fold",
@@ -1253,9 +1228,8 @@
         "skew": 0.3
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/fold.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "rect",
@@ -1290,9 +1264,8 @@
         "skew": 0.3
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/rect.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "shards",
@@ -1327,9 +1300,8 @@
         "skew": 0.3
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/shards.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "static",
@@ -1356,9 +1328,8 @@
         "skew": 0.3
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/static.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "echo",
@@ -1401,9 +1372,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/echo.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "reel",
@@ -1446,9 +1416,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/reel.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "ping",
@@ -1491,9 +1460,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/ping.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "slap",
@@ -1536,9 +1504,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/slap.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "dub",
@@ -1581,9 +1548,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/dub.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "teeth",
@@ -1626,9 +1592,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/teeth.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "choir",
@@ -1671,9 +1636,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/choir.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "flux",
@@ -1716,9 +1680,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/flux.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "phase",
@@ -1761,9 +1724,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/phase.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "pulse",
@@ -1798,9 +1760,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/pulse.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "orbit",
@@ -1835,9 +1796,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/orbit.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "ring",
@@ -1864,9 +1824,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/ring.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "drift",
@@ -1901,9 +1860,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/drift.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "wide",
@@ -1930,9 +1888,8 @@
         "skew": 0.4
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/wide.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "center",
@@ -1959,9 +1916,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/center.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "shadow",
@@ -1988,9 +1944,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/shadow.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "trim",
@@ -2017,9 +1972,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/trim.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "reverse",
@@ -2046,9 +2000,8 @@
         "skew": 1
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/reverse.png"
+    "status": "development",
+    "version": "0.3.0"
   },
   {
     "id": "clean",
@@ -2067,8 +2020,7 @@
         "skew": 0.5
       }
     ],
-    "status": "validated",
-    "version": "0.2.0",
-    "image": "/assets/plugins/clean.png"
+    "status": "development",
+    "version": "0.3.0"
   }
 ]

@@ -16,6 +16,12 @@ public:
   void process(float *left, float *right, const float *keyLeft,
                const float *keyRight, int samples) noexcept;
   float gainReduction() const noexcept { return reduction; }
+  float gainReductionLeft() const noexcept {
+    return kind == Kind::BusCompressor ? bondReduction[0] : reduction;
+  }
+  float gainReductionRight() const noexcept {
+    return kind == Kind::BusCompressor ? bondReduction[1] : reduction;
+  }
 
 private:
   struct Biquad {
@@ -23,12 +29,26 @@ private:
     float tick(float) noexcept;
     void clear() noexcept;
   };
+  struct BondKeyFilter {
+    float hp1=0, hp2=0, lp1=0, lp2=0;
+    float tick(float, float hpG, float lpG) noexcept;
+  };
+  struct BondPath {
+    std::array<BondKeyFilter,2> key{};
+    std::array<float,2> power{}, reductionDb{}, sustained{};
+    std::array<float,2> gain{1,1};
+  };
   Kind kind;
   double sr = 48000, phase = 0;
   std::array<float, 6> target{}, smooth{};
   AdvancedSettings advanced,advancedSmooth;
   std::array<float,2> detectorLow{},inputLow{},repeatLow{};
   float listenBlend=0,monoBlend=0;
+  std::array<BondPath,2> bondPaths{};
+  std::array<float,2> bondReduction{};
+  float bondModelBlend=0,bondTopologyBlend=0,bondDetectorBlend=0,
+        bondAutoBlend=0,bondExternalBlend=0;
+  float bondPowerCoefficient=0,bondHistoryCoefficient=0;
   float targetMix = 1, mix = 1, targetOutput = 1, output = 1, smoothing = .002f;
   float envelope = 0, fastEnvelope = 0, slowEnvelope = 0, gainState = 1,
         reduction = 0, heldL = 0, heldR = 0, holdClock = 0;
@@ -44,6 +64,9 @@ private:
   unsigned counter = 0;
   std::uint32_t noise = 0x137ac41u;
   void updateFilters() noexcept;
+  // Gain L/R, followed by the filtered key L/R used for audition.
+  std::array<float,4> processBondPrecision(float left, float right,
+      float keyLeft, float keyRight, bool externalKey) noexcept;
   float readDelay(int channel, float timeMs) const noexcept;
   float random() noexcept;
   bool usesDelay() const noexcept;

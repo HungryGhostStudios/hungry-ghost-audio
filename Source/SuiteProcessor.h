@@ -45,6 +45,7 @@ public:
   juce::UndoManager undo;
   juce::AudioProcessorValueTreeState state;
   std::atomic<float> inputPeak{0}, outputPeak{0}, reduction{0};
+  std::atomic<float> reductionLeft{0}, reductionRight{0};
   std::atomic<float> effectivePrimary{0},effectiveBpm{120};
 
 private:
@@ -62,6 +63,9 @@ private:
   std::atomic<float> *tempoSync=nullptr,*division=nullptr,*fallbackBpm=nullptr,
       *detectorCut=nullptr,*keyListen=nullptr,*inputCut=nullptr,*repeatCut=nullptr,*monoListen=nullptr;
   std::array<std::atomic<float>*,3> bandQ{};
+  std::atomic<float> *bondModel=nullptr,*bondTopology=nullptr,*bondDetector=nullptr,
+      *bondLink=nullptr,*bondKnee=nullptr,*bondRange=nullptr,*bondKeyLowpass=nullptr,
+      *bondAutoRelease=nullptr;
   std::array<juce::ValueTree, 2> banks;
   juce::CriticalSection bankLock;
   std::atomic<int> bank{0};

@@ -20,7 +20,7 @@ inline ProductDesign designFor(Kind kind) {
   case Kind::Compressor: return {L::Precision,1000,640,juce::Colour(0xffe6b879),juce::Colour(0xff202822),"PRECISION DYNAMICS"};
   case Kind::FastCompressor: return {L::Rack,1060,510,juce::Colour(0xffd69470),juce::Colour(0xff252525),"PEAK COMPRESSION"};
   case Kind::RmsCompressor: return {L::Optical,900,600,juce::Colour(0xffd4bf89),juce::Colour(0xff353831),"RMS LEVELLING"};
-  case Kind::BusCompressor: return {L::Bus,1060,600,juce::Colour(0xffb8c4d0),juce::Colour(0xff242b35),"STEREO BUS COMPRESSION"};
+  case Kind::BusCompressor: return {L::Bus,1160,720,juce::Colour(0xffe4b976),juce::Colour(0xff3c493a),"STEREO BUS COMPRESSION"};
   case Kind::ParallelCompressor: return {L::Parallel,1000,640,juce::Colour(0xffe2a57c),juce::Colour(0xff302821),"PARALLEL COMPRESSION"};
   case Kind::DeEsser: return {L::Gate,960,610,juce::Colour(0xffd5bb7d),juce::Colour(0xff303025),"SIBILANCE CONTROL"};
   case Kind::Gate: return {L::Gate,960,610,juce::Colour(0xffa6c98d),juce::Colour(0xff222f27),"HYSTERESIS GATE"};

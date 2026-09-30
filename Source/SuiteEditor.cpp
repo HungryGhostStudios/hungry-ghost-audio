@@ -21,6 +21,11 @@ SuiteEditor::SuiteEditor(SuiteProcessor &p)
   presetMenu.setTooltip("Musical starting points. Parameters remain fully editable and automatable.");
   for(int i=0;i<3;++i) presetMenu.addItem(presets[i].name,i+1);
   presetMenu.setSelectedId(1,juce::dontSendNotification);
+  if(processor.product.kind==Kind::BusCompressor){
+    presetMenu.setTitle("Starting point");
+    presetMenu.setTextWhenNothingSelected("Choose a starting point");
+    presetMenu.setSelectedId(0,juce::dontSendNotification);
+  }
   presetMenu.onChange=[this]{applyPreset(presetMenu.getSelectedId()-1);};
   addAndMakeVisible(presetMenu);
   for (int i = 0; i < 8; ++i) {
@@ -106,7 +111,11 @@ SuiteEditor::SuiteEditor(SuiteProcessor &p)
   bankA.onClick = [this] { processor.selectBank(0); };
   bankB.onClick = [this] { processor.selectBank(1); };
   copy.onClick = [this] { processor.copyBank(); };
-  resetButton.onClick = [this] { processor.factoryReset();presetMenu.setSelectedId(1,juce::dontSendNotification); };
+  resetButton.onClick = [this] {
+    processor.factoryReset();
+    presetMenu.setSelectedId(processor.product.kind==Kind::BusCompressor?0:1,juce::dontSendNotification);
+    bondPresetValues.clear();bondPresetBank=-1;
+  };
   bypassButton.setClickingTogglesState(true);
   bypassAttachment =
       std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
@@ -118,7 +127,7 @@ SuiteEditor::SuiteEditor(SuiteProcessor &p)
     polarityButtons[i].onClick=[this,i]{auto* p=processor.state.getParameter("control"+juce::String(i));p->beginChangeGesture();p->setValueNotifyingHost(polarityButtons[i].getToggleState()?1.f:0.f);p->endChangeGesture();};
     addAndMakeVisible(polarityButtons[i]);
   }
-  if(processor.getParameters().size()>processor.product.controlCount+3){
+  if(processor.product.kind!=Kind::BusCompressor && processor.getParameters().size()>processor.product.controlCount+3){
     advancedPanel=std::make_unique<AdvancedPanel>(processor);addChildComponent(*advancedPanel);
     advancedButton.setComponentID("advanced");addAndMakeVisible(advancedButton);
     advancedButton.setTooltip("Focused extra controls for this processor. Existing parameters and automation are preserved.");
@@ -129,6 +138,12 @@ SuiteEditor::SuiteEditor(SuiteProcessor &p)
                                      static_cast<float>(i) / 4095.f);
   spectrumPre.fill(-90);
   spectrumPost.fill(-90);
+  if(processor.product.kind==Kind::BusCompressor){
+    bondPanel=std::make_unique<BondPanel>(processor);
+    addAndMakeVisible(*bondPanel);
+    bondPanel->toBack();
+    setLookAndFeel(&bondPanel->lookAndFeel());
+  }
   lastFrame = juce::Time::getMillisecondCounterHiRes();
   startTimerHz(30);
   resized();

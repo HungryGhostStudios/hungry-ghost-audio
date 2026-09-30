@@ -17,10 +17,15 @@ inline std::array<ProductPreset,3> presetsFor(const Product& p) {
   else if(p.kind==Kind::ParallelCompressor||p.kind==Kind::Chorus||p.kind==Kind::Flanger||p.kind==Kind::Phaser)a.mix=.5f;
   switch(p.kind) {
   case Kind::Compressor: case Kind::FastCompressor: case Kind::RmsCompressor:
-  case Kind::BusCompressor: case Kind::ParallelCompressor:
+  case Kind::ParallelCompressor:
     b.name="Preserve the attack"; b.values[0]=-20; b.values[1]=3; b.values[2]=25; b.values[3]=160;
     c.name="Hold the peaks"; c.values[0]=-24; c.values[1]=8; c.values[2]=1; c.values[3]=80;
     if(p.kind==Kind::ParallelCompressor) {b.mix=.5f;c.mix=.35f;}
+    break;
+  case Kind::BusCompressor:
+    a.name="Mix glue";a.values={-18,2,30,180,100,0};
+    b.name="Open drum bus";b.values={-15,4,25,140,120,0};
+    c.name="Parallel weight";c.values={-30,6,8,220,80,0};c.mix=.5f;
     break;
   case Kind::DeEsser: b.name="Vocal sibilance"; b.values={-24,6500,1.5f,120,8,2}; c.name="Bright cymbals"; c.values={-20,9500,1,80,5,1}; break;
   case Kind::Gate: b.name="Drum spill"; b.values={-30,-50,1,90,4,30}; c.name="Quiet pauses"; c.values={-50,-80,5,240,6,100}; break;
