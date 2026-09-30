@@ -116,7 +116,7 @@ void SuiteEditor::resized(){
       for(int j=0;j<3;++j){float x=42+j*320;place(j*2,{x,352,154,208});place(j*2+1,{x+160,352,142,208},true);}
     }else if(processor.product.kind==Kind::Cuts){
       place(0,{48,361,264,208});place(2,{390,374,260,172});place(1,{728,361,264,208});
-    }else{place(0,{44,362,218,206});row({1,2},{286,363,468,203},true);place(3,{786,366,214,202});}
+    }else{place(0,{44,362,218,206});row({1,2},{376,394,274,172},true);place(3,{786,366,214,202});}
     break;
   case L::Filter:
     screen(36,116,w-72,208);
