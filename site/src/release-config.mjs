@@ -5,301 +5,301 @@ export default {
   "products": {
     "reverb": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-REVERB-0.3.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-REVERB-0.3.1-Windows-VST3.zip",
       "productId": "2ded13a9-4721-4730-b1b2-0f368186dce0",
       "checkout": "https://buy.polar.sh/polar_cl_QKoh0F2FUFyYGKCz3Ve5L6UT0EtK13EFIRPNP2F1djF"
     },
     "feral": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-FERAL-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-FERAL-0.3.0-Windows-VST3.zip",
       "productId": "a119e94e-e985-4abd-a8b2-f1518171989e",
       "checkout": "https://buy.polar.sh/polar_cl_BmZlpha0mQATtoZ2VcTt9If9YQugvIrmpnL5D0ulCE7"
     },
     "rift": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-RIFT-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-RIFT-0.3.0-Windows-VST3.zip",
       "productId": "c0c039e7-8080-4569-a467-af53e6769ed7",
       "checkout": "https://buy.polar.sh/polar_cl_pgFIutgvAxE13PDilEhU5vMzVqikc2Ix7Ltd33CGnET"
     },
     "claw": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-CLAW-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-CLAW-0.3.0-Windows-VST3.zip",
       "productId": "a65f8183-addb-41bf-834a-9184388b0875",
       "checkout": "https://buy.polar.sh/polar_cl_Cn1LH3fCrigaKpZd3VhzzH5RgZLh9apSAfsDR1hPzYs"
     },
     "velvet": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-VELVET-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-VELVET-0.3.0-Windows-VST3.zip",
       "productId": "ca0506af-e71a-4ce8-9b33-8be9037498da",
       "checkout": "https://buy.polar.sh/polar_cl_N4RBdKHQTrnCPTZjVNjOB3SdGzVaoSuRwJKt81laGCL"
     },
     "bond": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-BOND-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-BOND-0.3.0-Windows-VST3.zip",
       "productId": "b0c0530c-b8de-420f-acfb-5ef62089dcb5",
       "checkout": "https://buy.polar.sh/polar_cl_nqs07262Mqg0VM6mCidJ7pq1JmnNs7jBBu3EA2zXvrU"
     },
     "crush": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-CRUSH-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-CRUSH-0.3.0-Windows-VST3.zip",
       "productId": "b8a74bfb-5468-4a3c-98a9-ed110b2ce6d6",
       "checkout": "https://buy.polar.sh/polar_cl_PGZkHlHt47lcSXwIhgKQTOZOVh8hD0BZ52q8D3nnIUV"
     },
     "hush": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-HUSH-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-HUSH-0.3.0-Windows-VST3.zip",
       "productId": "ff6948ca-1f26-4fda-87f1-48f67afc66c0",
       "checkout": "https://buy.polar.sh/polar_cl_SiPNIFsvyYwIEMUBNh3IThIBCDXTOvnzrIeRX2vSCPC"
     },
     "gate": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-GATE-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-GATE-0.3.0-Windows-VST3.zip",
       "productId": "4e3318fd-e242-4719-8b27-ad44f083a4cb",
       "checkout": "https://buy.polar.sh/polar_cl_kb3nJqB3ri84Ta0oZqU0OzBJDqvC9iWfw4PM71Noeay"
     },
     "bloom": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-BLOOM-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-BLOOM-0.3.0-Windows-VST3.zip",
       "productId": "bca9304a-c437-4585-8f88-95c435204e96",
       "checkout": "https://buy.polar.sh/polar_cl_rEpnRnudL5ehuWO4SmP1KvkS0chGhR19kkCRb3LbOEs"
     },
     "punch": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-PUNCH-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-PUNCH-0.3.0-Windows-VST3.zip",
       "productId": "934a758a-1fcc-4b9b-aa2d-9294bcae5efc",
       "checkout": "https://buy.polar.sh/polar_cl_I2iC7vWI1SEVYy3VZaQnjXX0xT08LwSdWzofq00mlR3"
     },
     "tail": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-TAIL-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-TAIL-0.3.0-Windows-VST3.zip",
       "productId": "a8d7ae24-c9f6-431e-ae09-31f146f197ed",
       "checkout": "https://buy.polar.sh/polar_cl_Ka0RXRIT4z7AfeYGSqQ4G1jEtdUawmBTB8bDB29wz4v"
     },
     "guard": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-GUARD-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-GUARD-0.3.0-Windows-VST3.zip",
       "productId": "4be88827-265e-4d75-b4a8-bc0433d29f6c",
       "checkout": "https://buy.polar.sh/polar_cl_U3tfCUMJGizR6wqmriBmxlRfR8KDccytywm943REKlz"
     },
     "edge": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-EDGE-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-EDGE-0.3.0-Windows-VST3.zip",
       "productId": "bdff2791-3178-44ba-bde9-414a5478f9ad",
       "checkout": "https://buy.polar.sh/polar_cl_xZnLUKtsRpNnoIVF8JlcUJx3Davi7v6zwfeB40Zve11"
     },
     "ride": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-RIDE-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-RIDE-0.3.0-Windows-VST3.zip",
       "productId": "dbde387d-d5e7-4fec-aad7-7a328b4c0cb4",
       "checkout": "https://buy.polar.sh/polar_cl_Vfdiz16IjUWbeZ4adaLPdWwgMWurQkFqvqwL234p8Kp"
     },
     "duck": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-DUCK-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-DUCK-0.3.0-Windows-VST3.zip",
       "productId": "a37d39c6-7b2a-45d0-9e56-d9650edc1cb5",
       "checkout": "https://buy.polar.sh/polar_cl_6NJsNYK1Zio5qfz369VIPmnqH7zsuRV23OkOr0uOsuA"
     },
     "shade": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-SHADE-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-SHADE-0.3.0-Windows-VST3.zip",
       "productId": "faf23aad-38ab-48eb-ba08-2c3d3ef76694",
       "checkout": "https://buy.polar.sh/polar_cl_0gfsfhnchEr4mXr568thBQOVbM5YMVi91GYR02rmqny"
     },
     "tilt": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-TILT-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-TILT-0.3.0-Windows-VST3.zip",
       "productId": "e4cd2bf0-2bfe-4e09-bd7f-d24575e44ba8",
       "checkout": "https://buy.polar.sh/polar_cl_t1wBT9Ei4nmb39Qs0rS8dkvDYOnJUgwmkmz4P1LHlfp"
     },
     "weight": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-WEIGHT-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-WEIGHT-0.3.0-Windows-VST3.zip",
       "productId": "b5a206de-15a3-4e9f-a23e-631f13b4b8af",
       "checkout": "https://buy.polar.sh/polar_cl_1tGLmtUWP8m90d2oHwszWWCgQc4oSez7vlIlY3Z03Rs"
     },
     "air": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-AIR-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-AIR-0.3.0-Windows-VST3.zip",
       "productId": "cca467ac-ecc4-4e3a-9b79-95f15671020a",
       "checkout": "https://buy.polar.sh/polar_cl_FUkqim52680C4U0LRXWEjPsyNK7bYcBPko1zG2LTMRl"
     },
     "void": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-VOID-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-VOID-0.3.0-Windows-VST3.zip",
       "productId": "36087da5-54b5-447d-a3ad-1d0432831fe4",
       "checkout": "https://buy.polar.sh/polar_cl_in9NBsmWF3HYUMN6TDA3GVWTNR9tyo39XA87k1DiSDu"
     },
     "cross": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-CROSS-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-CROSS-0.3.0-Windows-VST3.zip",
       "productId": "b98f25a4-7c20-4dff-aa93-21874aa1f8b5",
       "checkout": "https://buy.polar.sh/polar_cl_iRxKde0etcEXkJhCcACtUmDcdGTKO0cQpRPGq3xaDy6"
     },
     "contour": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-CONTOUR-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-CONTOUR-0.3.0-Windows-VST3.zip",
       "productId": "73c2f00c-f18d-45c9-b589-7811dd9b478f",
       "checkout": "https://buy.polar.sh/polar_cl_sgzjMBs0tknO89DyRicTEhW6RPnwJPU9GYZ3p4EgaMP"
     },
     "focus": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-FOCUS-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-FOCUS-0.3.0-Windows-VST3.zip",
       "productId": "ec601fb6-13be-4d69-a057-8028b0aed4cc",
       "checkout": "https://buy.polar.sh/polar_cl_pGQnUkxkKcztvfUGoU4gTjmZVURKaTcN7dxMV3MGXrC"
     },
     "ember": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-EMBER-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-EMBER-0.3.0-Windows-VST3.zip",
       "productId": "c88e57ef-8aed-446c-bacf-a8d3dc724a12",
       "checkout": "https://buy.polar.sh/polar_cl_ZYeSkcxQj82FUUY9OkUfChSY4CnlnFnFykPhJ14cCuP"
     },
     "iron": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-IRON-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-IRON-0.3.0-Windows-VST3.zip",
       "productId": "4822aa18-f7c9-4b59-9f3f-8898997eb589",
       "checkout": "https://buy.polar.sh/polar_cl_n0KbqLyeM2LVJUJXUHGkkqIBdDx8cSwgfWagW30u6Ip"
     },
     "furnace": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-FURNACE-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-FURNACE-0.3.0-Windows-VST3.zip",
       "productId": "4165a893-26d7-4c27-8743-0c930ea2d7d7",
       "checkout": "https://buy.polar.sh/polar_cl_8ioYOAXv1cDZLMBpLTB7kKU0JVRkhpHSxKr6q1TBdZw"
     },
     "fold": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-FOLD-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-FOLD-0.3.0-Windows-VST3.zip",
       "productId": "03f2aa93-b5b7-461e-bf9b-5c7f224eb112",
       "checkout": "https://buy.polar.sh/polar_cl_gbeuLiS6jrWfYkT9iOYIRtPA4DDlSdof6reH81hKvqf"
     },
     "rect": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-RECT-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-RECT-0.3.0-Windows-VST3.zip",
       "productId": "25c18db0-60e8-4317-81d0-6fd39afb4d79",
       "checkout": "https://buy.polar.sh/polar_cl_Z8356HWH4mltqUY5EuwzyXiJuHzLhVaVlNw8w3PWgUv"
     },
     "shards": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-SHARDS-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-SHARDS-0.3.0-Windows-VST3.zip",
       "productId": "5a2cafb0-7058-47b2-ad84-86960eaa3475",
       "checkout": "https://buy.polar.sh/polar_cl_uztzjp8GXqmSyUQM7ewvE1WJinwTvGGNNkUNn1ulJ7G"
     },
     "static": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-STATIC-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-STATIC-0.3.0-Windows-VST3.zip",
       "productId": "06c61497-6338-40c7-bbe8-bfe866831e66",
       "checkout": "https://buy.polar.sh/polar_cl_9jowt9CWZRxRQm9fjoWnlaz3C5gkwPxQ2N56a2LBOXz"
     },
     "echo": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-ECHO-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-ECHO-0.3.0-Windows-VST3.zip",
       "productId": "edf85f64-7ff2-41d6-94f3-d662453c7038",
       "checkout": "https://buy.polar.sh/polar_cl_1GezfNYwxJx3Tz6YW76Xi3XzWppm1RcnLTgxl0Edzxw"
     },
     "reel": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-REEL-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-REEL-0.3.0-Windows-VST3.zip",
       "productId": "da8cb7fa-efe2-47ac-81bb-f8f66d1d7440",
       "checkout": "https://buy.polar.sh/polar_cl_VoLaPOMkYaCIqhcD7Z39B17pcAVbjD17tmS8w0ISKjq"
     },
     "ping": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-PING-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-PING-0.3.0-Windows-VST3.zip",
       "productId": "cffcea2c-45f6-4df8-9752-35d8ccab5234",
       "checkout": "https://buy.polar.sh/polar_cl_yAPHkP6xsHMdjY7GOQK7ZkMWVjMWh6MRAumXl1NPJ8X"
     },
     "slap": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-SLAP-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-SLAP-0.3.0-Windows-VST3.zip",
       "productId": "719df31e-b36d-4e24-bf7b-f9fa7ba46278",
       "checkout": "https://buy.polar.sh/polar_cl_aiA1hn4eAUCm55HlpByEArK2tUCtjYFdGfxMu4QAzyd"
     },
     "dub": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-DUB-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-DUB-0.3.0-Windows-VST3.zip",
       "productId": "174e267c-a0cd-44d9-8308-1ad71a561574",
       "checkout": "https://buy.polar.sh/polar_cl_tJQlVstg7UUUTqbpApZDVcpVJmTmWdd9wZ5232vMaaB"
     },
     "teeth": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-TEETH-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-TEETH-0.3.0-Windows-VST3.zip",
       "productId": "40b72a6c-b9ea-4f34-a6d1-083e07fdd115",
       "checkout": "https://buy.polar.sh/polar_cl_8Ax2q4refuN7oMoX0BCm1Yx9z6QuGX9Qdfa7l2yaBl0"
     },
     "choir": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-CHOIR-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-CHOIR-0.3.0-Windows-VST3.zip",
       "productId": "a24a5465-d387-4eed-b8e1-981a64764309",
       "checkout": "https://buy.polar.sh/polar_cl_6f2LX5GYcKtmstuaz7fP03lZYA0AKWaqwhJ4Q3OanKc"
     },
     "flux": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-FLUX-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-FLUX-0.3.0-Windows-VST3.zip",
       "productId": "b84d62fc-ca59-4813-a98e-df218a6e0fe3",
       "checkout": "https://buy.polar.sh/polar_cl_zlhk75nkk8EUKQwKZab5BcTooLvsg711S2hOa240eMe"
     },
     "phase": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-PHASE-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-PHASE-0.3.0-Windows-VST3.zip",
       "productId": "b6fff21f-f274-417f-9296-e326f9508dfd",
       "checkout": "https://buy.polar.sh/polar_cl_vCvsA45hzsHWHaJmz3cDOYS6jTTOAGU3PKQQR3GtTHg"
     },
     "pulse": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-PULSE-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-PULSE-0.3.0-Windows-VST3.zip",
       "productId": "9d780faa-fd84-4554-a11e-d761a72fc6ff",
       "checkout": "https://buy.polar.sh/polar_cl_zYDOSm64SI7LKO94iRC7z75m8Sg1R9TXWOvzE00HR7X"
     },
     "orbit": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-ORBIT-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-ORBIT-0.3.0-Windows-VST3.zip",
       "productId": "890c4e60-ea5c-4441-b1e6-f64d7aa52f60",
       "checkout": "https://buy.polar.sh/polar_cl_pompT5C5uiAcJA1azexDz0spqjVW40NuzUwFx4VhXSq"
     },
     "ring": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-RING-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-RING-0.3.0-Windows-VST3.zip",
       "productId": "3c391a4b-140c-4c26-96c3-d0fcb263dec0",
       "checkout": "https://buy.polar.sh/polar_cl_NJ3erChgR0J6eMxWegD39QQ0driaA4DJl5RUf08iFeN"
     },
     "drift": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-DRIFT-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-DRIFT-0.3.0-Windows-VST3.zip",
       "productId": "9daaec6e-7da8-4428-b630-da789fd52a13",
       "checkout": "https://buy.polar.sh/polar_cl_iewLmhqL9EQznsnKoZG8C30ODA14fEfW5X5xZ43I229"
     },
     "wide": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-WIDE-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-WIDE-0.3.0-Windows-VST3.zip",
       "productId": "6ab3134f-8c52-4909-9df1-87f4cc133137",
       "checkout": "https://buy.polar.sh/polar_cl_DZhWMM35zgtCw6D7CEnU35j76pK5j4NJLKtPO4cM7Yf"
     },
     "center": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-CENTER-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-CENTER-0.3.0-Windows-VST3.zip",
       "productId": "74734a23-b7b3-4983-bf36-dce871aa7f82",
       "checkout": "https://buy.polar.sh/polar_cl_DUdjOuYPgzNc7p67I7kzp2ItGaAlX4W57dzWF46pByT"
     },
     "shadow": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-SHADOW-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-SHADOW-0.3.0-Windows-VST3.zip",
       "productId": "a616880e-82bc-4503-88a4-5df1f7e9fc57",
       "checkout": "https://buy.polar.sh/polar_cl_USyAydkysjLyoL4oCIIPu2KJ9QbjPQcXPSMag0EhQNJ"
     },
     "trim": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-TRIM-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-TRIM-0.3.0-Windows-VST3.zip",
       "productId": "9cef74d2-17aa-48b8-8726-044b6015173d",
       "checkout": "https://buy.polar.sh/polar_cl_rjdVeHQauagrKeOhWSdX1NW2cCvd7Qob7BNKj3kXdz2"
     },
     "reverse": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-REVERSE-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-REVERSE-0.3.0-Windows-VST3.zip",
       "productId": "9a353bbc-27fb-4953-b7c0-dc30c3826cf7",
       "checkout": "https://buy.polar.sh/polar_cl_b64aGVa6sU5OkO7MalNlSt8ESGnVq40HWg5Ap4Q8WAy"
     },
     "clean": {
       "ready": true,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhost-CLEAN-0.2.0-Windows-VST3.zip",
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhost-CLEAN-0.3.0-Windows-VST3.zip",
       "productId": "0cf70b2b-7858-42aa-93ac-b79e6cfbc480",
       "checkout": "https://buy.polar.sh/polar_cl_nsG496Q7nLhX5RRe9D1GJTl54LXC2IUHPUNO51ujkRX"
     }
@@ -509,9 +509,9 @@ export default {
     ]
   },
   "downloads": {
-    "installer": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhostSuite-0.2.0-Setup.exe",
-    "suite": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhostSuite-0.2.0-Windows-VST3.zip",
-    "source": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.2.0/HungryGhostSuite-0.2.0-Complete-Source.zip",
+    "installer": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhostSuite-0.3.0-Setup.exe",
+    "suite": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhostSuite-0.3.0-Windows-VST3.zip",
+    "source": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.0/HungryGhostSuite-0.3.0-Complete-Source.zip",
     "macInstaller": "https://hungryghostaudio.com/downloads/macos/0.2.0/e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e/HungryGhostSuite-0.2.0-macOS-Universal.pkg",
     "macArtifact": {
       "path": "/downloads/macos/0.2.0/e2aa01a2f787934097f53179d7f943c72aef7889fcf28da19d6c2b792a10af4e/HungryGhostSuite-0.2.0-macOS-Universal.pkg",

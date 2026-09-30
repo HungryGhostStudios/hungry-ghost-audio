@@ -1,6 +1,17 @@
 # Hungry Ghost Audio launch
 
-Updated 28 September 2026. This file records verified release evidence and remaining launch requirements.
+Updated 30 September 2026. This file records verified release evidence and remaining launch requirements.
+
+## Suite 0.3.0 Windows verification
+
+- All 50 exact release binaries pass pluginval 1.0.4 at strictness 5, seed 2130, with GUI tests disabled. Windows PE ProductVersion, FileVersion and VST3 module versions agree: REVERB 0.3.1; the other 49 plugins 0.3.0. The validator now rejects stale generated Windows version resources before running pluginval.
+- Six native test targets pass. Native editor checks cover all 50 plugins at three sizes. The website's 50 product images are reviewed captures of these real interfaces, including the corrected FOCUS control placement and readable expanded Shape panels.
+- The 538,674,176-byte Windows installer has SHA-256 `73b9cc5a7a62c326d644412db483c6dec8b73384971d02ca0cee0f472f65067d`. Its 100 embedded file hashes pass. Real selected extraction and replacement pass; previous bytes, unrelated files and existing installation records are preserved. No system plugin installation was performed by these checks.
+- All 51 Windows ZIPs pass integrity checks. The complete-source archive contains all repository source files and official JUCE 9.0.2; an offline configuration uses the bundled framework and its DSP/BOND test builds pass.
+- Twenty-seven storefront/API tests and eight release-metadata checks pass. The website labels Windows and Mac versions independently during staggered platform updates. All 53 Windows package and manifest uploads have remote GitHub SHA-256 digests and sizes matching the final local files.
+- The Mac 0.3.0 pipeline is separate and still running. The signed, notarized 0.2.0 Mac download remains available until the new artifact has passed all release checks. An installed 0.3.0 host session and refresh of the existing Polar customer file benefit remain outstanding.
+
+The historical 0.2.0 evidence below remains a record of that release, not proof of new artifacts.
 
 ## Published and verified
 

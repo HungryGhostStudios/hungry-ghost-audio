@@ -1,9 +1,13 @@
-# Suite 0.3.0 — release candidate
+# Suite 0.3.0 — Windows release
 
-This update combines BOND Precision with the Hungry Ghost interface treatment across the complete collection. REVERB advances to 0.3.1; the other 49 plugins are 0.3.0. Public downloads remain on the previous release until the new artifacts complete native validation and packaging; Mac publication also requires signing, notarization and verified upload.
+This update combines BOND Precision with the Hungry Ghost interface treatment across the complete collection. REVERB advances to 0.3.1; the other 49 plugins are 0.3.0. The Windows x64 VST3 release is validated and packaged. The universal Mac 0.3.0 update is still in its build, validation and signing pipeline; Mac downloads continue to deliver the verified 0.2.0 release until its replacement passes notarization and complete upload verification.
 
 - Shared blackened metal, etched detail, recessed controls and readable numeric fields, with each plugin retaining its own layout and purpose.
 - Existing plugin identities, primary parameter IDs, saved sessions, purchases and trial policy are preserved. Processing outside BOND is unchanged by the interface rollout.
+
+All 50 exact Windows release binaries passed pluginval 1.0.4 at strictness 5, seed 2130, with GUI tests disabled. Their Windows version resources and VST3 module versions independently match the catalogue. Six native check targets passed; native editor checks covered all 50 tools at three sizes, with reviewed captures from the real interfaces. The installer verified 100 embedded hashes and passed selected extraction and replacement while preserving previous bytes and unrelated files. All 51 Windows ZIPs passed integrity checks. The corresponding-source archive includes JUCE 9.0.2 and passed an offline configuration and DSP-test build.
+
+Close the audio host before installing. Existing purchases cover the update; individual effects remain $5.99 USD and the complete suite remains $74.99 USD. These checks do not establish every host workflow; a fresh installed 0.3.0 REAPER session remains a user-side check.
 
 ## BOND Precision
 
