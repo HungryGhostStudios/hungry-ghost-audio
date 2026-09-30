@@ -4,6 +4,8 @@ Copyright (C) 2026 Hungry Ghost Studios
 Hungry Ghost source code, original rendered interface assets and storefront: AGPL-3.0-or-later.
 JUCE framework 9.0.2: AGPLv3 option; copyright Raw Material Software Limited.
 Dependency sources and their original notices are retained by the pinned JUCE checkout.
+Optional HAUNT preview: Signalsmith Stretch and Signalsmith Linear, MIT licences.
+Original licences and pinned upstream revisions are in ThirdParty/signalsmith-stretch.
 VST is a trademark of Steinberg Media Technologies GmbH.
 
 This program is distributed without any warranty; see LICENSE.

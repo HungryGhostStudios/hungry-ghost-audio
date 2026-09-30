@@ -16,6 +16,8 @@ The [universal 0.3.0 Mac build](https://github.com/HungryGhostStudios/hungry-gho
 
 ## Build
 
+HAUNT, the separate vocal pitch-correction development preview, is opt-in and is not included in the current 50-plugin release. See [its controls, build instructions and live-first roadmap](Docs/Haunt.md). Recorded-note editing and production-quality low-latency monitoring remain future work.
+
 Install Visual Studio 2022 with Desktop C++ and CMake 3.22 or newer.
 
 ```powershell
