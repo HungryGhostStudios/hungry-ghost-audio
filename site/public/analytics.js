@@ -21,7 +21,15 @@ if(listening){
  const mark=()=>{if(listened.has('listen'))return;listened.add('listen');track('listen_view');};
  if(location.hash==='#listen')mark();
  if('IntersectionObserver' in window){
-  const observer=new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting)){mark();observer.disconnect();}},{threshold:.35});
+  let dwellTimer;
+  const observer=new IntersectionObserver(entries=>{
+   clearTimeout(dwellTimer);
+   if(!entries.some(entry=>entry.isIntersecting))return;
+   dwellTimer=setTimeout(()=>{
+    const rect=listening.getBoundingClientRect(),visible=Math.min(innerHeight,rect.bottom)-Math.max(0,rect.top);
+    if(visible>0&&visible/Math.min(rect.height,innerHeight)>=.35){mark();observer.disconnect();}
+   },800);
+  },{threshold:.35});
   observer.observe(listening);
  }
 }
