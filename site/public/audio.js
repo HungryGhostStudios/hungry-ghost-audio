@@ -1,3 +1,5 @@
+import {track} from './analytics.js';
+
 const grid = document.querySelector('#demo-grid');
 let context, current, intent;
 const clock = seconds => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
@@ -32,6 +34,7 @@ class Preview {
       this.processed = index === 1;
       this.modes.forEach((mode, i) => mode.setAttribute('aria-pressed', String(i === index)));
       this.applyGains();
+      track('demo_toggle',{product:this.demo.id,label:this.processed?'processed':'dry'});
     }));
     this.slider.addEventListener('input', () => {
       const playing = this.playing;
@@ -76,6 +79,7 @@ class Preview {
       this.started = context.currentTime;
       this.playing = true;
       current = this;
+      track('demo_play',{product:this.demo.id,label:this.processed?'processed':'dry'});
       this.applyGains();
       this.sources.forEach(({source}) => source.start(this.started, this.offset));
       this.play.textContent = 'Pause';

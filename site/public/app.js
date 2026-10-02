@@ -1,4 +1,5 @@
 import {releaseVersions, productVersionSummary} from './release-versions.js';
+import {track} from './analytics.js';
 
 const $ = s => document.querySelector(s);
 let products=[], family='All', config={ready:false,products:{}};
@@ -42,7 +43,7 @@ function render(){
 }
 async function checkout(id, button){
  const old=button.textContent;button.disabled=true;button.textContent='Opening secure checkout…';
- try{const response=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product:id})});const result=await response.json();if(!response.ok)throw Error(result.error||'Checkout is temporarily unavailable.');const destination=new URL(result.url);if(destination.protocol!=='https:'||!['polar.sh','buy.polar.sh'].includes(destination.hostname))throw Error('Invalid checkout destination.');window.location.assign(result.url);}catch(error){notice(error.message);button.disabled=false;button.textContent=old;}
+ try{const response=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product:id})});const result=await response.json();if(!response.ok)throw Error(result.error||'Checkout is temporarily unavailable.');const destination=new URL(result.url);if(destination.protocol!=='https:'||!['polar.sh','buy.polar.sh'].includes(destination.hostname))throw Error('Invalid checkout destination.');track('checkout_opened',{product:id});window.location.assign(result.url);}catch(error){notice(error.message);button.disabled=false;button.textContent=old;}
 }
 function openProduct(id){
  const p=products.find(p=>p.id===id);if(!p)return;const release=config.products[p.id];

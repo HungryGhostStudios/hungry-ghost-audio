@@ -4,6 +4,7 @@
   "compatibility_date": "2026-09-27",
   "assets": {"directory": "./public", "binding": "ASSETS", "run_worker_first": true},
   "observability": {"enabled": true},
+  "analytics_engine_datasets": [{"binding": "ANALYTICS", "dataset": "hungry_ghost_events"}],
   "r2_buckets": [{"binding": "RELEASES", "bucket_name": "hungry-ghost-audio-releases"}],
   "vars": {"PUBLIC_ORIGIN": "https://hungryghostaudio.com"}
 }
