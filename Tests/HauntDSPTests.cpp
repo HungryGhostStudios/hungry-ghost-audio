@@ -23,6 +23,84 @@ std::vector<float> tone(double sr,double hz,double seconds,bool harmonics=false)
 void process(PitchEngine& engine,std::vector<float>& data,int block=257){for(int at=0;at<int(data.size());at+=block){float* p[]={data.data()+at};engine.process(p,1,std::min(block,int(data.size())-at));}}
 double measuredHz(const std::vector<float>& y,double sr){double first=0,last=0;int crossings=0;for(size_t i=y.size()/2+1;i<y.size();++i)if(y[i-1]<=0&&y[i]>0){const double cross=i-1-y[i-1]/(y[i]-y[i-1]);if(crossings==0)first=cross;last=cross;++crossings;}require(crossings>10,"Insufficient output crossings");return (crossings-1)*sr/(last-first);}
 
+void musicalPhrasing(bool enforce=true) {
+    // Read the emitted waveform as well as targets. These synthetic phrases
+    // distinguish musical control regressions from steady-tone accuracy.
+    const auto check=[&](bool passed,const char* reason){if(enforce)require(passed,reason);};
+    for(int sr:{44100,48000,96000}) {
+    for(bool hard:{false,true}) for(bool glide:{false,true}) for(int direction:{-1,1}) {
+        PitchEngine e;Settings s;s.retuneMs=hard?0.f:45.f;s.vibrato=hard?0.f:.8f;s.humanize=hard?0.f:.6f;
+        e.setSettings(s);e.prepare(sr,1);
+        std::vector<float> audio(sr*3);double phase=0;
+        for(int i=0;i<int(audio.size());++i) {
+            const double progress=glide?std::clamp((double(i)/sr-1.)/.2,0.,1.):(i<sr?0.:1.);
+            const double note=69.32+direction*(glide?2.:5.)*progress;
+            phase+=2*pi*440*std::pow(2.,(note-69)/12)/sr;audio[i]=float(.3*std::sin(phase));
+        }
+        process(e,audio);
+        const int delay=e.latencySamples();double maximumError=0;
+        for(double t=(glide?1.3:1.16);t<(glide?1.6:1.4);t+=.04) {
+            const int begin=int(t*sr)+delay;
+            std::vector<float> section(audio.begin()+begin,audio.begin()+begin+int(.08*sr));
+            const double note=69+12*std::log2(measuredHz(section,sr)/440.);
+            maximumError=std::max(maximumError,std::abs(note-(69.+direction*(glide?2.:5.)))*100);
+        }
+        std::cout<<"Melodic "<<(glide?"glide":"step")<<" / "<<sr<<" Hz / direction "<<direction<<" / hard "<<hard<<": max settled output error "<<maximumError<<" cents\n";
+        check(maximumError<(hard?5:12),"Note transition retained the previous note's vibrato centre");
+    }
+    PitchEngine e;Settings s;s.retuneMs=45;s.vibrato=.8f;s.humanize=.6f;e.setSettings(s);e.prepare(sr,1);
+    std::vector<float> audio(sr*4);double phase=0;
+    for(int i=0;i<int(audio.size());++i) {
+        const double note=69.25+.38*std::sin(2*pi*6*i/sr);
+        phase+=2*pi*440*std::pow(2.,(note-69)/12)/sr;audio[i]=float(.3*std::sin(phase));
+    }
+    int switches=0;float previous=-1;
+    for(int at=0;at<int(audio.size());at+=512) {
+        float* ptr[]={audio.data()+at};e.process(ptr,1,std::min(512,int(audio.size())-at));
+        const auto r=e.reading();
+        if(at>sr/2&&r.hasTarget) {if(previous>=0&&r.target!=previous)++switches;previous=r.target;}
+    }
+    // Cycle-by-cycle output pitch and its 6-Hz sinusoidal component measure
+    // surviving vibrato independently of the input detector/display.
+    double last=0,mean=0,real=0,imag=0;int count=0;
+    for(int i=sr*2;i<int(audio.size());++i) if(audio[i-1]<=0&&audio[i]>0) {
+        const double crossing=i-1-audio[i-1]/(audio[i]-audio[i-1]);
+        if(last>0) {
+            const double note=69+12*std::log2(sr/(crossing-last)/440.);
+            const double time=(crossing+last)*.5/sr;
+            mean+=note;real+=(note-69)*std::cos(2*pi*6*time);imag+=(note-69)*std::sin(2*pi*6*time);++count;
+        }
+        last=crossing;
+    }
+    mean/=count;const double depth=2*std::hypot(real,imag)/count;
+    std::cout<<"Vibrato phrase / "<<sr<<" Hz: "<<switches<<" target changes, centre "<<(mean-69)*100<<" cents, depth "<<depth*100<<" cents\n";
+    check(switches==0,"Natural vibrato caused repeated adjacent-note target switching");
+    check(std::abs(mean-69)<.12&&depth>.22&&depth<.5,"Vibrato was flattened or pitch centre was not corrected");
+    // Changing the scale must invalidate a now-forbidden held target promptly.
+    s.scale=4;s.customMask=1u<<11;e.setSettings(s);auto next=tone(sr,440,.2);process(e,next);
+    check(e.reading().target==71,"Target stabilisation retained a forbidden scale note");
+    s.customMask=0;e.setSettings(s);next=tone(sr,440,.1);process(e,next);
+    check(!e.reading().hasTarget,"Empty scale retained a stabilised target");
+    }
+    PitchEngine dropout;Settings steady;steady.retuneMs=0;steady.vibrato=steady.humanize=0;
+    dropout.setSettings(steady);dropout.prepare(48000,1);
+    auto signal=tone(48000,440*std::pow(2.,.32/12),1.1);signal.resize(512*94);
+    process(dropout,signal);float preceding=dropout.reading().correction;bool firstMiss=false;
+    // Stop a stable note: a missed detector frame must not abruptly bend the
+    // tail, but the correction must release once the silence is established.
+    for(int block=0;block<20;++block) {
+        float samples[512]={};float* ptr[]={samples};dropout.process(ptr,1,512);
+        const auto r=dropout.reading();
+        if(!r.voiced&&!firstMiss) {
+            firstMiss=true;
+            std::cout<<"First detector dropout: correction change "<<std::abs(r.correction-preceding)*100<<" cents\n";
+            check(std::abs(r.correction-preceding)<.01,"One missed detector frame abruptly released correction");
+        }
+        preceding=r.correction;
+    }
+    check(firstMiss&&!dropout.reading().hasTarget&&std::abs(dropout.reading().correction)<.001,"Correction stuck after sustained silence");
+}
+
 void harmonicIntegrity() {
     // A single sine can be correctly tuned while vocal harmonics are smeared.
     // Keep this regression independent of the shifter's FFT and pitch display.
@@ -56,8 +134,12 @@ void harmonicIntegrity() {
 }
 }
 int main(int argc,char** argv){try {
+    if(argc>1&&(std::string(argv[1])=="--phrasing-only"||std::string(argv[1])=="--phrasing-report")) {
+        musicalPhrasing(std::string(argv[1])!="--phrasing-report");return 0;
+    }
     harmonicIntegrity();
     if(argc>1&&std::string(argv[1])=="--quality-only")return 0;
+    musicalPhrasing();
     require(scaleMask(0,1)==2741&&scaleMask(0,2)==1453,"Incorrect scale notes");
     require(nearestNote(61.2f,scaleMask(0,1))==62,"Scale target selection");
     require(nearestNote(60.f,0)<0,"Empty mask must not invent a target");

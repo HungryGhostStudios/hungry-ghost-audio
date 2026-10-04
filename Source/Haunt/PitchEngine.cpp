@@ -45,9 +45,10 @@ struct PitchEngine::Impl {
     std::array<std::vector<float>,2> dry;
     std::array<std::array<bool,128>,16> held{}, latched{};
     std::array<bool,16> pedal{};
-    float low1=0,low2=0,low3=0,filter=0, dc=0;
+    float low1=0,low2=0,low3=0,filter=0;
     float smoothPitch=0, correction=0, target=-1, stableSeconds=0, unvoicedSeconds=0;
-    float wet=1, gain=1, filteredFrequency=0;
+    float candidate=-1, candidateSeconds=0;
+    float wet=1, gain=1;
     bool wasVoiced=false;
     void detect() {
         const int count=window+maxLag+1;
@@ -118,10 +119,35 @@ struct PitchEngine::Impl {
         const float dt=float(quantum/rate);
         float desired=0;
         if(view.voiced) {
-            if(!wasVoiced) smoothPitch=view.note;
-            smoothPitch+=(view.note-smoothPitch)*(1-std::exp(-dt/.18f));
-            const float chosen=settings.midiTarget?midiTarget(view.note):nearestNote(view.note,scaleMask(settings.key,settings.scale,settings.customMask),target);
-            if(chosen!=target) stableSeconds=0; else stableSeconds+=dt;
+            const unsigned mask=scaleMask(settings.key,settings.scale,settings.customMask);
+            float chosen=settings.midiTarget?midiTarget(view.note):nearestNote(view.note,mask,target);
+            // Expressive settings give a held note room to vibrate without
+            // alternating targets at each crest. Hard Tune and MIDI stay direct.
+            const float natural=settings.vibrato*std::clamp(settings.retuneMs/25.f,0.f,1.f);
+            const bool previousAllowed=target>=0&&target<128&&(mask&(1u<<(int(target)%12)));
+            if(chosen==target) { candidate=-1;candidateSeconds=0; }
+            if(!settings.midiTarget&&previousAllowed&&chosen>=0&&chosen!=target) {
+                const float advantage=std::abs(view.note-target)-std::abs(view.note-chosen);
+                if(natural>0) {
+                    if(candidate!=chosen) { candidate=chosen;candidateSeconds=0; }
+                    candidateSeconds+=dt;
+                    // Near-boundary candidates need to persist longer than a
+                    // vibrato crest. They must still win eventually: a permanent
+                    // wider deadband can trap a slightly sharp descending note.
+                    const float dwell=(advantage<.12f+.48f*natural?.09f:.025f)*natural;
+                    if(candidateSeconds<dwell) chosen=target;
+                }
+            }
+            const bool changed=chosen!=target;
+            // A new musical note needs its own pitch centre: retaining the old
+            // centre turns a melodic step into a false vibrato offset for ~300 ms.
+            if(changed||(!wasVoiced&&unvoicedSeconds>.025f)) smoothPitch=view.note;
+            if(changed) { stableSeconds=0;candidate=-1;candidateSeconds=0; }
+            else stableSeconds+=dt;
+            // Let a scoop arrive at its new centre before interpreting small
+            // movements as sustained vibrato. Blend into the slower estimator.
+            const float centreTime=.045f+.135f*std::clamp((stableSeconds-.08f)/.12f,0.f,1.f);
+            smoothPitch+=(view.note-smoothPitch)*(1-std::exp(-dt/centreTime));
             target=chosen; unvoicedSeconds=0;
             if(target>=0) {
                 const float expression=std::clamp(view.note-smoothPitch,-.65f,.65f)*settings.vibrato;
@@ -129,7 +155,11 @@ struct PitchEngine::Impl {
             }
         } else {
             unvoicedSeconds+=dt;
-            if(unvoicedSeconds>.025f) target=-1;
+            candidate=-1;candidateSeconds=0;
+            // Do not bend the voice towards zero correction during a single
+            // missed detection. Release after this short grace interval.
+            if(unvoicedSeconds<=.025f&&target>=0&&(!settings.midiTarget||midiTarget(view.note)>=0)) desired=correction;
+            else target=-1;
         }
         wasVoiced=view.voiced;
         view.hasTarget=view.voiced&&target>=0; view.target=target>=0?target:0;
@@ -176,7 +206,8 @@ void PitchEngine::reset() {
     p.shift->shift(ins,outs);p.output={};
     for(auto& d:p.dry) std::fill(d.begin(),d.end(),0);
     p.view={};p.detectorWrite=p.detectorFilled=p.position=p.dryWrite=p.hop=p.decimationPhase=0;
-    p.low1=p.low2=p.low3=p.dc=p.correction=p.smoothPitch=p.stableSeconds=p.unvoicedSeconds=p.filteredFrequency=0;
+    p.low1=p.low2=p.low3=p.correction=p.smoothPitch=p.stableSeconds=p.unvoicedSeconds=p.candidateSeconds=0;
+    p.candidate=-1;
     const bool neutral=p.settings.amount==0&&p.settings.transpose==0&&p.settings.formant==0;
     p.target=-1;p.analysisChannel=0;p.wasVoiced=false;p.wet=p.settings.bypass||neutral?0:p.settings.mix;p.gain=p.settings.bypass?1.f:std::pow(10.f,p.settings.outputDb/20);
     allNotesOff();

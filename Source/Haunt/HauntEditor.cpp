@@ -108,7 +108,7 @@ void HauntEditor::paintSurface(juce::Graphics& g) {
     const char* hints[]={"Note transition speed","Pull towards target","Ease sustained notes","Keep expressive motion","Vocal envelope","Shift the whole voice"};
     for(int i=0;i<6;++i){const float x=36+i*174.f;theme.paintPanel(g,{x,492,158,177},i==1?mint():violet());text(g,labels[i],{x+8,498,142,20},10,GhostTheme::ink(),true,juce::Justification::centred);text(g,hints[i],{x+4,647,150,15},9,GhostTheme::muted(),false,juce::Justification::centred);}
     const double sr=processor.getSampleRate()>0?processor.getSampleRate():48000;
-    text(g,"HAUNT 0.1.1 / LIVE ENGINE PREVIEW",{36,689,340,17},10,GhostTheme::muted(),true);
+    text(g,"HAUNT 0.1.2 / LIVE ENGINE PREVIEW",{36,689,340,17},10,GhostTheme::muted(),true);
     text(g,juce::String(processor.getLatencySamples()*1000./sr,1)+" ms reported latency / "+juce::String(sr/1000,1)+" kHz",{36,710,400,16},9,GhostTheme::muted());
     text(g,"MIX",{487,696,36,20},9,GhostTheme::muted(),true);text(g,"OUT",{702,696,36,20},9,GhostTheme::muted(),true);
 }

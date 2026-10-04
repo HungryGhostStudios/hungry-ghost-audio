@@ -154,7 +154,7 @@ if(HG_BUILD_HAUNT_PREVIEW)
  if(APPLE)
   list(APPEND formats AU)
  endif()
- juce_add_plugin(HAUNT VERSION 0.1.1 COMPANY_NAME "Hungry Ghost Audio"
+ juce_add_plugin(HAUNT VERSION 0.1.2 COMPANY_NAME "Hungry Ghost Audio"
   BUNDLE_ID "audio.hungryghost.haunt.preview" PLUGIN_MANUFACTURER_CODE Aftr PLUGIN_CODE HgHt
   FORMATS ${formats} PRODUCT_NAME "Hungry Ghost HAUNT Preview"
   IS_SYNTH FALSE NEEDS_MIDI_INPUT TRUE NEEDS_MIDI_OUTPUT FALSE IS_MIDI_EFFECT FALSE
