@@ -1,6 +1,6 @@
 # HAUNT — vocal pitch correction preview
 
-HAUNT is a separate, optional JUCE effect for one vocal line. The first stage is real-time correction; recorded-note editing is the next stage. It is not part of the released 50-product catalogue, installer, licence service or store. The current Windows preview is 0.1.0, with its own VST3 identity. Do not advertise this prototype as a finished competitor or as a low-latency tracking product.
+HAUNT is a separate, optional JUCE effect for one vocal line. The first stage is real-time correction; recorded-note editing is the next stage. It is not part of the released 50-product catalogue, installer, licence service or store. The current Windows preview is 0.1.1. The VST3 identity and parameter/state layout are unchanged from 0.1.0. Do not advertise this prototype as a finished competitor or as a low-latency tracking product.
 
 ## Working controls
 
@@ -17,13 +17,13 @@ The amount of humanize matters only when retune time is above zero. Vibrato pres
 
 ## Audio architecture
 
-`Source/Haunt/PitchEngine` is independent of JUCE. It uses a decimated, low-pass-filtered difference-function pitch detector, fractional-period refinement, allowed-note hysteresis and a fixed 64-sample processing quantum. The two audio channels retain their stereo relationship. Detection follows a stable stronger channel rather than summing potentially phase-opposed inputs.
+`Source/Haunt/PitchEngine` is independent of JUCE. It uses a decimated, low-pass-filtered difference-function pitch detector, fractional-period refinement, allowed-note hysteresis and a fixed 512-sample processing quantum. The two audio channels retain their stereo relationship. Detection follows a stable stronger channel rather than summing potentially phase-opposed inputs.
 
-The spectral shifter and formant processor use the unmodified, MIT-licensed Signalsmith Stretch 1.3.2 and Signalsmith Linear headers. Exact upstream commits and original licences are in `ThirdParty/signalsmith-stretch`. HAUNT supplies its own detector, targeting, expression controls, audio scheduling and native interface. This is not Signalsmith's separate commercial Compose engine.
+Version 0.1.1 replaces the previous custom spectral mapping with the unmodified Rubber Band 4.0.0 LiveShifter and its formant processing. The pinned source and GPL-2.0-or-later licence are in `ThirdParty/rubberband`. The build uses the upstream single-file compilation unit, built-in FFT/BQ resampler, and linked-channel processing. HAUNT supplies its own detector, targeting, expression controls, audio scheduling and native interface. This change addresses an observed harmonic-integrity defect in our original configuration; it is not a claim that swapping libraries alone solves natural vocal tuning.
 
 Preparation allocates delay and spectral buffers. Audio processing uses fixed detector storage, cached parameter atomics and preallocated sample buffers. Long, unrelated MIDI SysEx messages are skipped without copying their payload. GUI history and state-bank operations stay outside the audio callback.
 
-The reported delay includes spectral input/output latency and the quantum queue. At 48 kHz the current preview reports 2,368 samples (49.33 ms), before the audio interface and host buffers. The 48 ms spectral window and a smooth, monotonic harmonic-aware frequency map improve low-register accuracy. Detection also needs a voiced onset before it can select a target. This is a quality-development baseline, not the final live-monitoring latency target. Shorter windows must pass output-frequency, transient and listening checks before replacing it.
+The reported delay includes the shifter's start delay and the quantum queue. At 48 kHz the current preview reports 2,624 samples (54.67 ms), before the audio interface and host buffers. This is slightly longer than 0.1.0. The shifter is primed at unity outside the processing callback. With correction, transpose and formant shift all disabled, audio follows the original delayed path directly. Detection still needs a voiced onset before it can select a target. This is a quality-development baseline, not the final live-monitoring latency target.
 
 ## Build and checks
 
@@ -37,9 +37,15 @@ Use the repository's pinned JUCE 9.0.2, or pass `JUCE_SOURCE_DIR`. The option de
 
 DSP checks measure the actual corrected waveform independently of the displayed pitch. They cover harmonic tracking at 44.1/48/96 kHz, positive and negative detuning, fixed transposition, formant compensation, exact bypass/neutral latency, MIDI/sustain, stereo phase opposition, host block-size invariance, noise/silence, invalid samples/settings and C++ heap allocations during processing. Native integration checks exercise parameter attachments, keyboard notes, saved A/B states, host bypass, MIDI delivery and editor captures at three sizes. Synthetic signals establish those properties only; they do not establish natural-vocal quality.
 
-On the initial Windows check, the 24-case output grid (73.42–1046.50 Hz, ±32 cents, formant compensation both on and off, 48 kHz) stayed within 1.76 cents of its targets. Neutral wet output nulled against the reported-delay-aligned input at approximately −124.9 dB. Six seconds of stereo processing with a formant shift took approximately 2.35 seconds on this development machine; no C++ heap allocations were observed in that processing loop. These are a synthetic baseline and a local timing sample, not a cross-machine performance claim. CPU cost and monitoring latency both need substantial improvement.
+The new harmonic-integrity regression uses a sustained 60-harmonic vowel-like signal, a fixed 32-cent downward shift, and an independent projection of the final two seconds onto the expected 220-Hz harmonic series. Unwanted residual must be below -35 dB, with formant compensation both off and on. The 0.1.0 engine fails at -6.32 dB; the replacement passes at -61.89 dB and -54.02 dB respectively. This check detects artifacts the original sine-wave tests missed. Run just this regression with `hg_haunt_dsp_tests --quality-only`.
 
-The first Windows VST3 preview passed pluginval strictness 5 (seed 2130, GUI tests disabled), plus native editor/state/parameter/MIDI/bypass checks. PE and VST3 metadata both report 0.1.0. The exact validated VST3 binary has SHA-256 `aa4434a16d6554fdc85206fe52deff4045c99bb31972c0a781b67229df1793c2`. The local preview deliverable includes the validation logs and manifest; this is not a macOS or universal-host certification.
+The 24-case output grid (73.42–1046.50 Hz, ±32 cents, formant compensation on/off, 48 kHz) stayed within 0.75 cents of its targets. The disabled-correction path nulled exactly against the aligned input. Six seconds of stereo processing with a formant shift took approximately 0.60 seconds on this development machine; no C++ heap allocations were observed in that processing loop. These are a synthetic baseline and a local timing sample, not a cross-machine performance claim. Monitoring latency still needs substantial improvement.
+
+Two attributed LibriSpeech spoken-voice clips and a short noise burst were also used for local rendering comparisons. These checks isolate a small fixed pitch shift and do not validate singing, automatic note transitions or the user's reported example. The exact vocal recording and a listening comparison remain necessary before claiming the sound is fixed. Source clips were obtained from librosa's official example collection; their CC-BY-4.0 notices accompany any delivered comparisons.
+
+The 0.1.1 Windows VST3 passed pluginval strictness 5 (seed 2130, GUI tests disabled) and native controls/state/MIDI/bypass checks. The exact validated and installed binary has SHA-256 `1908a71512f016a7a80e003be2f3ef99b077740ccd18fe81483af243e093efbc`; both PE and VST3 versions are 0.1.1. The preview package includes its logs and checksum manifest. macOS remains unvalidated for HAUNT.
+
+Upstream reference: [Rubber Band LiveShifter API](https://breakfastquay.com/rubberband/code-doc/classRubberBand_1_1RubberBandLiveShifter.html). Benchmark voice metadata: [librosa example recordings](https://librosa.org/doc/main/recordings.html).
 
 ## Next stage: recording and detailed note editing
 

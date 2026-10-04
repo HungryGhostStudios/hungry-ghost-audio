@@ -1,12 +1,15 @@
 #include "PitchEngine.h"
-#include "signalsmith-stretch.h"
+#include "rubberband/RubberBandLiveShifter.h"
 #include <algorithm>
 #include <cmath>
 #include <vector>
+#include <stdexcept>
 
 namespace hungryghost::haunt {
 namespace {
-constexpr int quantum=64;
+// Rubber Band 4.0's live interface has a fixed 512-frame input/output quantum.
+constexpr int quantum=512;
+using Shifter=RubberBand::RubberBandLiveShifter;
 float clean(float x) { return std::isfinite(x)?std::clamp(x,-16.f,16.f):0.f; }
 float pole(float milliseconds, double rate) { return milliseconds<=0?0.f:std::exp(-1.f/float(.001*milliseconds*rate)); }
 }
@@ -30,7 +33,7 @@ float nearestNote(float note,unsigned mask,float previous) {
     return best;
 }
 struct PitchEngine::Impl {
-    signalsmith::stretch::SignalsmithStretch<float> shift{2130};
+    std::unique_ptr<Shifter> shift;
     Settings settings;
     Reading view;
     double rate=48000, detectorRate=12000;
@@ -136,26 +139,16 @@ struct PitchEngine::Impl {
         correction=coefficient*correction+(1-coefficient)*desired;
         view.correction=correction;
         const float semitones=std::clamp(correction+settings.transpose,-24.f,24.f);
-        shift.setTransposeSemitones(semitones);
-        if(view.voiced&&std::abs(semitones)>1e-6f) {
-            // A short FFT window estimates a low harmonic's spectral centre less
-            // accurately than the period detector. Flatten the frequency shift
-            // around each detected harmonic, without a discontinuous staircase.
-            // The bound keeps the map strictly increasing even for octave drops.
-            const float fundamental=view.frequency/float(rate),ratio=std::pow(2.f,semitones/12);
-            const float flatten=ratio<1?std::min(1.f,.95f*ratio/(1-ratio)):1.f;
-            shift.setFreqMap([fundamental,ratio,flatten](float f){
-                constexpr float tau=6.28318530718f;
-                const float harmonic=f-fundamental*flatten*std::sin(tau*f/fundamental)/tau;
-                return f+(ratio-1)*harmonic;
-            });
-        }
-        shift.setFormantSemitones(settings.formant,settings.preserveFormants);
-        if(view.voiced) filteredFrequency=view.frequency;
-        shift.setFormantBase((filteredFrequency>0?filteredFrequency:180.f)/float(rate));
+        const double pitchRatio=std::pow(2.,semitones/12.);
+        shift->setPitchScale(pitchRatio);
+        shift->setFormantOption(settings.preserveFormants?Shifter::OptionFormantPreserved:Shifter::OptionFormantShifted);
+        // Rubber Band's explicit formant scale is relative to the pitch-scaled
+        // envelope. A zero value delegates compensation to the selected option.
+        shift->setFormantScale(std::abs(settings.formant)<1e-6f?0.:
+            std::pow(2.,settings.formant/12.)/(settings.preserveFormants?pitchRatio:1.));
         const float* ins[]={input[0].data(),input[1].data()};
         float* outs[]={output[0].data(),output[1].data()};
-        shift.process(ins,quantum,outs,quantum);
+        shift->shift(ins,outs);
     }
 };
 PitchEngine::PitchEngine():impl(std::make_unique<Impl>()) {}
@@ -167,20 +160,25 @@ void PitchEngine::prepare(double sr,int channels) {
     p.window=int(std::round(.024*p.detectorRate)); p.maxLag=int(std::ceil(p.detectorRate/65))+1;
     p.detectorHop=std::max(1,int(std::round(.005*p.detectorRate)));
     p.filter=1-std::exp(-float(2*3.141592653589793*2200/p.rate));
-    const int block=std::max(256,int(std::round(.048*p.rate/64))*64);
-    // A dense overlap reduces small-shift tuning bias in the spectral engine.
-    // Keep this explicit: a cheaper hop must pass the actual output-pitch tests.
-    p.shift.configure(p.channels,block,block/64,false);
-    p.latency=p.shift.inputLatency()+p.shift.outputLatency()+quantum;
+    p.shift=std::make_unique<Shifter>(size_t(p.rate),size_t(p.channels),Shifter::OptionWindowShort|Shifter::OptionChannelsTogether);
+    if(p.shift->getBlockSize()!=quantum)throw std::runtime_error("Unexpected live pitch-shifter block size");
+    p.latency=int(p.shift->getStartDelay())+quantum;
     for(auto& channel:p.dry) channel.assign(p.latency,0);
     reset();
 }
 void PitchEngine::reset() {
-    auto& p=*impl;if(p.latency<=0){allNotesOff();return;} p.shift.reset(); p.detector.fill(0); p.input={};p.output={};
+    auto& p=*impl;if(!p.shift){allNotesOff();return;}
+    p.shift->setPitchScale(1.);p.shift->reset();p.detector.fill(0);p.input={};p.output={};
+    // Anchor startup to unity before automation can alter the pitch ratio.
+    // This also performs any first-call setup outside the audio callback.
+    const float* ins[]={p.input[0].data(),p.input[1].data()};
+    float* outs[]={p.output[0].data(),p.output[1].data()};
+    p.shift->shift(ins,outs);p.output={};
     for(auto& d:p.dry) std::fill(d.begin(),d.end(),0);
     p.view={};p.detectorWrite=p.detectorFilled=p.position=p.dryWrite=p.hop=p.decimationPhase=0;
     p.low1=p.low2=p.low3=p.dc=p.correction=p.smoothPitch=p.stableSeconds=p.unvoicedSeconds=p.filteredFrequency=0;
-    p.target=-1;p.analysisChannel=0;p.wasVoiced=false;p.wet=p.settings.bypass?0:p.settings.mix;p.gain=p.settings.bypass?1.f:std::pow(10.f,p.settings.outputDb/20);
+    const bool neutral=p.settings.amount==0&&p.settings.transpose==0&&p.settings.formant==0;
+    p.target=-1;p.analysisChannel=0;p.wasVoiced=false;p.wet=p.settings.bypass||neutral?0:p.settings.mix;p.gain=p.settings.bypass?1.f:std::pow(10.f,p.settings.outputDb/20);
     allNotesOff();
 }
 void PitchEngine::setSettings(const Settings& supplied) {
@@ -210,7 +208,8 @@ void PitchEngine::process(float* const* buffers,int count,int samples) {
     auto& p=*impl;if(p.latency<=0||count<1)return;
     count=std::min(count,p.channels);
     const float smooth=pole(8,p.rate), outputGain=p.settings.bypass?1.f:std::pow(10.f,p.settings.outputDb/20);
-    const float desiredWet=p.settings.bypass?0.f:p.settings.mix;
+    const bool neutral=p.settings.amount==0&&p.settings.transpose==0&&p.settings.formant==0;
+    const float desiredWet=p.settings.bypass||neutral?0.f:p.settings.mix;
     for(int i=0;i<samples;++i) {
         const float strongest=clean(buffers[std::min(count-1,p.analysisChannel)][i]);
         // Track one stable channel instead of summing phase-opposed stereo vocals.

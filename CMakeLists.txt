@@ -19,8 +19,18 @@ add_executable(hg_bond_tests Tests/BondTests.cpp)
 target_link_libraries(hg_bond_tests PRIVATE hg_dsp)
 add_test(NAME hg_bond_tests COMMAND hg_bond_tests)
 if(HG_BUILD_HAUNT_PREVIEW)
+ add_library(hg_haunt_shift STATIC ThirdParty/rubberband/single/RubberBandSingle.cpp)
+ target_include_directories(hg_haunt_shift PUBLIC ThirdParty/rubberband)
+ set_target_properties(hg_haunt_shift PROPERTIES POSITION_INDEPENDENT_CODE ON)
+ if(WIN32)
+  target_compile_definitions(hg_haunt_shift PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN _USE_MATH_DEFINES)
+ endif()
+ if(APPLE)
+  target_link_libraries(hg_haunt_shift PRIVATE "-framework Accelerate")
+ endif()
  add_library(hg_haunt_dsp STATIC Source/Haunt/PitchEngine.cpp)
- target_include_directories(hg_haunt_dsp PUBLIC Source PRIVATE ThirdParty/signalsmith-stretch)
+ target_include_directories(hg_haunt_dsp PUBLIC Source)
+ target_link_libraries(hg_haunt_dsp PRIVATE hg_haunt_shift)
  add_executable(hg_haunt_dsp_tests Tests/HauntDSPTests.cpp)
  target_link_libraries(hg_haunt_dsp_tests PRIVATE hg_haunt_dsp)
  add_test(NAME hg_haunt_dsp_tests COMMAND hg_haunt_dsp_tests)
@@ -144,7 +154,7 @@ if(HG_BUILD_HAUNT_PREVIEW)
  if(APPLE)
   list(APPEND formats AU)
  endif()
- juce_add_plugin(HAUNT VERSION 0.1.0 COMPANY_NAME "Hungry Ghost Audio"
+ juce_add_plugin(HAUNT VERSION 0.1.1 COMPANY_NAME "Hungry Ghost Audio"
   BUNDLE_ID "audio.hungryghost.haunt.preview" PLUGIN_MANUFACTURER_CODE Aftr PLUGIN_CODE HgHt
   FORMATS ${formats} PRODUCT_NAME "Hungry Ghost HAUNT Preview"
   IS_SYNTH FALSE NEEDS_MIDI_INPUT TRUE NEEDS_MIDI_OUTPUT FALSE IS_MIDI_EFFECT FALSE

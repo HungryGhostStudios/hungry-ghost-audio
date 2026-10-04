@@ -22,8 +22,42 @@ void require(bool ok,const char* why){if(!ok)throw std::runtime_error(why);}
 std::vector<float> tone(double sr,double hz,double seconds,bool harmonics=false){std::vector<float> x(size_t(sr*seconds));for(size_t i=0;i<x.size();++i){const double p=2*pi*hz*i/sr;x[i]=float(.24*std::sin(p)+(harmonics?.35*std::sin(2*p)+.18*std::sin(3*p):0));}return x;}
 void process(PitchEngine& engine,std::vector<float>& data,int block=257){for(int at=0;at<int(data.size());at+=block){float* p[]={data.data()+at};engine.process(p,1,std::min(block,int(data.size())-at));}}
 double measuredHz(const std::vector<float>& y,double sr){double first=0,last=0;int crossings=0;for(size_t i=y.size()/2+1;i<y.size();++i)if(y[i-1]<=0&&y[i]>0){const double cross=i-1-y[i-1]/(y[i]-y[i-1]);if(crossings==0)first=cross;last=cross;++crossings;}require(crossings>10,"Insufficient output crossings");return (crossings-1)*sr/(last-first);}
+
+void harmonicIntegrity() {
+    // A single sine can be correctly tuned while vocal harmonics are smeared.
+    // Keep this regression independent of the shifter's FFT and pitch display.
+    constexpr int rate=48000,n=rate*4;
+    const double inputFrequency=220*std::pow(2.,.32/12);
+    std::vector<float> vocal(n,0);
+    for(int harmonic=1;harmonic<=60;++harmonic) {
+        const double frequency=harmonic*inputFrequency;
+        const auto bell=[&](double centre,double width){return std::exp(-.5*std::pow((frequency-centre)/width,2));};
+        const double amplitude=(.06+bell(650,95)+.7*bell(1200,140)+.4*bell(2600,200))/harmonic;
+        for(int i=0;i<n;++i)vocal[i]+=float(amplitude*std::cos(2*pi*frequency*i/rate));
+    }
+    float peak=0;for(float sample:vocal)peak=std::max(peak,std::abs(sample));for(float& sample:vocal)sample*=.5f/peak;
+    for(bool preserve:{false,true}) {
+        PitchEngine engine;Settings settings;settings.amount=0;settings.transpose=-.32f;settings.preserveFormants=preserve;
+        engine.setSettings(settings);engine.prepare(rate,1);auto output=vocal;process(engine,output);
+        // Two seconds contain an integer number of 220-Hz cycles. Projection
+        // onto all expected sine/cosine harmonics allows arbitrary phase/envelope.
+        constexpr int count=rate*2;
+        double total=0,harmonicEnergy=0;for(int i=n-count;i<n;++i)total+=double(output[i])*output[i];
+        for(int harmonic=1;harmonic<=60;++harmonic) {
+            const double angle=2*pi*220*harmonic/rate,cosStep=std::cos(angle),sinStep=std::sin(angle);
+            double cosine=1,sine=0,real=0,imag=0;
+            for(int i=n-count;i<n;++i){real+=output[i]*cosine;imag+=output[i]*sine;const double next=cosine*cosStep-sine*sinStep;sine=sine*cosStep+cosine*sinStep;cosine=next;}
+            harmonicEnergy+=2*(real*real+imag*imag)/count;
+        }
+        const double residualDb=10*std::log10(std::max(1e-15,(total-harmonicEnergy)/total));
+        std::cout<<"Vocal-harmonic residual / formants "<<preserve<<": "<<residualDb<<" dB\n";
+        require(residualDb<-35,"Pitch shifter introduced excessive non-harmonic vocal artifacts");
+    }
 }
-int main(){try {
+}
+int main(int argc,char** argv){try {
+    harmonicIntegrity();
+    if(argc>1&&std::string(argv[1])=="--quality-only")return 0;
     require(scaleMask(0,1)==2741&&scaleMask(0,2)==1453,"Incorrect scale notes");
     require(nearestNote(61.2f,scaleMask(0,1))==62,"Scale target selection");
     require(nearestNote(60.f,0)<0,"Empty mask must not invent a target");
