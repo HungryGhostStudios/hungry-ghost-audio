@@ -12,7 +12,7 @@ export function releaseVersions(config, productId) {
   windowsSuite: suiteVersion(downloads.installer) || suiteVersion(downloads.suite),
   windowsZip: suiteVersion(downloads.suite),
   windowsPlugin: pluginVersion(config.products?.[productId]?.download),
-  macSuite: downloads.macInstaller ? suiteVersion(downloads.macInstaller) || suiteVersion(downloads.macArtifact?.path) : ''
+  macSuite: downloads.macInstaller && (!productId || !downloads.macProducts || downloads.macProducts.includes(productId)) ? suiteVersion(downloads.macInstaller) || suiteVersion(downloads.macArtifact?.path) : ''
  };
 }
 
@@ -20,5 +20,6 @@ export function productVersionSummary(config, productId) {
  const versions=releaseVersions(config, productId);
  const windows=versions.windowsPlugin ? `Windows plugin v${versions.windowsPlugin}` : 'Windows plugin';
  if(!config.downloads?.macInstaller)return windows;
+ if(config.downloads.macProducts && !config.downloads.macProducts.includes(productId))return windows+' · macOS not yet available';
  return windows + ' · ' + (versions.macSuite ? `macOS suite v${versions.macSuite}` : 'macOS suite');
 }

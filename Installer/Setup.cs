@@ -22,7 +22,7 @@ internal static class Package {
     internal static void Verify() {
         using(var zip=Open()) {
             var files=zip.Entries.Where(entry=>entry.FullName.StartsWith("VST3/",StringComparison.Ordinal)&&entry.Name.Length>0).ToArray();
-            if(files.Length!=Hashes.Count || Bundles.Length!=50) throw new InvalidDataException("Incomplete plugin package.");
+            if(files.Length!=Hashes.Count || Bundles.Length!=51) throw new InvalidDataException("Incomplete plugin package.");
             foreach(var entry in files) {
                 string expected;
                 if(!Hashes.TryGetValue(entry.FullName,out expected)) throw new InvalidDataException("Unexpected package file.");
@@ -92,7 +92,7 @@ internal sealed class SetupWindow:Form {
             mark.SetBounds(28,24,64,64);Controls.Add(mark);
         }
         AddText("HUNGRY GHOST AUDIO",108,22,660,40,24,true,paper);
-        AddText("50 effects. One common language.",110,69,658,25,12,false,jade);
+        AddText("51 tools. Including HAUNT early access.",110,69,658,25,12,false,jade);
         AddText("Select your plugins. Close your audio host before installing.",28,111,740,24,10,false,paper);
         selection.SetBounds(28,147,744,298);selection.BackColor=panel;selection.ForeColor=paper;
         selection.BorderStyle=BorderStyle.FixedSingle;selection.CheckOnClick=true;selection.MultiColumn=true;selection.ColumnWidth=180;
@@ -149,8 +149,8 @@ internal static class Program {
             }
             return 0;
         }
-        if(args.Length>=2&&args[0]=="--verify") {try{Package.Verify();File.WriteAllText(args[1],"PASS: 50 bundles and "+Package.Hashes.Count+" embedded file hashes verified.");return 0;}catch(Exception error){File.WriteAllText(args[1],"FAIL: "+error.Message);return 1;}}
-        if(args.Length>=2&&args[0]=="--extract") {try{var chosen=args.Length>=3?Package.Bundles.Where(name=>args[2].Split(',').Any(id=>name=="Hungry Ghost "+id.ToUpperInvariant()+".vst3"||(id=="reverb"&&name=="Hungry Ghost.vst3"))).ToArray():Package.Bundles;Package.Install(args[1],chosen,(value,name)=>{});return 0;}catch{return 1;}}
+        if(args.Length>=2&&args[0]=="--verify") {try{Package.Verify();File.WriteAllText(args[1],"PASS: 51 bundles and "+Package.Hashes.Count+" embedded file hashes verified.");return 0;}catch(Exception error){File.WriteAllText(args[1],"FAIL: "+error.Message);return 1;}}
+        if(args.Length>=2&&args[0]=="--extract") {try{var chosen=args.Length>=3?Package.Bundles.Where(name=>args[2].Split(',').Any(id=>name=="Hungry Ghost "+id.ToUpperInvariant()+".vst3"||(id=="reverb"&&name=="Hungry Ghost.vst3")||(id=="haunt"&&name=="Hungry Ghost HAUNT Preview.vst3"))).ToArray():Package.Bundles;Package.Install(args[1],chosen,(value,name)=>{});return 0;}catch{return 1;}}
         Application.EnableVisualStyles();Application.SetCompatibleTextRenderingDefault(false);Application.Run(new SetupWindow());return 0;
     }
 }

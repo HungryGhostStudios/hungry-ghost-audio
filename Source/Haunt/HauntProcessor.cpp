@@ -19,7 +19,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout HauntProcessor::layout() {
     for(int i=0;i<12;++i)p.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{"note"+juce::String(i),1},"Allow note "+juce::String(i),true));
     return p;
 }
-HauntProcessor::HauntProcessor():AudioProcessor(BusesProperties().withInput("Vocal",juce::AudioChannelSet::stereo(),true).withOutput("Output",juce::AudioChannelSet::stereo(),true)),state(*this,nullptr,"HAUNT",layout()) {
+HauntProcessor::HauntProcessor(juce::File licenceCache):AudioProcessor(BusesProperties().withInput("Vocal",juce::AudioChannelSet::stereo(),true).withOutput("Output",juce::AudioChannelSet::stereo(),true)),state(*this,nullptr,"HAUNT",layout()),license("haunt",licenceCache) {
     const char* ids[]={"retune","amount","humanize","vibrato","formant","transpose","reference","mix","output","key","scale","range","preserve","midi","bypass"};
     for(int i=0;i<15;++i)parameters[i]=state.getRawParameterValue(ids[i]);
     for(int i=0;i<12;++i)parameters[15+i]=state.getRawParameterValue("note"+juce::String(i));
@@ -36,10 +36,10 @@ Settings HauntProcessor::settings() const {
     return s;
 }
 bool HauntProcessor::isBusesLayoutSupported(const BusesLayout& b) const {const auto c=b.getMainInputChannelSet();return (c==juce::AudioChannelSet::mono()||c==juce::AudioChannelSet::stereo())&&c==b.getMainOutputChannelSet();}
-void HauntProcessor::prepareToPlay(double sr,int) {engine.setSettings(settings());engine.prepare(sr,getTotalNumInputChannels());setLatencySamples(engine.latencySamples());}
+void HauntProcessor::prepareToPlay(double sr,int) {auto s=settings();s.bypass|=!license.canProcess();engine.setSettings(s);engine.prepare(sr,getTotalNumInputChannels());setLatencySamples(engine.latencySamples());}
 void HauntProcessor::run(juce::AudioBuffer<float>& audio,juce::MidiBuffer& midi,bool bypassed) {
     juce::ScopedNoDenormals noDenormals;
-    auto s=settings();s.bypass|=bypassed;engine.setSettings(s);
+    auto s=settings();s.bypass|=bypassed||!license.canProcess();engine.setSettings(s);
     const int count=std::min(2,audio.getNumChannels());
     auto process=[&](int start,int end){if(end<=start||count==0)return;float* channels[2]={audio.getWritePointer(0,start),count>1?audio.getWritePointer(1,start):nullptr};engine.process(channels,count,end-start);};
     int offset=0;

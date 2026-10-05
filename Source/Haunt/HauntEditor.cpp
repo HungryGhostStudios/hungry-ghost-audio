@@ -9,8 +9,9 @@ const char* noteNames[]={"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};
 juce::String noteName(float value){const int n=juce::jlimit(0,127,int(std::round(value)));return juce::String(noteNames[n%12])+juce::String(n/12-1);}
 void text(juce::Graphics& g,juce::String value,juce::Rectangle<float> rect,float size,juce::Colour colour,bool bold=false,int justify=juce::Justification::left){g.setFont(font(size,bold));g.setColour(colour);g.drawText(value,rect,justify);}
 }
-HauntEditor::HauntEditor(HauntProcessor& p):AudioProcessorEditor(p),processor(p),surface(*this) {
+HauntEditor::HauntEditor(HauntProcessor& p):AudioProcessorEditor(p),processor(p),surface(*this),license(p.license) {
     setLookAndFeel(&theme);addAndMakeVisible(surface);
+    license.setBounds(279,691,185,29);license.setName("Activate HAUNT or suite licence");surface.addAndMakeVisible(license);
     auto combo=[&](juce::ComboBox& box,const char* id,const juce::StringArray& items,juce::Rectangle<int> bounds) {
         box.addItemList(items,1);box.setBounds(bounds);box.setName(id);box.setTitle(id);box.setComponentID(id);box.setWantsKeyboardFocus(true);surface.addAndMakeVisible(box);
         comboAttachments.push_back(std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.state,id,box));
@@ -65,7 +66,7 @@ void HauntEditor::poll() {
 void HauntEditor::paintSurface(juce::Graphics& g) {
     theme.paintChassis(g,{0,0,1100,740});theme.paintSpectralMark(g,{478,18,85,67},violet());
     text(g,"HUNGRY GHOST / VOCAL INSTRUMENT",{36,18,440,17},10,GhostTheme::muted());theme.paintWordmark(g,"HAUNT",{34,36,400,44},38);
-    text(g,"REAL-TIME PITCH / DEVELOPMENT PREVIEW",{37,79,470,18},10,violet(),true);
+    text(g,"REAL-TIME PITCH / EARLY ACCESS",{37,79,470,18},10,violet(),true);
     for(auto pair:{std::pair<const char*,float>{"KEY",36},{"SCALE",154},{"VOICE RANGE",406},{"REFERENCE A4",949}})text(g,pair.first,{pair.second,96,220,15},9,GhostTheme::muted(),true);
     const juce::Rectangle<float> graph{36,168,807,232};theme.paintDisplay(g,graph.expanded(6));
     const auto plot=graph.withTrimmedLeft(44).withTrimmedTop(29).withTrimmedRight(13).withTrimmedBottom(19);
@@ -108,8 +109,8 @@ void HauntEditor::paintSurface(juce::Graphics& g) {
     const char* hints[]={"Note transition speed","Pull towards target","Ease sustained notes","Keep expressive motion","Vocal envelope","Shift the whole voice"};
     for(int i=0;i<6;++i){const float x=36+i*174.f;theme.paintPanel(g,{x,492,158,177},i==1?mint():violet());text(g,labels[i],{x+8,498,142,20},10,GhostTheme::ink(),true,juce::Justification::centred);text(g,hints[i],{x+4,647,150,15},9,GhostTheme::muted(),false,juce::Justification::centred);}
     const double sr=processor.getSampleRate()>0?processor.getSampleRate():48000;
-    text(g,"HAUNT 0.1.2 / LIVE ENGINE PREVIEW",{36,689,340,17},10,GhostTheme::muted(),true);
-    text(g,juce::String(processor.getLatencySamples()*1000./sr,1)+" ms reported latency / "+juce::String(sr/1000,1)+" kHz",{36,710,400,16},9,GhostTheme::muted());
+    text(g,"HAUNT 0.1.3 / EARLY ACCESS",{36,689,232,17},10,GhostTheme::muted(),true);
+    text(g,juce::String(processor.getLatencySamples()*1000./sr,1)+" ms reported latency / "+juce::String(sr/1000,1)+" kHz",{36,710,232,16},9,GhostTheme::muted());
     text(g,"MIX",{487,696,36,20},9,GhostTheme::muted(),true);text(g,"OUT",{702,696,36,20},9,GhostTheme::muted(),true);
 }
 }

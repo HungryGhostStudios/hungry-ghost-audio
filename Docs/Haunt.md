@@ -1,6 +1,8 @@
 # HAUNT — vocal pitch correction preview
 
-HAUNT is a separate, optional JUCE effect for one vocal line. The first stage is real-time correction; recorded-note editing is the next stage. It is not part of the released 50-product catalogue, installer, licence service or store. The current Windows preview is 0.1.2. The VST3 identity and parameter/state layout are unchanged from 0.1.0. Do not advertise this prototype as a finished competitor or as a low-latency tracking product.
+HAUNT is an early-access JUCE effect for one vocal line, joining the suite in release 0.3.1. The current plugin version is 0.1.3. Live correction is implemented; recorded-note editing is not included. Windows release validation passes; the Mac release must complete universal validation, signing and notarization before its download is offered. The VST3 identity and parameter/state layout are unchanged from 0.1.0, including the host name "Hungry Ghost HAUNT Preview" for session compatibility. Do not advertise this as a finished competitor or a low-latency tracking product.
+
+HAUNT costs $5.99 USD individually and is included in the $74.99 complete suite, including existing suite purchases. Version 0.1.3 adds the shared activation panel and 30-day suite trial; its pitch engine is unchanged from 0.1.2. Use the licence button in the footer to activate either your HAUNT key or your existing suite key. Activating an existing key reuses its cached device activation when present. An inactive trial passes latency-aligned dry audio at unity gain. The service must include `haunt` in the existing suite benefit before publication; do not create a replacement suite benefit that would exclude earlier purchases.
 
 ## Working controls
 
@@ -35,7 +37,7 @@ cmake --build build --config Release --target HAUNT_VST3 HAUNT_Standalone hg_hau
 ctest --test-dir build -C Release -R "^hg_haunt_" --output-on-failure
 ```
 
-Use the repository's pinned JUCE 9.0.2, or pass `JUCE_SOURCE_DIR`. The option defaults to OFF so normal suite releases are unaffected. `HG_BUILD_PLUGINS=OFF` still permits the independent DSP checks. On Apple the optional target also declares AU, but this preview has not yet been built, signed, notarized or validated on macOS.
+Use the repository's pinned JUCE 9.0.2, or pass `JUCE_SOURCE_DIR`. HAUNT now defaults to ON and is included in `hg_suite`. `HG_BUILD_PLUGINS=OFF` still permits the independent DSP checks. Apple builds include VST3 and AU. Do not publish the Mac artifact until universal validation, signing and notarization have passed.
 
 DSP checks measure the actual corrected waveform independently of the displayed pitch. They cover harmonic tracking at 44.1/48/96 kHz, positive and negative detuning, fixed transposition, formant compensation, exact bypass/neutral latency, MIDI/sustain, stereo phase opposition, host block-size invariance, noise/silence, invalid samples/settings and C++ heap allocations during processing. Native integration checks exercise parameter attachments, keyboard notes, saved A/B states, host bypass, MIDI delivery and editor captures at three sizes. Synthetic signals establish those properties only; they do not establish natural-vocal quality.
 

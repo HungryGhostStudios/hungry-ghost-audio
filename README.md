@@ -1,8 +1,10 @@
 # Hungry Ghost Audio
 
-A collection of 50 effects with shared metalwork and individual processing controls: Windows x64 VST3, and universal macOS VST3 / Audio Units for Intel and Apple Silicon. The complete source, original interface assets, editable Blender scenes, installers and storefront are released under **AGPL-3.0-or-later**. JUCE 9.0.2 is the pinned framework dependency.
+A collection of 51 audio tools, including HAUNT vocal pitch correction in early access. Windows uses x64 VST3; Mac releases use universal VST3 / Audio Units for Intel and Apple Silicon. Check each product's current platform availability on the website: an older Mac installer does not include a newly added Windows product. The complete source, original interface assets, editable Blender scenes, installers and storefront are released under **AGPL-3.0-or-later**. JUCE 9.0.2 is the pinned framework dependency.
 
 ## Current state
+
+Suite 0.3.1 adds HAUNT 0.1.3 with suite/individual activation and a shared 30-day trial. It retains the 0.1.2 pitch engine and existing HAUNT preview identity for session compatibility. The 50 existing Windows plugin binaries remain byte-identical to release 0.3.0; HAUNT's exact new binary passes pluginval level 5 and native state, MIDI, controls and inactive-trial bypass checks. Mac 0.3.1 validation and notarization must finish before its installer is published. [HAUNT's guide](Docs/Haunt.md) describes its early-access scope and 54.7-ms latency at 48 kHz. Release 0.3.0 evidence below is historical evidence for the retained plugins.
 
 Suite 0.3.0 brings the Hungry Ghost interface treatment to all 50 effects and adds BOND's new Precision engine. REVERB advances to 0.3.1; the other 49 plugins are 0.3.0. Plugin identities and saved-state compatibility are preserved; processing outside BOND is unchanged by the interface update. Windows x64 VST3 and the signed, notarized universal Mac 0.3.0 installer are available from [hungryghostaudio.com](https://hungryghostaudio.com). See [release notes](Docs/ReleaseNotes.md) and [the BOND guide](Docs/BondPrecision.md).
 
@@ -16,7 +18,7 @@ The [universal 0.3.0 Mac build](https://github.com/HungryGhostStudios/hungry-gho
 
 ## Build
 
-HAUNT, the separate vocal pitch-correction development preview, is opt-in and is not included in the current 50-plugin release. See [its controls, build instructions and live-first roadmap](Docs/Haunt.md). Recorded-note editing and production-quality low-latency monitoring remain future work.
+HAUNT is included in the default suite build. See [its controls, build instructions and live-first roadmap](Docs/Haunt.md). Recorded-note editing and production-quality low-latency monitoring remain future work.
 
 Install Visual Studio 2022 with Desktop C++ and CMake 3.22 or newer.
 

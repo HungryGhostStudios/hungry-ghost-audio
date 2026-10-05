@@ -1,7 +1,7 @@
 """Validate every catalogue VST3 and record hashes of the exact tested binaries."""
 import argparse, concurrent.futures, ctypes, hashlib, json, os, re, subprocess, time
 from pathlib import Path
-from release_metadata import catalogue as read_catalogue
+from release_metadata import catalogue as read_catalogue, bundle_name
 
 def windows_product_version(binary):
     """Read the PE ProductVersion string without loading executable code."""
@@ -61,7 +61,7 @@ def preflight_versions(binary, module_info, expected):
     return actual
 
 def validate(product, args):
-    name = 'Hungry Ghost' if product['id'] == 'reverb' else 'Hungry Ghost ' + product['name']
+    name = bundle_name(product)
     bundle = args.build.resolve() / (product['name'] + '_artefacts') / 'Release' / 'VST3' / (name + '.vst3')
     binary = bundle / 'Contents' / 'x86_64-win' / (name + '.vst3')
     if not binary.is_file():

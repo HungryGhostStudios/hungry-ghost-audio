@@ -1,11 +1,12 @@
 #pragma once
 #include "PitchEngine.h"
+#include "Licensing/LicenseManager.h"
 #include <juce_audio_utils/juce_audio_utils.h>
 
 namespace hungryghost::haunt {
 class HauntProcessor final:public juce::AudioProcessor {
 public:
-    HauntProcessor();
+    explicit HauntProcessor(juce::File licenceCache={});
     void prepareToPlay(double,int) override;
     void releaseResources() override { engine.reset(); }
     void reset() override { engine.reset(); }
@@ -35,6 +36,7 @@ public:
     int selectedBank() const { return bank.load(); }
     Reading reading() const;
     juce::AudioProcessorValueTreeState state;
+    LicenseManager license;
 private:
     static juce::AudioProcessorValueTreeState::ParameterLayout layout();
     Settings settings() const;

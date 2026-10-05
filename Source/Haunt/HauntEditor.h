@@ -25,6 +25,7 @@ private:
     std::array<juce::Slider,9> sliders;
     std::array<juce::TextButton,12> notes;
     juce::TextButton preserve{"FORMANT LOCK"},midi{"MIDI TARGET"},bypass{"BYPASS"},a{"A"},b{"B"},copy{"COPY"};
+    LicenseButton license;
     std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>> sliderAttachments;
     std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>> comboAttachments;
     std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>> buttonAttachments;

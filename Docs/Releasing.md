@@ -1,6 +1,8 @@
 # Releasing the suite
 
-Release versions are defined in `CMakeLists.txt`: the project version is the suite and default product version; `HG_REVERB_VERSION` preserves REVERB's existing higher version history. Current preparation targets suite 0.3.0, REVERB 0.3.1, and 0.3.0 for the other 49 plugins. Keep previous release assets and immutable Mac download paths intact.
+Release versions are defined in `CMakeLists.txt`: project version 0.3.1 is the package version; `HG_EFFECTS_VERSION` keeps the original 49 effects at 0.3.0, `HG_REVERB_VERSION` is 0.3.1 and `HG_HAUNT_VERSION` is 0.1.3. Suite 0.3.1 includes 51 Windows VST3s / 102 Mac format bundles. Existing Windows binaries may be retained only when their exact hashes and versions match prior passing validation. Always validate the changed HAUNT binary and installer. Keep previous release assets and immutable Mac download paths intact.
+
+HAUNT adds one Polar product at $5.99 and one individual licence benefit. Extend the existing suite licence benefit's service mapping with `haunt`, preserving its ID so past purchases receive access. Retain the $74.99 suite price. Refresh the existing download benefits after uploading the verified installers. Keep Windows-only availability explicit until the new Mac installer completes signing/notarization; `downloads.macProducts` lists the products actually present in the offered Mac package. Never route HAUNT's Mac button to the older 50-plugin installer. The remaining procedure below originated with the 50-plugin release; apply the current catalogue count to validation and packaging.
 
 ## Prepare and validate
 

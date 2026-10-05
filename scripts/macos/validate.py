@@ -2,7 +2,7 @@
 import argparse, concurrent.futures, hashlib, json, os, platform, plistlib, shutil, subprocess, sys, threading, time
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from release_metadata import catalogue
+from release_metadata import catalogue, bundle_name
 
 p = argparse.ArgumentParser()
 p.add_argument('--build', type=Path)
@@ -20,7 +20,7 @@ products = catalogue(root)
 a.output.mkdir(parents=True, exist_ok=True)
 inventory = []
 for product in products:
-    name = 'Hungry Ghost' if product['id'] == 'reverb' else 'Hungry Ghost ' + product['name']
+    name = bundle_name(product)
     for fmt, ext in [('VST3', 'vst3'), ('AU', 'component')]:
         bundle = ((a.build / (product['name'] + '_artefacts') / 'Release' / fmt) if a.build
                   else (a.stage / 'Library/Audio/Plug-Ins' / ('VST3' if fmt == 'VST3' else 'Components'))) / (name + '.' + ext)
@@ -56,7 +56,7 @@ if os.environ.get('GITHUB_ACTIONS') == 'true':
     subprocess.run(['sudo', 'killall', '-9', 'AudioComponentRegistrar'], capture_output=True)
 expected = {tuple(r['audioComponent'][k] for k in ('type', 'subtype', 'manufacturer'))
             for r in inventory if r['format'] == 'AU'}
-assert len(expected) == 50, 'Audio Unit identifiers must be unique'
+assert len(expected) == len(products), 'Audio Unit identifiers must be unique'
 for attempt in range(6):
     scan = subprocess.run(['auval', '-a'], capture_output=True, text=True, timeout=120)
     (a.output / f'au-registry-{attempt}.log').write_text(scan.stdout + scan.stderr, encoding='utf-8')
@@ -99,7 +99,7 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=a.workers) as pool:
         results.append(record)
         (a.output / 'results.json').write_text(json.dumps(results, indent=2) + '\n', encoding='utf-8')
         print(('PASS' if record['passed'] else 'FAIL') + ': ' + record['id'] + ' / ' + record['format'], flush=True)
-assert len(results) == 100
+assert len(results) == 2*len(products)
 failed = [r for r in results if not r['passed']]
-print(f'{100-len(failed)}/100 passed on {platform.machine()}', flush=True)
+print(f'{2*len(products)-len(failed)}/{2*len(products)} passed on {platform.machine()}', flush=True)
 raise SystemExit(bool(failed))
