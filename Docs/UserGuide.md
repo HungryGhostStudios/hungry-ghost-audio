@@ -1,11 +1,11 @@
 # Hungry Ghost Audio · Windows and macOS
 
-Suite release 0.3.0. Windows 10 or 11 uses x64 VST3. macOS 11 and later uses universal VST3 and Audio Units on Intel and Apple Silicon. Choose Audio Units for Logic Pro and VST3 for REAPER or other compatible hosts. REVERB is version 0.3.1; the other 49 effects are 0.3.0. The same purchase covers both platforms. See [release notes](ReleaseNotes.md) for current publication and validation status.
+The Windows suite release is 0.3.1 with 51 plugins, including HAUNT 0.1.3 in early access. The current signed Mac 0.3.0 release contains the original 50 plugins; HAUNT's Mac update is undergoing release validation. Windows 10 or 11 uses x64 VST3. macOS 11 and later uses universal VST3 and Audio Units on Intel and Apple Silicon. Choose Audio Units for Logic Pro and VST3 for REAPER or other compatible hosts. REVERB is version 0.3.1; the other 49 effects are 0.3.0. The same purchase covers both platforms. See [release notes](ReleaseNotes.md) for current publication and validation status.
 
 ## Install on Windows
 
 1. Close your audio host. The installer never closes it for you.
-2. Run `HungryGhostSuite-0.3.0-Setup.exe`, select your effects and choose Install. The default is your standard user VST3 folder: `%LOCALAPPDATA%\Programs\Common\VST3`. Installing there does not require administrator access.
+2. Run `HungryGhostSuite-0.3.1-Setup.exe`, select your effects and choose Install. The default is your standard user VST3 folder: `%LOCALAPPDATA%\Programs\Common\VST3`. Installing there does not require administrator access.
 3. Open your host and rescan that folder. In REAPER, open Preferences → Plug-ins → VST, add the folder to the scan paths if needed, and use Re-scan.
 
 The ZIP downloads provide the same tested binaries for manual installation. Copy the folders **inside** `VST3` to your user VST3 folder, or to `C:\Program Files\Common Files\VST3` with administrator access. Copy each whole `.vst3` folder, including Contents; do not extract just the inner binary. Choose either the user location or shared location for an installation to avoid duplicate versions.
@@ -28,7 +28,9 @@ The public Mac installer is Developer ID signed, notarized by Apple and stapled.
 
 The suite starts a shared 30-day trial on its first launch. No account or audio upload is needed for the trial. When it ends, unlicensed effects pass audio through; they do not insert noise or mute your project. Trial status is assessed when you open a plugin instance, so a running session is not interrupted midway through a take.
 
-After purchasing, sign in to [Polar's customer portal](https://polar.sh/hungry-ghost-audio/portal) using your checkout email and copy the `HG_` licence key. The Windows installer is in the File Downloads benefit; platform downloads are also offered at [Downloads](https://hungryghostaudio.com/#downloads). Click the activation button at the bottom of a plugin, paste the key and activate. A suite key covers all 50 tools. An individual key covers that tool. Activating on a device stores a shared signed record, so you can open your other purchased plugins on that device. A Windows computer and a Mac count as separate devices toward the two-device allowance.
+After purchasing, sign in to [Polar's customer portal](https://polar.sh/hungry-ghost-audio/portal) using your checkout email and copy the `HG_` licence key. The Windows installer is in the File Downloads benefit; platform downloads are also offered at [Downloads](https://hungryghostaudio.com/#downloads). Click the activation button at the bottom of a plugin, paste the key and activate. A suite key covers all 51 tools, including HAUNT for existing suite owners. An individual key covers that tool. Activating on a device stores a shared signed record, so you can open your other purchased plugins on that device. A Windows computer and a Mac count as separate devices toward the two-device allowance.
+
+HAUNT appears in the host as **Hungry Ghost HAUNT Preview** to preserve earlier sessions. Use its footer's **Activate / refresh** button with your existing suite key to refresh HAUNT access; no new purchase or key is needed. HAUNT is for live monophonic pitch correction and does not yet include recorded-note editing. Its 2,624-sample processing latency is about 54.7 ms at 48 kHz, before your audio buffer. See [HAUNT's guide](Haunt.md) for controls and limitations.
 
 Each purchase permits two device activations. Use Manage devices to deactivate an old computer before moving to another. Paid activations work offline for up to 90 days. The plugin refreshes an older cache in the background when the service is available; an offline session retains a still-valid cache. After its expiry, reconnect and use Activate / refresh.
 
