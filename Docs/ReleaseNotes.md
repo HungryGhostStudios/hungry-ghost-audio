@@ -1,3 +1,13 @@
+# Suite 0.3.1 — HAUNT early access
+
+HAUNT 0.1.3 joins the [Windows release](https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/tag/v0.3.1) and the live website. The suite now includes 51 Windows VST3 plugins. The original 50 Windows plugin binaries are unchanged from suite 0.3.0. Individual plugins remain $5.99 USD and the complete suite remains $74.99 USD. Existing suite owners can activate HAUNT using their current key.
+
+HAUNT retains the improved pitch engine from 0.1.2 and adds public trial and licence support. It supports live monophonic correction, key/scale and MIDI targeting, humanize, vibrato preservation, formant shifting and transposition. Recorded-note editing is not included. Reported latency is 2,624 samples (54.7 ms at 48 kHz), plus the host/interface buffer. The host name remains Hungry Ghost HAUNT Preview to preserve session identity. See [the HAUNT guide](Haunt.md).
+
+The exact HAUNT Windows binary passes pluginval strictness 5 (seed 2130, GUI disabled) and native controls, state, MIDI, resizing and expired-trial bypass checks. The 51-plugin installer passes embedded checksum verification and selected HAUNT/REVERB extraction. All uploaded Windows assets match local SHA-256 values. Thirty-five storefront/API tests and desktop/mobile storefront checks pass; the live $5.99 HAUNT checkout and download links were verified without making a purchase.
+
+The Mac 0.3.1 build, validation, signing and notarization pipeline is running. Until its verified installer is published, the website continues to offer the signed 50-plugin Mac 0.3.0 release and does not advertise a Mac HAUNT download.
+
 # Suite 0.3.0
 
 This update combines BOND Precision with the Hungry Ghost interface treatment across the complete collection. REVERB advances to 0.3.1; the other 49 plugins are 0.3.0. Windows x64 VST3 and universal Mac VST3 / AU installers are published on [hungryghostaudio.com](https://hungryghostaudio.com). The Mac 0.3.0 installer passed validation, signing, notarization, selectable-installation checks and complete remote checksum verification before publication. The previous 0.2.0 Mac download remains available at its immutable URL.

@@ -63,6 +63,6 @@ The same plugin should offer Live and Edit views. Live keeps key/scale, retune a
 2. Reduce tracking latency and processing cost while keeping pitch accuracy, stereo coherence and consonant quality. Measure on realistic hardware and buffers; a short synthetic benchmark is not a dropout guarantee.
 3. Add captured-audio and pitch-event storage outside the callback, a host-time model, note segmentation, undoable edits and deterministic offline rendering. Each note needs independent pitch centre, drift, vibrato, transition and formant overrides.
 4. Add safe phrase capture/import, looping, audition and scale-aware editing. Preserve the live preset when entering Edit. Define how edited phrases follow transport, seeks, tempo and project recall before adding ARA integration.
-5. Validate real host sessions, automation, render/export, reopen and platform installers before adding HAUNT to the paid catalogue. No new price or bundle entitlement has been published.
+5. Continue validating real host sessions, automation, render/export and reopen workflows during early access. HAUNT 0.1.3 is published for Windows in suite 0.3.1 at $5.99, with existing suite purchases included. Mac distribution remains gated on the signed, notarized release.
 
 The practical quality bar is convincing vocals and predictable musical control. Synthetic pitch tolerances alone are not sufficient for release.
