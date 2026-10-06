@@ -304,8 +304,10 @@ export default {
       "checkout": "https://buy.polar.sh/polar_cl_nsG496Q7nLhX5RRe9D1GJTl54LXC2IUHPUNO51ujkRX"
     },
     "haunt": {
-      "ready": false,
-      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.1/HungryGhost-HAUNT-0.1.3-Windows-VST3.zip"
+      "ready": true,
+      "download": "https://github.com/HungryGhostStudios/hungry-ghost-audio/releases/download/v0.3.1/HungryGhost-HAUNT-0.1.3-Windows-VST3.zip",
+      "productId": "504094c9-be6f-4319-a3dd-0fb884c29941",
+      "checkout": "https://buy.polar.sh/polar_cl_xmQ7W2AdXgHvSoEhhaHny7PzF9QpcfvJyYWUg0SUP49"
     }
   },
   "benefits": {
@@ -511,6 +513,9 @@ export default {
     ],
     "9df868c1-ac60-4a64-80d2-a230c448b9cb": [
       "clean"
+    ],
+    "b1a5923b-cbd9-4b73-9251-a3fc21cc5e19": [
+      "haunt"
     ]
   },
   "downloads": {
