@@ -16,23 +16,23 @@ choices_xml = subprocess.check_output(['installer', '-showChoiceChangesXML', '-p
 choices = plistlib.loads(choices_xml)
 ids = {c['choiceIdentifier'] for c in choices}
 required = {r['id'] + '.' + r['format'].lower() for r in manifest['products']}
-assert required <= ids and len(required) == 100
-changes = [dict(choiceIdentifier=identifier, choiceAttribute='selected', attributeSetting=int(identifier.split('.')[0] in {'crush', 'reel'})) for identifier in sorted(required)]
+assert required <= ids and len(required) == 102
+changes = [dict(choiceIdentifier=identifier, choiceAttribute='selected', attributeSetting=int(identifier.split('.')[0] in {'crush', 'reel', 'haunt'})) for identifier in sorted(required)]
 file = a.output / 'selected-plugins.plist'
 with file.open('wb') as f: plistlib.dump(changes, f)
 after = subprocess.check_output(['installer', '-showChoicesAfterApplyingChangesXML', str(file), '-pkg', str(package), '-target', '/'])
 (a.output / 'applied-choices.plist').write_bytes(after)
 selected = {c['choiceIdentifier'] for c in plistlib.loads(after) if c['choiceAttribute'] == 'selected' and c['attributeSetting'] and c['choiceIdentifier'] in required}
-assert selected == {'crush.vst3', 'crush.au', 'reel.vst3', 'reel.au'}, selected
+assert selected == {'crush.vst3', 'crush.au', 'reel.vst3', 'reel.au', 'haunt.vst3', 'haunt.au'}, selected
 subprocess.run(['sudo', 'installer', '-pkg', str(package), '-target', '/', '-applyChoiceChangesXML', str(file)], check=True)
 for record in manifest['products']:
     folder = 'VST3' if record['format'] == 'VST3' else 'Components'
     bundle = Path('/Library/Audio/Plug-Ins') / folder / Path(record['bundle']).name
-    if record['id'] not in {'crush', 'reel'}:
+    if record['id'] not in {'crush', 'reel', 'haunt'}:
         assert not bundle.exists(), 'An unselected plugin was installed: ' + str(bundle)
         continue
     with (bundle / 'Contents/Info.plist').open('rb') as f: info = plistlib.load(f)
     binary = bundle / 'Contents/MacOS' / info['CFBundleExecutable']
     assert hashlib.sha256(binary.read_bytes()).hexdigest() == record['sha256']
     subprocess.run(['codesign', '--verify', '--strict', str(bundle)], check=True)
-print('Apple Installer exposed 100 format/plugin choices and installed exactly the four selected bundles with verified hashes.')
+print('Apple Installer exposed all format/plugin choices and installed exactly the six selected bundles with verified hashes.')

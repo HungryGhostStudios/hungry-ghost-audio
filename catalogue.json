@@ -2070,5 +2070,68 @@
     "status": "validated",
     "version": "0.3.0",
     "image": "/assets/plugins/clean.png"
+  },
+  {
+    "id": "haunt",
+    "name": "HAUNT",
+    "family": "Vocal",
+    "engine": "VocalPitch",
+    "description": "Expressive vocal pitch correction, from natural movement to hard tuning.",
+    "price": 5.99,
+    "controls": [
+      {
+        "name": "Retune",
+        "minimum": 0,
+        "maximum": 250,
+        "default": 35,
+        "unit": "ms",
+        "skew": 1
+      },
+      {
+        "name": "Correction",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 100,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Humanize",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 35,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Vibrato",
+        "minimum": 0,
+        "maximum": 100,
+        "default": 50,
+        "unit": "%",
+        "skew": 1
+      },
+      {
+        "name": "Formant",
+        "minimum": -12,
+        "maximum": 12,
+        "default": 0,
+        "unit": "st",
+        "skew": 1
+      },
+      {
+        "name": "Transpose",
+        "minimum": -12,
+        "maximum": 12,
+        "default": 0,
+        "unit": "st",
+        "skew": 1
+      }
+    ],
+    "status": "validated",
+    "version": "0.1.3",
+    "earlyAccess": true,
+    "releaseNotes": "Live pitch correction for one vocal line. About 54.7 ms latency at 48 kHz plus host buffers. Recorded-note editing is not included. Windows x64 early access; Mac availability is listed separately.",
+    "image": "/assets/plugins/haunt.png"
   }
 ]

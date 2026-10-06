@@ -17,19 +17,22 @@ def suite_version(root=ROOT):
 
 
 def product_version(product_id, root=ROOT):
-    if product_id != 'reverb':
-        return suite_version(root)
     source = (root / 'CMakeLists.txt').read_text(encoding='utf-8')
-    match = re.search(r'set\(HG_REVERB_VERSION\s+(\d+\.\d+\.\d+)\s*\)', source)
+    variable = {'reverb':'HG_REVERB_VERSION', 'haunt':'HG_HAUNT_VERSION'}.get(product_id, 'HG_EFFECTS_VERSION')
+    match = re.search(r'set\(' + variable + r'\s+(\d+\.\d+\.\d+)\s*\)', source)
     if not match:
-        raise ValueError('Missing REVERB version in CMakeLists.txt')
+        if variable == 'HG_EFFECTS_VERSION': return suite_version(root)
+        raise ValueError('Missing '+variable+' in CMakeLists.txt')
     return match.group(1)
+
+def bundle_name(product):
+    return 'Hungry Ghost' if product['id']=='reverb' else 'Hungry Ghost HAUNT Preview' if product['id']=='haunt' else 'Hungry Ghost '+product['name']
 
 
 def catalogue(root=ROOT):
     products = json.loads((root / 'catalogue.json').read_text(encoding='utf-8'))
-    if len(products) != 50 or len({p['id'] for p in products}) != 50:
-        raise ValueError('Expected all 50 unique catalogue products')
+    if len(products) != 51 or len({p['id'] for p in products}) != 51:
+        raise ValueError('Expected all 51 unique catalogue products')
     for product in products:
         if product['version'] != product_version(product['id'], root):
             raise ValueError('Catalogue/CMake version mismatch: ' + product['id'])
@@ -43,7 +46,7 @@ def verify_native_source(revision, root=ROOT):
     git = ['git', '-C', str(root)]
     subprocess.run(git + ['fetch', '--depth=1', 'origin', revision], check=True)
     native_paths = ['CMakeLists.txt', 'Products.cmake', 'Source', 'Tests', 'Assets',
-                    'scripts/release_metadata.py']
+                    'scripts/release_metadata.py', 'ThirdParty']
     subprocess.run(git + ['diff', '--exit-code', revision, 'HEAD', '--', *native_paths], check=True)
     previous = json.loads(subprocess.check_output(git + ['show', revision + ':catalogue.json'], text=True))
     current = json.loads((root / 'catalogue.json').read_text(encoding='utf-8'))
@@ -64,6 +67,6 @@ if __name__ == '__main__':
         public = json.loads((ROOT / 'site/public/catalogue.json').read_text(encoding='utf-8'))
         if {(p['id'], p['version']) for p in public} != {(p['id'], p['version']) for p in products}:
             raise SystemExit('Storefront/catalogue version mismatch')
-        print(f'Suite {suite_version()}: 50 native and storefront versions agree.')
+        print(f'Suite {suite_version()}: {len(products)} native and storefront versions agree.')
     else:
         print(suite_version())

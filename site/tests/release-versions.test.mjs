@@ -50,3 +50,14 @@ test('unavailable or unrecognized artifacts never invent a version or advertise 
  delete config.downloads.suite;
  assert.equal(releaseVersions(config).windowsSuite,'');
 });
+
+test('a Windows-only addition cannot advertise a download from an older Mac suite',()=>{
+ const config=fixture();config.products.haunt={download:'https://example.com/HungryGhost-HAUNT-0.1.3-Windows-VST3.zip'};
+ config.downloads.macProducts=['bond','reverb'];
+ assert.equal(releaseVersions(config,'haunt').macSuite,'');
+ assert.equal(productVersionSummary(config,'haunt'),'Windows plugin v0.1.3 · macOS not yet available');
+ assert.equal(releaseVersions(config).macSuite,'0.2.0');
+ assert.equal(releaseVersions(config,'reverb').macSuite,'0.2.0');
+ config.downloads.macProducts.push('haunt');
+ assert.equal(releaseVersions(config,'haunt').macSuite,'0.2.0');
+});

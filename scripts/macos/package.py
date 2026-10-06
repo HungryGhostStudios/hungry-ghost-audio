@@ -2,7 +2,7 @@
 import argparse, hashlib, json, plistlib, shutil, subprocess, sys, tempfile, xml.etree.ElementTree as ET
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from release_metadata import suite_version
+from release_metadata import suite_version, catalogue
 
 p = argparse.ArgumentParser()
 p.add_argument('--stage', type=Path, required=True)
@@ -17,7 +17,7 @@ root = Path(__file__).resolve().parents[2]
 if not a.preview and not all([a.installer_identity, a.application_identity, a.notary_profile]):
     p.error('A public installer requires Application/Installer identities and a notary profile')
 manifest = json.loads((a.stage / 'manifest.json').read_text(encoding='utf-8'))
-assert len(manifest['products']) == 100 and all(r['passed'] for r in manifest['products'])
+assert len(manifest['products']) == 2*len(catalogue()) and all(r['passed'] for r in manifest['products'])
 assert manifest['suiteVersion'] == suite_version(root), 'Staged release version differs from source'
 a.output.mkdir(parents=True, exist_ok=True)
 with tempfile.TemporaryDirectory(prefix='hungryghost-mac-') as scratch:
@@ -25,10 +25,12 @@ with tempfile.TemporaryDirectory(prefix='hungryghost-mac-') as scratch:
     packages = scratch / 'packages'; packages.mkdir()
     resources = scratch / 'resources'; resources.mkdir()
     shutil.copy2(root / 'Design/Brand/hungry-ghost-mark.png', resources / 'mark.png')
+    licenceText=(root/'LICENSE').read_text()+'\n\nRubber Band 4.0.0\n'+(root/'ThirdParty/rubberband/COPYING').read_text()+'\n\n'+(root/'ThirdParty/rubberband/UPSTREAM.txt').read_text()
+    (resources/'licences.txt').write_text(licenceText,encoding='utf-8')
     (resources / 'welcome.html').write_text('''<!doctype html><html><head><meta charset="utf-8"><style>
       body{font:14px -apple-system,Helvetica,sans-serif;color:#16231e;padding:24px}img{width:64px;float:left;margin-right:18px}
       h1{font-size:24px;margin-top:10px}p{line-height:1.5}h2{font-size:17px}</style></head><body>
-      <img src="mark.png"><h1>Hungry Ghost Audio</h1><p>50 effects. One common language.</p><h2>Before you install</h2>
+      <img src="mark.png"><h1>Hungry Ghost Audio</h1><p>51 tools, including HAUNT early access.</p><h2>Before you install</h2>
       <p>Close your audio apps. Use Customize to choose your plugins and VST3 / Audio Unit formats.</p>
       <p>Universal plugins run natively on Apple Silicon and Intel, on macOS 11 or later. Audio Units support Logic Pro;
       VST3 supports REAPER and other compatible hosts. Your existing purchase includes both platforms.</p>
@@ -37,6 +39,7 @@ with tempfile.TemporaryDirectory(prefix='hungryghost-mac-') as scratch:
     dist = ET.Element('installer-gui-script', {'minSpecVersion': '2'})
     ET.SubElement(dist, 'title').text = 'Hungry Ghost Audio'
     ET.SubElement(dist, 'welcome', {'file': 'welcome.html', 'mime-type': 'text/html'})
+    ET.SubElement(dist, 'license', {'file':'licences.txt','mime-type':'text/plain'})
     ET.SubElement(dist, 'options', {'customize': 'always', 'require-scripts': 'false',
                                  'hostArchitectures': 'arm64,x86_64', 'rootVolumeOnly': 'true'})
     domains = ET.SubElement(dist, 'domains', {'enable_localSystem': 'true', 'enable_currentUserHome': 'false', 'enable_anywhere': 'false'})
@@ -74,7 +77,7 @@ with tempfile.TemporaryDirectory(prefix='hungryghost-mac-') as scratch:
             subprocess.run(['pkgbuild', '--root', str(payload), '--component-plist', str(components),
                             '--identifier', package_id, '--version', record['version'],
                             '--install-location', '/Library/Audio/Plug-Ins/' + folder, str(packages / package_name)], check=True)
-            # The component package now owns the payload. Do not retain 100
+            # The component package now owns the payload. Do not retain all
             # duplicate staging trees alongside the original universal bundles.
             assert payload.parent.resolve().parent == scratch.resolve()
             shutil.rmtree(payload.parent)

@@ -1,0 +1,1 @@
+Rubber Band 4.0.0; https://github.com/breakfastquay/rubberband; commit 1d95888bec3ae0a17c0c4af791810d5a63f6bc35. Unmodified upstream sources. GPL-2.0-or-later; see COPYING. Built with single/RubberBandSingle.cpp using built-in FFT and BQResampler.

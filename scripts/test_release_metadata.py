@@ -6,7 +6,7 @@ import unittest
 from argparse import Namespace
 from pathlib import Path
 from unittest.mock import patch
-from release_metadata import product_version, suite_version, verify_native_source
+from release_metadata import product_version, suite_version, verify_native_source, bundle_name
 from validate_release import preflight_versions, validate
 
 
@@ -19,7 +19,9 @@ class ReleaseMetadataTests(unittest.TestCase):
                        'engine': 'BusCompressor', 'controls': [{'default': 2}], 'price': 5.99}]
         (self.root / 'CMakeLists.txt').write_text(
             'project(HungryGhostSuite VERSION 0.3.0 LANGUAGES C CXX)\n'
-            'set(HG_REVERB_VERSION 0.3.1)\n', encoding='utf-8')
+            'set(HG_REVERB_VERSION 0.3.1)\n'
+            'set(HG_HAUNT_VERSION 0.1.3)\n'
+            'set(HG_EFFECTS_VERSION 0.3.0)\n', encoding='utf-8')
 
     def check_source(self, current):
         (self.root / 'catalogue.json').write_text(json.dumps(current), encoding='utf-8')
@@ -37,6 +39,8 @@ class ReleaseMetadataTests(unittest.TestCase):
         self.assertEqual(suite_version(self.root), '0.3.0')
         self.assertEqual(product_version('reverb', self.root), '0.3.1')
         self.assertEqual(product_version('bond', self.root), '0.3.0')
+        self.assertEqual(product_version('haunt', self.root), '0.1.3')
+        self.assertEqual(bundle_name({'id':'haunt','name':'HAUNT'}), 'Hungry Ghost HAUNT Preview')
 
     def test_gallery_and_validation_flags_may_change(self):
         current = copy.deepcopy(self.prior)

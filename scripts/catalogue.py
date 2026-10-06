@@ -90,14 +90,19 @@ add('CLEAN','Utility','DCBlock','Remove DC offset and subsonic energy.',[p('Cuto
 
 assert len(rows)==50, len(rows)
 assert len({r['id'] for r in rows})==50
+native_rows=list(rows) # HAUNT has a dedicated processor and parameter layout.
+add('HAUNT','Vocal','VocalPitch','Expressive vocal pitch correction, from natural movement to hard tuning.',[
+ p('Retune',0,250,35,'ms'),p('Correction',0,100,100,'%'),p('Humanize',0,100,35,'%'),
+ p('Vibrato',0,100,50,'%'),p('Formant',-12,12,0,'st'),p('Transpose',-12,12,0,'st')])
+rows[-1].update(earlyAccess=True,releaseNotes='Live pitch correction for one vocal line. About 54.7 ms latency at 48 kHz plus host buffers. Recorded-note editing is not included. Windows x64 early access; Mac availability is listed separately.')
 parser=argparse.ArgumentParser()
-parser.add_argument('--validated',type=Path,help='Record of all 50 exact pluginval-tested binaries')
+parser.add_argument('--validated',type=Path,help='Record of all 51 exact pluginval-tested binaries')
 args=parser.parse_args()
 if args.validated:
  import hashlib
  checks=json.loads(args.validated.read_text())
  valid={r['id']:r for r in checks if r.get('passed') and r.get('strictness',0)>=5}
- assert set(valid)==set(r['id'] for r in rows), 'All 50 products must pass'
+ assert set(valid)==set(r['id'] for r in rows), 'All 51 products must pass'
  for row in rows:
   check=valid[row['id']]
   assert check.get('version')==row['version'], 'Validation version differs from current catalogue: '+row['id']
@@ -106,11 +111,11 @@ if args.validated:
 (ROOT/'site/public/catalogue.json').write_text(json.dumps(rows,indent=2)+'\n')
 (ROOT/'catalogue.json').write_text(json.dumps(rows,indent=2)+'\n')
 lines=['#pragma once','#include <array>','#include <string_view>','namespace hungryghost {',
- 'enum class Kind { '+', '.join(r['engine'] for r in rows)+' };',
+ 'enum class Kind { '+', '.join(r['engine'] for r in native_rows)+' };',
  'struct Control { const char* name; float min, max, initial; const char* unit; float skew; };',
  'struct Product { const char* id; const char* name; const char* family; const char* description; Kind kind; int controlCount; std::array<Control,6> controls; };',
  'inline constexpr std::array<Product,50> products {{']
-for r in rows:
+for r in native_rows:
  cs=[f'{{"{c["name"]}",{c["minimum"]}f,{c["maximum"]}f,{c["default"]}f,"{c["unit"]}",{c["skew"]}f}}' for c in r['controls']]
  # C++ float literals need a decimal point.
  import re
@@ -120,7 +125,7 @@ for r in rows:
 lines+=['}};','}']
 (ROOT/'Source/Catalogue.h').write_text('\n'.join(lines)+'\n')
 cm=['set(HG_PRODUCT_TARGETS)']
-for i,r in enumerate(rows[2:],2):
+for i,r in enumerate(native_rows[2:],2):
  cm.append(f'hg_add_product({r["name"]} {i} Hg{i:02d} "{r["family"]}")')
 (ROOT/'Products.cmake').write_text('\n'.join(cm)+'\n')
-print('Catalogue: 50 products, 48 additional distinct engines.')
+print('Catalogue: 51 products, including the dedicated HAUNT vocal processor.')

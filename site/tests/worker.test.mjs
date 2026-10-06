@@ -1,9 +1,41 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {generateKeyPairSync,verify} from 'node:crypto';import worker,{api,signEntitlement,configuration,checkoutDestination} from '../src/worker.mjs';
 test('purchase gates remain closed without a validated release',async()=>{const response=await api(new Request('https://hungryghostaudio.com/api/checkout',{method:'POST',body:JSON.stringify({product:'suite'})}),{STORE_CONFIG:JSON.stringify({ready:false,suite:{ready:false}})});assert.equal(response.status,409);});
-test('the approved release exposes 51 distinct checkouts with matching licence coverage',async()=>{const config=configuration({}),ids=Object.keys(config.products);assert.equal(config.ready,true);assert.equal(ids.length,50);const entries=[['suite',config.suite],...Object.entries(config.products)];assert.equal(new Set(entries.map(([,p])=>p.productId)).size,51);assert.equal(new Set(entries.map(([,p])=>p.checkout)).size,51);assert.equal(Object.keys(config.benefits).length,51);for(const [id,p] of entries){assert.equal(p.ready,true);const response=await api(new Request('https://hungryghostaudio.com/api/checkout',{method:'POST',body:JSON.stringify({product:id})}),{});assert.equal(response.status,200);assert.equal((await response.json()).url,checkoutDestination(p.checkout));}const coverage=Object.values(config.benefits);assert.deepEqual(coverage.find(x=>x.length===50).slice().sort(),ids.slice().sort());assert.deepEqual(coverage.filter(x=>x.length===1).flat().sort(),ids.slice().sort());assert.equal((await api(new Request('https://hungryghostaudio.com/api/checkout',{method:'POST',body:'{"product":"unknown"}'}),{})).status,409);});
+test('all enabled checkouts have individual coverage and the existing suite covers all 51 products',async()=>{
+ const config=configuration({}),ids=Object.keys(config.products);assert.equal(config.ready,true);assert.equal(ids.length,51);
+ const enabled=Object.entries(config.products).filter(([,p])=>p.ready),entries=[['suite',config.suite],...enabled];
+ assert.equal(new Set(entries.map(([,p])=>p.productId)).size,entries.length);
+ assert.equal(new Set(entries.map(([,p])=>p.checkout)).size,entries.length);
+ for(const [id,p] of entries){
+  assert.ok(p.productId);const response=await api(new Request('https://hungryghostaudio.com/api/checkout',{method:'POST',body:JSON.stringify({product:id})}),{});
+  assert.equal(response.status,200);assert.equal((await response.json()).url,checkoutDestination(p.checkout));
+ }
+ const suiteBenefit=config.benefits['82bdc898-4d7b-4006-9990-91e2bcef628f'];
+ assert.deepEqual(suiteBenefit.slice().sort(),ids.slice().sort());
+ const individualCoverage=Object.values(config.benefits).filter(x=>x.length===1).flat();
+ assert.deepEqual(individualCoverage.slice().sort(),enabled.map(([id])=>id).sort());
+ for(const [id,p] of Object.entries(config.products))if(!p.ready){
+  assert.equal((await api(new Request('https://hungryghostaudio.com/api/checkout',{method:'POST',body:JSON.stringify({product:id})}),{})).status,409);
+ }
+ assert.equal((await api(new Request('https://hungryghostaudio.com/api/checkout',{method:'POST',body:'{"product":"unknown"}'}),{})).status,409);
+});
 test('www requests permanently redirect to the canonical storefront',async()=>{const response=await worker.fetch(new Request('https://www.hungryghostaudio.com/plugins?group=space'),{});assert.equal(response.status,308);assert.equal(response.headers.get('location'),'https://hungryghostaudio.com/plugins?group=space');});
 test('checkout only accepts a configured Polar destination',async()=>{for(const checkout of ['https://evil.test/checkout/hello','http://polar.sh/checkout/a','https://polar.sh/unrelated']){const env={STORE_CONFIG:JSON.stringify({suite:{ready:true,checkout}})};assert.equal((await api(new Request('https://hungryghostaudio.com/api/checkout',{method:'POST',body:'{"product":"suite"}'}),env)).status,503);}const response=await api(new Request('https://hungryghostaudio.com/api/checkout',{method:'POST',body:'{"product":"suite"}'}),{STORE_CONFIG:JSON.stringify({suite:{ready:true,checkout:'https://polar.sh/checkout/test'}})});assert.equal(response.status,200);assert.equal((await response.json()).url,'https://polar.sh/checkout/test');});
 test('cross-origin purchase requests are rejected',async()=>{assert.equal((await api(new Request('https://hungryghostaudio.com/api/checkout',{method:'POST',headers:{Origin:'https://evil.test'},body:'{}'}),{})).status,403);});
+test('analytics accepts only allowlisted anonymous events and campaign fields',async()=>{
+ const points=[],env={ANALYTICS:{writeDataPoint:point=>points.push(point)}};
+ const response=await api(new Request('https://hungryghostaudio.com/api/analytics',{method:'POST',headers:{Origin:'https://hungryghostaudio.com',Referer:'https://hungryghostaudio.com/?utm_source=youtube'},body:JSON.stringify({event:'demo_play',product:'reverb',label:'processed',utm_source:'youtube',utm_medium:'organic_social',utm_campaign:'vst_3_daily_oct_2026',utm_content:'vst-20261001-01'})}),env);
+ assert.equal(response.status,204);assert.equal(points.length,1);
+ assert.deepEqual(points[0].blobs.slice(0,8),['demo_play','/api/analytics','reverb','processed','youtube','organic_social','vst_3_daily_oct_2026','vst-20261001-01']);
+ assert.equal(points[0].blobs[8],'hungryghostaudio.com');assert.deepEqual(points[0].doubles,[1]);assert.deepEqual(points[0].indexes,['demo_play']);
+ assert.equal((await api(new Request('https://hungryghostaudio.com/api/analytics',{method:'POST',body:'{"event":"email"}'}),env)).status,400);
+ assert.equal((await api(new Request('https://hungryghostaudio.com/api/analytics',{method:'POST',headers:{Origin:'https://evil.test'},body:'{"event":"page_view"}'}),env)).status,403);
+});
+test('successful HTML requests create a tagged page view without changing the response',async()=>{
+ const points=[],env={ANALYTICS:{writeDataPoint:point=>points.push(point)},ASSETS:{fetch:async()=>new Response('<h1>Store</h1>',{headers:{'Content-Type':'text/html; charset=utf-8'}})}};
+ const response=await worker.fetch(new Request('https://hungryghostaudio.com/?utm_source=instagram&utm_campaign=launch&utm_content=clip-01'),env);
+ assert.equal(response.status,200);assert.equal(await response.text(),'<h1>Store</h1>');assert.equal(points.length,1);
+ assert.deepEqual(points[0].blobs.slice(0,8),['page_view','/','','','instagram','','launch','clip-01']);
+});
 test('signed entitlements interoperate with standard RSA SHA-256',async()=>{const {privateKey,publicKey}=generateKeyPairSync('rsa',{modulusLength:3072});const payload={v:1,device:'a'.repeat(64),products:['feral'],issued:1,expires:2,activationId:'a',licenceId:'l'};const signed=await signEntitlement(payload,privateKey.export({type:'pkcs8',format:'pem'}));assert.equal(verify('sha256',Buffer.from(signed.payload,'base64url'),publicKey,Buffer.from(signed.signature,'base64url')),true);assert.equal(verify('sha256',Buffer.from(JSON.stringify({...payload,products:['suite']})),publicKey,Buffer.from(signed.signature,'base64url')),false);});
 test('malformed public configuration fails closed',()=>assert.equal(configuration({STORE_CONFIG:'oops'}).ready,false));
 test('real Polar checkout-link URLs are accepted without allowing lookalike domains',()=>{assert.equal(checkoutDestination('https://buy.polar.sh/polar_cl_Ab123'),'https://buy.polar.sh/polar_cl_Ab123');for(const value of ['https://buy.polar.sh.evil.test/polar_cl_Ab123','https://buy.polar.sh/unrelated','http://buy.polar.sh/polar_cl_Ab123','https://user:pass@buy.polar.sh/polar_cl_Ab123'])assert.throws(()=>checkoutDestination(value));});
@@ -43,3 +75,11 @@ test('malformed licence requests do not contact Polar',async()=>{
  }finally{globalThis.fetch=previous;}
 });
 test('Polar outage cannot issue an entitlement',async()=>assert.equal((await provider({error:'NotPermitted'},()=>api(request(),env),403)).status,403));
+
+test('an existing suite benefit grants HAUNT without a new purchase or benefit ID',async()=>{
+ const result=await provider({...activation,license_key:{...licence,benefit_id:'82bdc898-4d7b-4006-9990-91e2bcef628f'}},()=>api(request(),{LICENSE_SIGNING_KEY:env.LICENSE_SIGNING_KEY}));
+ assert.equal(result.status,200);const signed=await result.json();
+ assert.equal(verify('sha256',Buffer.from(signed.payload,'base64url'),signingKeys.publicKey,Buffer.from(signed.signature,'base64url')),true);
+ const payload=JSON.parse(Buffer.from(signed.payload,'base64url'));assert.ok(payload.products.includes('haunt'));assert.equal(payload.products.length,51);
+ assert.equal(payload.activationId,activation.id);
+});
