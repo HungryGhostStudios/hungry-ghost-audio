@@ -12,8 +12,13 @@ const packagePath=resolve(process.argv[2]||''), releaseDirectory=dirname(package
 if(!process.argv[2] || !/^HungryGhostSuite-[A-Za-z0-9._-]+-macOS-Universal\.pkg$/.test(packagePath.split(/[\\/]/).at(-1)))throw Error('Supply the final Mac installer path');
 const manifest=JSON.parse(await readFile(join(releaseDirectory,'macOS-manifest.json'),'utf8'));
 const notarization=JSON.parse(await readFile(join(releaseDirectory,'notarization.json'),'utf8'));
+const catalogue=JSON.parse(await readFile(join(root,'catalogue.json'),'utf8'));
+const expectedBundles=new Set(catalogue.flatMap(p=>['VST3','AU'].map(format=>`${p.id}:${format}`)));
+const actualBundles=new Set((manifest.products||[]).map(p=>`${p.id}:${p.format}`));
 if(manifest.signing!=='Developer ID signed, notarized and stapled' || notarization.status!=='Accepted'
- || manifest.products?.length!==100 || manifest.products.some(p=>p.passed!==true||!p.architectures?.includes('arm64')||!p.architectures?.includes('x86_64')))
+ || manifest.products?.length!==expectedBundles.size || actualBundles.size!==expectedBundles.size
+ || [...expectedBundles].some(key=>!actualBundles.has(key))
+ || manifest.products.some(p=>p.passed!==true||!p.architectures?.includes('arm64')||!p.architectures?.includes('x86_64')))
  throw Error('Signed, notarized universal release evidence is required');
 const hashFile=async(file)=>{const hash=createHash('sha256');for await(const chunk of createReadStream(file))hash.update(chunk);return hash.digest('hex');};
 const sha256=await hashFile(packagePath), bytes=(await stat(packagePath)).size;
